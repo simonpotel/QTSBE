@@ -48,9 +48,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - [Flask](https://flask.palletsprojects.com/) has been used for API Framework
+- NB: The contents of files in indicators are by no means a 100% exact science, and you should always check what you're using.
+Check the code of each indicator to be sure of what you're using. 
 
 ## Contact
 
-For questions or inquiries, feel free to contact me on linkeldin
+For questions or inquiries, feel free to contact me on LinkedIn
 
 </center>
