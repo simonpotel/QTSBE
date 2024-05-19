@@ -2,6 +2,7 @@ import os
 import sys
 import requests
 from bs4 import BeautifulSoup
+from loguru import logger
 
 # import the lib DEXcryptoLib
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
@@ -13,17 +14,18 @@ class algo(object):
                  version="",
                  author="",
                  description="",
-                 db_conntect=True):
+                 db_connect=True):
         self.name = name
         self.version = version 
         self.author = author 
         self.description = description
-        if db_conntect:
+        if db_connect:
             self.db_smartswap_data = init_database(
                 "smartswap_data",
                 os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../configs/db_config.json")
                 )
             self.db_smartswap_data.connect()
+            logger.info("Connected to database")
 
     def get_crypto_logo_from_table_str(self, text):
         tokens = text.split("_")
@@ -45,11 +47,12 @@ class algo(object):
                     logo_link = logo_links[0]['href']
                     if width and height:
                         logo_link += f"?width={width}&height={height}"
+                    logger.info(f"Logo link retrieved for {token_name}: {logo_link}")
                     return logo_link
                 else:
+                    logger.warning(f"No logo found for {token_name}")
                     return None 
             else:
-                print("The request failed.")
+                logger.error("Failed to make the request.")
         except Exception as e:
-            print(f"An error occurred: {str(e)}")
-
+            logger.error(f"An error occurred: {str(e)}")
