@@ -45,16 +45,37 @@ def get_data(pair, strategy):
     result = strategies[strategy].analyse(data, prices) # call the strategy func
 
     response = jsonify(
-        {"pair": pair, 
-         "strategy": strategy, 
-         "data": data,
-         "result": result 
+        {"pair": pair, # string
+         "strategy": strategy, # string
+         "data": data, # tab of tabs of 2 elements
+         "result": result # indicators, trades, position
         })
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-    
+
     logger.info(f"Request pair: {pair} | strategy: {strategy}")
     logger.debug(f"Request response: {response}")
+
+    # structure of a response:
+    # the indicators set is unique to every strategies
+    # (example for spot):
+    #
+    #{
+    #    "data": [],
+    #    "pair": "Binance_THEPAIR",
+    #    "result": [
+    #        {
+    #            "mm_100": [],
+    #            "mm_20": [],
+    #            "rsi": []
+    #        },
+    #        [],
+    #        {}
+    #    ],
+    #    "strategy": "spot"
+    #}
+
+    # see more details about the structure of "result" in strategies/default.py
     return response
 
 if __name__ == '__main__':
