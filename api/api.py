@@ -7,7 +7,9 @@ from loguru import logger
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from DEXcryptoLib.Lib import *
+
 from algo.algo import *
+from algo.data.file import *
 
 debug_mode = True
 
@@ -17,7 +19,7 @@ CORS(app, resources={r"/QTSBE/*": {"origins": "http://127.0.0.1"}})
 def get_data(pair, algo):
     response = jsonify(
         {"pair": pair, 
-         "data": algo}
+         "data": get_file_data(pair)}
         )
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
