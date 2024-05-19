@@ -8,10 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".
 from loguru import logger
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
-
 from DEXcryptoLib.Lib import *
-
-from algo.algo import *
 from algo.data.file import *
 
 debug_mode = True
@@ -43,12 +40,19 @@ CORS(app, resources={r"/QTSBE/*": {"origins": "http://127.0.0.1"}})
 
 @app.route('/QTSBE/<pair>/<strategy>')
 def get_data(pair, strategy):
+    data = get_file_data(pair) # get data (list of lists) with datetime and price (in str)
+    prices = [float(entry[1].replace(',', ''))  for entry in data] # list of all prices in float 
+    result = strategies[strategy].analyse(data, prices) # call the strategy func
+
     response = jsonify(
         {"pair": pair, 
-         "data": get_file_data(pair)}
-        )
+         "strategy": strategy, 
+         "data": data,
+         "result": result 
+        })
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    
     logger.info(f"Request pair: {pair} | strategy: {strategy}")
     logger.debug(f"Request response: {response}")
     return response
@@ -58,6 +62,4 @@ if __name__ == '__main__':
     import_strategies()
     logger.debug("List of all strategies: {}", list(strategies.keys()))
     logger.warning("API has been restarted.")
-    strategies["default"].analyse()
-    strategies["spot"].analyse()
     app.run(debug=debug_mode)

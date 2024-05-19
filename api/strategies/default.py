@@ -1,2 +1,2 @@
-def analyse():
-    print("Default analyse func log")
+def analyse(data, prices):
+    return
