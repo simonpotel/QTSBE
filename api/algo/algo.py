@@ -1,9 +1,7 @@
 import os
 import sys
 import requests
-import requests
 from bs4 import BeautifulSoup
-import numpy as np
 
 # import the lib DEXcryptoLib
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
