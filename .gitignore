@@ -1,2 +1,4 @@
 *.pyc
 /Logs
+api/strategies/*
+!api/strategies/default.py
