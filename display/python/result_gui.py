@@ -83,6 +83,17 @@ def plot_json_data_in_gui(json_data, root, data_combo, strategy_combo):
     labels.append('Price')
     
     for indicator in json_data['result'][0].keys():
+        #At present, all indicators are depicted on a single graph, leading to visibility issues, 
+        #especially with indicators like RSI that typically range between 1 and 100 while most assets like Bitcoin have values in the thousands. 
+        #To address this, I've introduced a temporary solution. 
+
+        #By multiplying the RSI value with the current asset value and adjusting it relative to 50, 
+        #we create a representation that aligns with the price curve. 
+        #If the resulting RSI curve exceeds the price curve, it indicates an RSI above 50, and vice versa. 
+        #This approach ensures that RSI trends are discernible even on graphs with vastly different value scales.
+
+        #This solution will be discontinued with the introduction of a next feature : displaying data on multiple graphs.
+
         if indicator == "rsi":
             values_indicator = [(((float(entry)+50.0)/100)*values[index]) if entry is not None else 0.0 for index, entry in enumerate(json_data['result'][0][indicator])]
         else:
