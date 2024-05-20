@@ -1,4 +1,3 @@
-customtkinter
-matplotlib
-pillow
 loguru
+imgui
+PyOpenGL
