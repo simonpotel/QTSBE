@@ -33,13 +33,19 @@ QTSBE is an open-source project aimed at providing a robust environment for back
 
 ### Usage
 
-1. Run the API:
-
-   ```bash
-   python api.py
-   ```
-
-2. Access the interface through `http://127.0.0.1:5000/QTSBE/pair/strategy` on your browser or integrate it with your application.
+1. Create your strategy based on the default structure (api/strategies/default.py)
+2. To create your strategy, you just need to create the file python and create the func analyse thats return the same things has the others strategies. You can choose whether you want to use an indicator in the code but not pass it on in the json response and therefore not display it.
+3. You got a simple strategy, now you can start the api in api/api.py
+  ![image](https://github.com/simonpotel/QTSBE/assets/155122848/c276e11b-043b-4d45-a58c-a0d776ac9da2)
+4. You can get the response of the API on ur web browser (http://127.0.0.1:5000/QTSBE/<data_set>/<your_strategy_name>
+5. You can also display the response of the API by starting display/python/main_gui.py
+   The display tool will show you this window:
+   
+   ![image](https://github.com/simonpotel/QTSBE/assets/155122848/e8d91944-8b22-4b24-9c46-1b400a6f0ac1)
+   
+   And you will be able to select your strategy, and the data thats you want to apply it
+   
+   ![image](https://github.com/simonpotel/QTSBE/assets/155122848/7dff0f51-fa19-45c7-96dc-3176bc725175)
 
 ## License
 
@@ -49,7 +55,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Flask](https://flask.palletsprojects.com/) has been used for API Framework
 - NB: The contents of files in indicators are by no means a 100% exact science, and you should always check what you're using.
-Check the code of each indicator to be sure of what you're using. 
+Check the code of each indicator to be sure of what you're using.
 
 ## Contact
 
