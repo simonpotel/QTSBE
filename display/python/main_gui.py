@@ -8,11 +8,7 @@ from result_gui import fetch_and_show_data
 def list_files_in_directory(directory):
     """Get files of a directory without their extension"""
     return [os.path.splitext(f)[0] for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
-
-def show_toload(data_combo, strategy_combo, root):
-    print("Selected file:", data_combo.get())
-    print("Selected option:", strategy_combo.get())
-    fetch_and_show_data(data_combo, strategy_combo, root)
+    
 
 ctk.set_appearance_mode("dark")  # "light", "dark", "system"
 ctk.set_default_color_theme("green")  # "blue", "dark-blue", "green"
@@ -40,7 +36,7 @@ strategy_combo = ctk.CTkComboBox(frame, values=list_files_in_directory("api/stra
 strategy_combo.grid(row=1, column=1, pady=(10, 0), padx=10, sticky="ew")
 
 # button that make a request in result_gui.py to the API and print the data
-load_button = ctk.CTkButton(frame, text="Load", command=lambda: show_toload(data_combo, strategy_combo, root))
+load_button = ctk.CTkButton(frame, text="Load", command=lambda: fetch_and_show_data(data_combo, strategy_combo, root))
 load_button.grid(row=2, column=0, columnspan=2, pady=(20, 10))
 
 frame.columnconfigure(0, weight=1)
