@@ -8,6 +8,14 @@ import tkinter as tk
 import matplotlib.backends.backend_tkagg as tkagg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 
+chart_colors = {
+    "price": "#6c7386", #gunmetal
+    "mm_100": "#B8336A", #raspberry rose
+    "mm_40": "#FF9B42", #sandy brown
+    "mm_20": "#00A7E1", #picton blue
+    "rsi": "#9AB87A", #olivine
+}
+
 def fetch_and_show_data(data_combo, strategy_combo, root):
     data_file = data_combo.get()
     strategy = strategy_combo.get()
@@ -39,9 +47,8 @@ def fetch_and_show_data(data_combo, strategy_combo, root):
         save_button.pack(pady=10)
         
         # plot graph
-        if 'data' in json_data:
-            plot_json_data_in_gui(json_data['data'], graph_frame, data_combo, strategy_combo)
-            tk.mainloop()
+        plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo)
+        tk.mainloop()
 
     except requests.RequestException as e:
         print("Request failed:", e)
@@ -58,15 +65,32 @@ def save_to_file(content):
     except Exception as e:
         print("Failed to save content:", e)
 
-def plot_json_data_in_gui(data, root, data_combo, strategy_combo):
+def plot_json_data_in_gui(json_data, root, data_combo, strategy_combo):
     # extracting dates and values from the JSON data
+    data = json_data['data']
     dates = [datetime.strptime(entry[0], "%Y-%m-%d") for entry in data]
     values = [float(entry[1]) for entry in data]
 
     # plotting the data
     fig = plt.Figure(figsize=(8, 6), facecolor='#2b2b2b')  # set background color for the whole figure
     ax = fig.add_subplot(111, facecolor='#2b2b2b')  # set background color for the subplot
-    ax.plot(dates, values, color='#106a43', linestyle='-', linewidth=2)  # set line color to green
+    
+    lines = []  
+    labels = [] 
+    
+    line, = ax.plot(dates, values, color=chart_colors["price"], linestyle='-', linewidth=2, label='Price')  # set line color to green
+    lines.append(line)
+    labels.append('Price')
+    
+    for indicator in json_data['result'][0].keys():
+        if indicator == "rsi":
+            values_indicator = [(((float(entry)+50.0)/100)*values[index]) if entry is not None else 0.0 for index, entry in enumerate(json_data['result'][0][indicator])]
+        else:
+            values_indicator = [float(entry) if entry is not None else 0.0 for entry in json_data['result'][0][indicator]]
+        line, = ax.plot(dates, values_indicator, color=chart_colors[indicator], linestyle='-', linewidth=2, label=indicator.upper())  # blue
+        lines.append(line)
+        labels.append(indicator.upper())
+    
     ax.set_xlabel('Date', color='white') 
     ax.set_ylabel('Value', color='white')
     ax.tick_params(axis='y', colors='white')  
@@ -77,6 +101,17 @@ def plot_json_data_in_gui(data, root, data_combo, strategy_combo):
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     ax.tick_params(axis='x', rotation=45, colors='white')  
+
+    legend = ax.legend(lines, labels, loc='upper left', bbox_to_anchor=(1, 1))  
+    legend.set_visible(True)  
+
+    def toggle_visibility(event):
+        for line in lines:
+            line.set_visible(not line.get_visible())
+        plt.draw()
+    
+    legend.set_picker(True)  # enable picking on the legend
+    fig.canvas.mpl_connect('pick_event', toggle_visibility)  # connect pick_event->toggle_visibility function
 
     fig.tight_layout()
 
