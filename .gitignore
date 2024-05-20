@@ -2,3 +2,4 @@
 /Logs
 api/strategies/*
 !api/strategies/default.py
+result.json
