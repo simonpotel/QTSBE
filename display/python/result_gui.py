@@ -7,6 +7,7 @@ import matplotlib.dates as mdates
 import tkinter as tk
 import matplotlib.backends.backend_tkagg as tkagg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
+import os
 
 chart_colors = {
     "price": "#6c7386", #gunmetal
@@ -56,6 +57,7 @@ def fetch_and_show_data(data_combo, strategy_combo, root):
 
 def save_to_file(content):
     try:
+        os.makedirs('display/python/saved_results/', exist_ok=True)
         content_dict = json.loads(content) 
         filename = f"display/python/saved_results/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}_{content_dict['pair']}_{content_dict['strategy']}.json"
         
