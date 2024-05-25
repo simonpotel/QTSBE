@@ -4,3 +4,4 @@ api/strategies/*
 !api/strategies/default.py
 result.json
 data/bank/*
+!data/bank/Binance_BTCUSDT_1d.csv
