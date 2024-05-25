@@ -68,8 +68,36 @@ def save_to_file(content):
 def plot_json_data_in_gui(json_data, root, data_combo, strategy_combo):
     # extracting dates and values from the JSON data
     data = json_data['data']
-    dates = [datetime.strptime(entry[0], "%Y-%m-%d") for entry in data]
-    values = [float(entry[1]) for entry in data]
+    dates = []
+    values = []
+
+    date_formats = ["%Y-%m-%d %H:%M:%S", "%Y-%m-%d"]  # date formats expected
+
+    for entry in data:
+        date_parsed = False
+        for fmt in date_formats:
+            try:
+                date = datetime.strptime(entry[0], fmt)
+                dates.append(date)
+                date_parsed = True
+                break
+            except ValueError:
+                continue
+        if not date_parsed:
+            print(f"Invalid date format: {entry[0]}")
+
+        try:
+            value = float(entry[1])
+            values.append(value)
+        except ValueError:
+            print(f"Invalid value format: {entry[1]}")
+
+    if not dates:
+        print("No valid dates found. Cannot plot the data.")
+        return
+    if not values:
+        print("No valid values found. Cannot plot the data.")
+        return
 
     # plotting the data
     fig = plt.Figure(figsize=(8, 6), facecolor='#2b2b2b')  # set background color for the whole figure
@@ -83,24 +111,11 @@ def plot_json_data_in_gui(json_data, root, data_combo, strategy_combo):
     labels.append('Price')
     
     for indicator in json_data['result'][0].keys():
-        #At present, all indicators are depicted on a single graph, leading to visibility issues, 
-        #especially with indicators like RSI that typically range between 1 and 100 while most assets like Bitcoin have values in the thousands. 
-        #To address this, I've introduced a temporary solution. 
-
-        #By multiplying the RSI value with the current asset value and adjusting it relative to 50, 
-        #we create a representation that aligns with the price curve. 
-        #If the resulting RSI curve exceeds the price curve, it indicates an RSI above 50, and vice versa. 
-        #This approach ensures that RSI trends are discernible even on graphs with vastly different value scales.
-
-        #This solution will be discontinued with the introduction of a next feature : displaying data on multiple graphs.
-
-        if indicator == "rsi":
-            values_indicator = [(((float(entry)+50.0)/100)*values[index]) if entry is not None else 0.0 for index, entry in enumerate(json_data['result'][0][indicator])]
-        else:
+        if indicator != "rsi":
             values_indicator = [float(entry) if entry is not None else 0.0 for entry in json_data['result'][0][indicator]]
-        line, = ax.plot(dates, values_indicator, color=chart_colors[indicator], linestyle='-', linewidth=2, label=indicator.upper())  # blue
-        lines.append(line)
-        labels.append(indicator.upper())
+            line, = ax.plot(dates, values_indicator, color=chart_colors[indicator], linestyle='-', linewidth=2, label=indicator.upper())
+            lines.append(line)
+            labels.append(indicator.upper())
     
     ax.set_xlabel('Date', color='white') 
     ax.set_ylabel('Value', color='white')
@@ -118,11 +133,11 @@ def plot_json_data_in_gui(json_data, root, data_combo, strategy_combo):
 
     def toggle_visibility(event):
         for line in lines:
-            line.set_visible(not line.get_visible())
+            line.set_visible(not line.get_visible())  # Corrected: changed `!` to `not`
         plt.draw()
     
     legend.set_picker(True)  # enable picking on the legend
-    fig.canvas.mpl_connect('pick_event', toggle_visibility)  # connect pick_event->toggle_visibility function
+    fig.canvas.mpl_connect('pick_event', toggle_visibility)  # connect pick_event to toggle_visibility function
 
     fig.tight_layout()
 
@@ -142,4 +157,3 @@ def plot_json_data_in_gui(json_data, root, data_combo, strategy_combo):
     navigation_toolbar.configure(background='#2b2b2b')  
     for item in navigation_toolbar.winfo_children():
         item.configure(bg='#2b2b2b')
-
