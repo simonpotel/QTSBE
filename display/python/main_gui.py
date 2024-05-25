@@ -14,7 +14,7 @@ def list_files_in_directory(directory):
     
 
 ctk.set_appearance_mode("dark")  # "light", "dark", "system"
-ctk.set_default_color_theme("green")  # "blue", "dark-blue", "green"
+ctk.set_default_color_theme("dark-blue")  # "blue", "dark-blue", "green"
 
 # create the main window QTSBE
 root = ctk.CTk()

@@ -14,6 +14,7 @@ chart_colors = {
     "mm_100": "#B8336A", #raspberry rose
     "mm_40": "#FF9B42", #sandy brown
     "mm_20": "#00A7E1", #picton blue
+    "test": "#C73E1D", #sinopia
     "rsi": "#9AB87A", #olivine
 }
 
