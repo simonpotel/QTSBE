@@ -51,6 +51,15 @@ class BinanceAPI:
             print(f"{symbol}: {volume}")
 
         return [symbol for symbol, volume in top_50_volumes]
+    
+    def fetch_top_50_tokens_daily_ohlcv(self):
+        """
+        Function to fetch and save daily OHLCV data for the top 50 tokens by trading volume.
+        """
+        top_50_tokens = self.get_top_50_tokens_by_volume()
+        for symbol in top_50_tokens:
+            print(f"Fetching data for {symbol}")
+            self.fetch_and_save_ohlcv(symbol, '1d')
 
 
 if __name__ == "__main__":
