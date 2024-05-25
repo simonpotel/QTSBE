@@ -12,7 +12,7 @@ from DEXcryptoLib.Lib import *
 from algo.data.file import *
 
 debug_mode = True
-strategies_folder = r"api\strategies" # path to the folder containing strategy files
+strategies_folder = r"api/strategies" # path to the folder containing strategy files
 strategies = {} # dictionary to store strategy functions
 
 def reload_loguru_config():
