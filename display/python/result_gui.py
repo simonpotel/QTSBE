@@ -133,14 +133,6 @@ def plot_json_data_in_gui(json_data, root, data_combo, strategy_combo):
     legend = ax.legend(lines, labels, loc='upper left', bbox_to_anchor=(1, 1))  
     legend.set_visible(True)  
 
-    def toggle_visibility(event):
-        for line in lines:
-            line.set_visible(not line.get_visible())  # Corrected: changed `!` to `not`
-        plt.draw()
-    
-    legend.set_picker(True)  # enable picking on the legend
-    fig.canvas.mpl_connect('pick_event', toggle_visibility)  # connect pick_event to toggle_visibility function
-
     fig.tight_layout()
 
     # embed the plot into a Tkinter window
