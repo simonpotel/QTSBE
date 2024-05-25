@@ -2,6 +2,7 @@ import ccxt
 import pandas as pd
 import os
 from datetime import datetime
+import argparse
 
 def fetch_and_save_ohlcv(symbol, timeframe):
     """
@@ -32,4 +33,10 @@ def fetch_and_save_ohlcv(symbol, timeframe):
     df.to_csv(filepath, index=False)
     print(f"All Data has been saved in: {filepath}")
 
-fetch_and_save_ohlcv('TRX/USDT', '1d')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Fetch and save OHLCV data from Binance.')
+    parser.add_argument('-symbol', type=str, default='BTC/USDT', help='The trading pair symbol, e.g., "BTC/USDT".')
+    parser.add_argument('-timeframe', type=str, default='1d', help='The timeframe for the OHLCV data, e.g., "1d".')
+    args = parser.parse_args()
+
+    fetch_and_save_ohlcv(args.symbol, args.timeframe)
