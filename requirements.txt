@@ -1,3 +1,5 @@
 customtkinter
 matplotlib
 loguru
+ccxt
+tables

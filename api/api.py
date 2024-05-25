@@ -12,16 +12,16 @@ from DEXcryptoLib.Lib import *
 from algo.data.file import *
 
 debug_mode = True
-strategies_folder = r"api\strategies" # path to the folder containing strategy files
+strategies_folder = r"api/strategies" # path to the folder containing strategy files
 strategies = {} # dictionary to store strategy functions
 
 def reload_loguru_config():
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")  
     if debug_mode:
-        logger.add(r"logs\debug.log", level="DEBUG")
+        logger.add(r"logs/debug.log", level="DEBUG")
     else:
-        logger.add(r"logs\logs.log", level="INFO")
+        logger.add(r"logs/logs.log", level="INFO")
 reload_loguru_config()
 
 def import_strategies():
