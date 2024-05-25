@@ -3,3 +3,4 @@
 api/strategies/*
 !api/strategies/default.py
 result.json
+data/bank/*
