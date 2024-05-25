@@ -1,8 +1,7 @@
 
 # QTSBE - Quantitative Trading Strategy Backtesting Environment
 <center>
-<img src="https://github.com/simonpotel/QTSBE/blob/fc7ea8ee1a2a42df1053bb05d77e8a288abc1411/files/logo.jpg" width="300" height="300">
-
+<img src="https://github.com/simonpotel/QTSBE/blob/1066ab0d2f039f108cf164dd5cbeb2201705880e/files/logo_nobc.png" width="400" height="400">
 QTSBE is an open-source project aimed at providing a robust environment for backtesting quantitative trading strategies. It includes an API developed in Python using Flask and an interface built with Python.
 
   <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"> 
