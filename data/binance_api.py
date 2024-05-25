@@ -50,6 +50,9 @@ class BinanceAPI:
         for symbol, volume in top_50_volumes:
             print(f"{symbol}: {volume}")
 
+        return [symbol for symbol, volume in top_50_volumes]
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Fetch and save OHLCV data from Binance.')
     parser.add_argument('-symbol', type=str, default='BTC/USDT', help='The trading pair symbol, e.g., "BTC/USDT".')
