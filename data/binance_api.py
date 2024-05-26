@@ -1,7 +1,7 @@
 import ccxt
 import pandas as pd
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import argparse
 
 class BinanceAPI:
@@ -75,6 +75,40 @@ class BinanceAPI:
             print(pair)
 
         return recent_try_pairs
+
+    def get_least_volatile_tokens(self, days):
+        """
+        Function to get the 50 tokens with the least price variation over the past X days.
+        """
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(days=days)
+        start_timestamp = int(start_time.timestamp() * 1000)
+        
+        tickers = self.exchange.fetch_tickers()
+        
+        variations = []
+        
+        for symbol in tickers:
+            print(f"Collected symbols: {len(variations)}/50 ({symbol})")
+            ohlcv = self.exchange.fetch_ohlcv(symbol, '1d', since=start_timestamp)
+            if ohlcv:
+                df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+                df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+                df.set_index('timestamp', inplace=True)
+                
+                if not df.empty:
+                    price_change = (df['close'].iloc[-1] - df['close'].iloc[0]) / df['close'].iloc[0]
+                    variations.append((symbol, price_change))
+            
+            if len(variations) >= 50:
+                break
+        
+        least_volatile_tokens = sorted(variations, key=lambda x: abs(x[1]))[:50]
+        
+        for symbol, variation in least_volatile_tokens:
+            print(f"{symbol}: {variation}")
+
+        return [symbol for symbol, variation in least_volatile_tokens]
 
 
 if __name__ == "__main__":
