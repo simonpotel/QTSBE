@@ -52,14 +52,29 @@ class BinanceAPI:
 
         return [symbol for symbol, volume in top_50_volumes]
     
-    def fetch_top_50_tokens_daily_ohlcv(self):
+    def fetch_tokens_daily_ohlcv(self, tokens_list):
         """
         Function to fetch and save daily OHLCV data for the top 50 tokens by trading volume.
         """
-        top_50_tokens = self.get_top_50_tokens_by_volume()
-        for symbol in top_50_tokens:
+        for symbol in tokens_list:
             print(f"Fetching data for {symbol}")
             self.fetch_and_save_ohlcv(symbol, '1d')
+
+    def get_recent_try_pairs(self):
+        """
+        Function to get the 100 most recent trading pairs that trade with TRY.
+        """
+        markets = self.exchange.load_markets()  # Load all markets
+        try_pairs = [symbol for symbol in markets if 'TRY' in symbol.split('/')]
+
+        # Since we don't have the exact creation date, we'll assume the order in the list is by recency
+        recent_try_pairs = try_pairs[-100:]  # Get the last 100 pairs
+
+        print("Recent 100 TRY trading pairs:")
+        for pair in recent_try_pairs:
+            print(pair)
+
+        return recent_try_pairs
 
 
 if __name__ == "__main__":
