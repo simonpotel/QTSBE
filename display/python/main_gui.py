@@ -39,7 +39,7 @@ strategy_combo = ctk.CTkComboBox(frame, values=list_files_in_directory("api/stra
 strategy_combo.grid(row=1, column=1, pady=(10, 0), padx=10, sticky="ew")
 
 # button that make a request in result_gui.py to the API and print the data
-load_button = ctk.CTkButton(frame, text="Load", command=lambda: fetch_and_show_data(data_combo, strategy_combo, root))
+load_button = ctk.CTkButton(frame, text="Load", command=lambda: fetch_and_show_data(data_combo, strategy_combo))
 load_button.grid(row=2, column=0, columnspan=2, pady=(20, 10))
 
 frame.columnconfigure(0, weight=1)
