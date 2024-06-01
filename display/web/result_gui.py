@@ -81,13 +81,15 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
     """Plot JSON data in the GUI with candlestick chart and RSI chart if available."""
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
     indicators = extract_indicators(json_data)
+    to_plot = 1
+    if 'rsi' in indicators: to_plot += 1
 
     if not dates or not opens or not highs or not lows or not closes:
         print("Error: OHLC data is missing or empty")
         return
 
     # subplot grid
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.05)
+    fig = make_subplots(rows=to_plot, cols=1, shared_xaxes=True, vertical_spacing=0.05)
 
     # candlestick chart to the first subplot
     fig.add_trace(go.Candlestick(x=dates, open=opens, high=highs, low=lows, close=closes), row=1, col=1)
@@ -97,6 +99,13 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
                       xaxis_title='Date',
                       yaxis_title='Price',
                       xaxis_rangeslider_visible=False)
+
+    for indicator in indicators:
+        if indicator == 'rsi':
+            fig.add_trace(go.Scatter(x=dates, y=indicators['rsi'], mode='lines', name='RSI', line=dict(color=chart_colors['rsi'])), row=2, col=1)
+        else:
+            fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=1, col=1)
+
 
     # plot
     plot_filename = 'temp_plot.html'
