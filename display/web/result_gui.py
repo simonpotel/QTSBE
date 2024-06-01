@@ -98,14 +98,18 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
     fig.update_layout(title=f"{data_combo.get()} ({strategy_combo.get()})",
                       xaxis_title='Date',
                       yaxis_title='Price',
-                      xaxis_rangeslider_visible=False)
+                      xaxis_rangeslider_visible=False,
+                      plot_bgcolor='#161a25',  # Set background color
+                      paper_bgcolor='#161a25',  # Set paper color
+                      font=dict(color='white'),  # Set font color to white
+                      yaxis=dict(gridcolor='#232632'),  # Set grid color
+                      xaxis=dict(gridcolor='#232632'))  # Set grid color
 
     for indicator in indicators:
         if indicator == 'rsi':
             fig.add_trace(go.Scatter(x=dates, y=indicators['rsi'], mode='lines', name='RSI', line=dict(color=chart_colors['rsi'])), row=2, col=1)
         else:
             fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=1, col=1)
-
 
     # plot
     os.makedirs('display/web/saved_results/', exist_ok=True)
