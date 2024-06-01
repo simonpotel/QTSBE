@@ -77,21 +77,43 @@ def generate_filename(content):
     """generate a filename based on the current timestamp, pair, and strategy."""
     return f"display/python/saved_results/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}_{content['pair']}_{content['strategy']}.json"
 
+def extract_trade_data(trades):
+    """Extract trade indices and ratios from the trade data."""
+    trade_indices = list(range(1, len(trades) + 1))
+    trade_ratios = [trade['ratio'] for trade in trades if 'ratio' in trade]
+    return trade_indices, trade_ratios
+
 def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
-    """Plot JSON data in the GUI with candlestick chart and RSI chart if available."""
+    """Plot JSON data in the GUI with candlestick chart, RSI chart (if available), and trade ratios."""
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
     indicators = extract_indicators(json_data)
-    to_plot = 1
-    if 'RSI' in indicators: to_plot += 1
+    trade_indices, trade_ratios = extract_trade_data(json_data['result'][1])
+    rows = 1
+    cols = 1
+    
+    if 'RSI' in indicators:
+        price_row_height = 0.7
+        rsi_row_height = 0.3
+        rows += 1
+    else:
+        price_row_height = 1.0
+        rsi_row_height = 0.0
 
-    if not dates or not opens or not highs or not lows or not closes:
-        print("Error: OHLC data is missing or empty")
-        return
+    row_heights=[price_row_height]
+    if 'RSI' in indicators:
+        row_heights.append(rsi_row_height)
 
-    # subplot grid
-    fig = make_subplots(rows=to_plot, cols=1, shared_xaxes=True, vertical_spacing=0.05)
 
-    # candlestick chart to the first subplot
+    if len(trade_ratios) > 0: cols += 1
+
+    column_widths = [0.7] * cols  
+    if cols > 1:
+        column_widths[0] = 0.7  
+
+    fig = make_subplots(rows=rows, cols=cols, shared_xaxes=True, vertical_spacing=0.25,
+                        row_heights=row_heights,
+                        column_widths=column_widths) 
+
     fig.add_trace(go.Candlestick(x=dates, open=opens, high=highs, low=lows, close=closes), row=1, col=1)
 
     for indicator in indicators:
@@ -99,23 +121,34 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
         if indicator == 'RSI': row += 1
         fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=row, col=1)
 
-    # Set layout properties
-    fig.update_layout(title=f"{data_combo.get()} ({strategy_combo.get()})",
-                      xaxis_title='Date',
-                      yaxis_title='Price',
-                      xaxis_rangeslider_visible=False,
-                      plot_bgcolor='#161a25',  # Set background color
-                      paper_bgcolor='#161a25',  # Set paper color
-                      font=dict(color='white'),  # Set font color to white
-                      yaxis=dict(gridcolor='#232632'),  # Set grid color
-                      xaxis=dict(gridcolor='#232632'))  # Set grid color
+    if len(trade_ratios) > 0:
+        fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color=chart_colors['Test'])), row=1, col=2)
+        cumulative_ratios = [trade_ratios[0]]
+        for i in range(1, len(trade_ratios)):
+            cumulative_ratio = cumulative_ratios[i - 1] * trade_ratios[i]
+            cumulative_ratios.append(cumulative_ratio)
+        fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=1, col=2)
 
-    # Write plot to HTML file and open in browser
+    # layout
+    fig.update_layout(title=f"{data_combo.get()} ({strategy_combo.get()})",
+                    xaxis_title='Date',
+                    yaxis_title='Price',
+                    xaxis_rangeslider_visible=False,
+                    plot_bgcolor='#161a25',
+                    paper_bgcolor='#161a25',
+                    font=dict(color='white'),
+                    yaxis=dict(gridcolor='#6c7386'),
+                    xaxis=dict(gridcolor='#6c7386'),
+                    yaxis2=dict(gridcolor='#6c7386'), 
+                    xaxis2=dict(gridcolor='#6c7386')) 
+
+    if 'RSI' in indicators:
+        fig.update_yaxes(range=[0, 100], row=2, col=1)
+
     os.makedirs('display/web/saved_results/', exist_ok=True)
     plot_filename = 'display/web/saved_results/plot.html'
     fig.write_html(plot_filename)
     webbrowser.open(os.path.join(os.getcwd(), 'display', 'web', 'saved_results', 'plot.html'))
-
 
 def extract_ohlc_data(data):
     """Extract OHLC data from the JSON data."""
