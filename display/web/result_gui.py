@@ -8,12 +8,12 @@ import os
 from plotly.subplots import make_subplots
 
 chart_colors = {
-    "price": "#6c7386", #gunmetal
-    "mm_100": "#B8336A", #raspberry rose
-    "mm_40": "#FF9B42", #sandy brown
-    "mm_20": "#00A7E1", #picton blue
-    "test": "#C73E1D", #sinopia
-    "rsi": "#9AB87A", #olivine
+    "Price": "#6c7386", #gunmetal
+    "MA_100": "#B8336A", #raspberry rose
+    "MA_40": "#FF9B42", #sandy brown
+    "MA_20": "#00A7E1", #picton blue
+    "Test": "#C73E1D", #sinopia
+    "RSI": "#9AB87A", #olivine
 }
 
 def fetch_and_show_data(data_combo, strategy_combo):
@@ -82,7 +82,7 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
     indicators = extract_indicators(json_data)
     to_plot = 1
-    if 'rsi' in indicators: to_plot += 1
+    if 'RSI' in indicators: to_plot += 1
 
     if not dates or not opens or not highs or not lows or not closes:
         print("Error: OHLC data is missing or empty")
@@ -94,7 +94,12 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
     # candlestick chart to the first subplot
     fig.add_trace(go.Candlestick(x=dates, open=opens, high=highs, low=lows, close=closes), row=1, col=1)
 
-    # layout
+    for indicator in indicators:
+        row = 1
+        if indicator == 'RSI': row += 1
+        fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=row, col=1)
+
+    # Set layout properties
     fig.update_layout(title=f"{data_combo.get()} ({strategy_combo.get()})",
                       xaxis_title='Date',
                       yaxis_title='Price',
@@ -105,17 +110,12 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
                       yaxis=dict(gridcolor='#232632'),  # Set grid color
                       xaxis=dict(gridcolor='#232632'))  # Set grid color
 
-    for indicator in indicators:
-        if indicator == 'rsi':
-            fig.add_trace(go.Scatter(x=dates, y=indicators['rsi'], mode='lines', name='RSI', line=dict(color=chart_colors['rsi'])), row=2, col=1)
-        else:
-            fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=1, col=1)
-
-    # plot
+    # Write plot to HTML file and open in browser
     os.makedirs('display/web/saved_results/', exist_ok=True)
     plot_filename = 'display/web/saved_results/plot.html'
     fig.write_html(plot_filename)
     webbrowser.open(os.path.join(os.getcwd(), 'display', 'web', 'saved_results', 'plot.html'))
+
 
 def extract_ohlc_data(data):
     """Extract OHLC data from the JSON data."""

@@ -3,7 +3,7 @@ import numpy as np
 # Good article to understand the cross between 2 Moving Averrage windows (example 40 and 100)
 # https://www.investopedia.com/terms/m/movingaverage.asp
 
-def get_MM(price_tab, window):
+def get_MA(price_tab, window):
     """
     Calculate the moving average for a given price series.
 
