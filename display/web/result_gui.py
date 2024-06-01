@@ -103,7 +103,6 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
     if 'RSI' in indicators:
         row_heights.append(rsi_row_height)
 
-
     if len(trade_ratios) > 0: cols += 1
 
     column_widths = [0.7] * cols  
@@ -144,6 +143,9 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
 
     if 'RSI' in indicators:
         fig.update_yaxes(range=[0, 100], row=2, col=1)
+        fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
+
+
 
     os.makedirs('display/web/saved_results/', exist_ok=True)
     plot_filename = 'display/web/saved_results/plot.html'
