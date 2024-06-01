@@ -1,11 +1,14 @@
+from stats.trades import Positions
 from api import logger
 
 def analyse(data, prices):
     logger.debug("No analyse (DEFAULT)")
-    indicators = {} 
-    trades = []
-    position = {}
-    return indicators, trades, position
+    positions = Positions() # You must create an object of the class positions
+    positions.indicators = {
+        # This is an example of indicator, but you can use the fonctions in algo/indicators/
+        'test': [price*2 for price in prices] 
+    }
+    return positions
 
 # structure of indicators:
 # {
