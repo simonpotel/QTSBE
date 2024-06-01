@@ -172,7 +172,7 @@ def plot_trade_ratios(ax, trade_indices, trade_ratios):
             cumulative_ratios.append(cumulative_ratio)
         ax.plot(trade_indices, cumulative_ratios, color='#F26419', linestyle='-', linewidth=2, label='Cumulative Ratios')
         ax.legend(loc='upper left', bbox_to_anchor=(1, 0.9)).set_visible(True)
-        print("Final Cumulative Ratio:", cumulative_ratios[-1])
+        #print("Final Cumulative Ratio:", cumulative_ratios[-1])
 
         # adjust y-axis limits for better readability
         max_ratio = max(max(trade_ratios), max(cumulative_ratios))
