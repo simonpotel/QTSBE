@@ -1,5 +1,4 @@
-from algo.indicators.mm import get_MM
-from algo.indicators.rsi import get_rsi
+from algo.indicators.rsi import get_RSI
 from stats.trades import Positions
 #from api import logger
 
@@ -16,10 +15,10 @@ def analyse(data, prices):
     positions = Positions()  
 
     # indicators used in this strategy example
-    rsi = get_rsi(prices, 14)
+    rsi = get_RSI(prices, 14)
 
     positions.indicators = {  # must convert all to a list because its using np (Object of type ndarray is not JSON serializable)
-        "rsi": list(rsi)
+        "RSI": list(rsi)
     }
 
     for i in range(len(prices) - 1):  # iterate through each price entry
@@ -32,7 +31,7 @@ def analyse(data, prices):
                     buy_price=prices[i],
                     buy_date=data[i][0],
                     buy_signals={
-                        "rsi": rsi[i]
+                        "RSI": rsi[i]
                     }
                 )
         else:
@@ -42,7 +41,7 @@ def analyse(data, prices):
                     sell_price=prices[i],
                     sell_date=data[i][0],
                     sell_signals={
-                        "rsi": rsi[i]
+                        "RSI": rsi[i]
                     }
                 )
 
