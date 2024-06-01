@@ -8,12 +8,16 @@ import os
 from plotly.subplots import make_subplots
 
 chart_colors = {
-    "Price": "#6c7386", #gunmetal
-    "MA_100": "#B8336A", #raspberry rose
-    "MA_40": "#FF9B42", #sandy brown
-    "MA_20": "#00A7E1", #picton blue
-    "Test": "#C73E1D", #sinopia
-    "RSI": "#9AB87A", #olivine
+    "Price": "#6c7386", #gunmetal (grey)
+    "MA_100": "#B8336A", #raspberry rose (pink)
+    "MA_40": "#FF9B42", #sandy brown (yellow)
+    "MA_20": "#00A7E1", #picton blue (blue)
+    "Test": "#C73E1D", #sinopia (red)
+    "RSI": "#9AB87A", #olivine (green)
+    "EMA": "#F0A7A0", #melon (~red light)
+    "EMA_MACD": "#F0A7A0", #melon (~red light)
+    "MACD": "#5E4AE3", #majorelle blue (blue/purple)
+    "Normalize_MACD": "#947BD3" #tropical indigo
 }
 
 def fetch_and_show_data(data_combo, strategy_combo):
@@ -65,7 +69,7 @@ def add_save_button(text_frame, json_data):
 def save_to_file(content):
     """save JSON content to a file."""
     try:
-        os.makedirs('display/python/saved_results/', exist_ok=True)
+        os.makedirs('display/web/saved_results/', exist_ok=True)
         filename = generate_filename(content)
         with open(filename, "w") as file:
             file.write(json.dumps(content, indent=4))
@@ -75,7 +79,7 @@ def save_to_file(content):
 
 def generate_filename(content):
     """generate a filename based on the current timestamp, pair, and strategy."""
-    return f"display/python/saved_results/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}_{content['pair']}_{content['strategy']}.json"
+    return f"display/web/saved_results/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}_{content['pair']}_{content['strategy']}.json"
 
 def extract_trade_data(trades):
     """Extract trade indices and ratios from the trade data."""
@@ -91,7 +95,7 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
     rows = 1
     cols = 1
     
-    if 'RSI' in indicators:
+    if 'RSI' or 'Normalize_MACD' in indicators:
         price_row_height = 0.7
         rsi_row_height = 0.3
         rows += 1
@@ -100,7 +104,7 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
         rsi_row_height = 0.0
 
     row_heights=[price_row_height]
-    if 'RSI' in indicators:
+    if 'RSI' or 'Normalize_MACD' in indicators:
         row_heights.append(rsi_row_height)
 
     if len(trade_ratios) > 0: cols += 1
@@ -117,7 +121,7 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
 
     for indicator in indicators:
         row = 1
-        if indicator == 'RSI': row += 1
+        if indicator == 'RSI' or indicator == 'Normalize_MACD': row += 1
         fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=row, col=1)
 
     if len(trade_ratios) > 0:
@@ -141,11 +145,9 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
                     yaxis2=dict(gridcolor='#6c7386'), 
                     xaxis2=dict(gridcolor='#6c7386')) 
 
-    if 'RSI' in indicators:
+    if 'RSI' or 'Normalize_MACD' in indicators:
         fig.update_yaxes(range=[0, 100], row=2, col=1)
         fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
-
-
 
     os.makedirs('display/web/saved_results/', exist_ok=True)
     plot_filename = 'display/web/saved_results/plot.html'
