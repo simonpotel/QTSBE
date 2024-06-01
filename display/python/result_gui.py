@@ -2,20 +2,25 @@ import requests
 import customtkinter as ctk
 import json
 from datetime import datetime
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import tkinter as tk
-import matplotlib.backends.backend_tkagg as tkagg
-from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
+import plotly.graph_objs as go
+import webbrowser
 import os
+from plotly.subplots import make_subplots
 
 chart_colors = {
-    "Price": "#6c7386", #gunmetal
-    "MA_100": "#B8336A", #raspberry rose
-    "MA_40": "#FF9B42", #sandy brown
-    "MA_20": "#00A7E1", #picton blue
-    "Test": "#C73E1D", #sinopia
-    "RSI": "#9AB87A", #olivine
+    "Price": "#6c7386", #gunmetal (grey)
+    "MA_100": "#B8336A", #raspberry rose (pink)
+    "MA_40": "#FF9B42", #sandy brown (orange)
+    "MA_20": "#F4D35E", #naples yellow (yellow)
+    "Test": "#C73E1D", #sinopia (red)
+    "RSI": "#9AB87A", #olivine (green)
+    "EMA": "#F0A7A0", #melon (~red light)
+    "EMA_MACD": "#F0A7A0", #melon (~red light)
+    "MACD": "#5E4AE3", #majorelle blue (blue/purple)
+    "Normalize_MACD": "#947BD3", #tropical indigo,
+    "Bollinger_Lower": "#A682FF", #forest green
+    "Bollinger_Rolling": "#A682FF",#forest green
+    "Bollinger_Upper": "#A682FF", #forest green
 }
 
 def fetch_and_show_data(data_combo, strategy_combo):
@@ -79,117 +84,87 @@ def generate_filename(content):
     """generate a filename based on the current timestamp, pair, and strategy."""
     return f"display/python/saved_results/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}_{content['pair']}_{content['strategy']}.json"
 
-def plot_json_data_in_gui(json_data, root, data_combo, strategy_combo):
-    """Plot JSON data in the GUI with two subplots."""
-    dates, values = extract_dates_and_values(json_data['data'])
-    trade_indices, trade_ratios = extract_trade_data(json_data['result'][1])
-
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(20, 10), facecolor='#2b2b2b')
-
-    plot_price_and_indicators(ax1, dates, values, json_data['result'][0], data_combo, strategy_combo)
-    plot_trade_ratios(ax2, trade_indices, trade_ratios)
-
-    fig.tight_layout()
-
-    embed_plot_in_gui(fig, root)
-
-def extract_dates_and_values(data):
-    """Extract dates and values from the JSON data."""
-    dates = []
-    values = []
-    date_formats = ["%Y-%m-%d %H:%M:%S", "%Y-%m-%d"]
-
-    for entry in data:
-        date = parse_date(entry[0], date_formats)
-        if date:
-            dates.append(date)
-        value = parse_value(entry[1])
-        if value is not None:
-            values.append(value)
-
-    return dates, values
-
-def parse_date(date_str, date_formats):
-    """Parse a date string using the provided date formats."""
-    for fmt in date_formats:
-        try:
-            return datetime.strptime(date_str, fmt)
-        except ValueError:
-            continue
-    print(f"Invalid date format: {date_str}")
-    return None
-
-def parse_value(value_str):
-    """Parse a value string to a float."""
-    try:
-        return float(value_str)
-    except ValueError:
-        print(f"Invalid value format: {value_str}")
-        return None
-
 def extract_trade_data(trades):
     """Extract trade indices and ratios from the trade data."""
     trade_indices = list(range(1, len(trades) + 1))
     trade_ratios = [trade['ratio'] for trade in trades if 'ratio' in trade]
     return trade_indices, trade_ratios
 
-def plot_price_and_indicators(ax, dates, values, indicators, data_combo, strategy_combo):
-    """Plot the price and indicators on the given axis."""
-    ax.set_facecolor('#2b2b2b')
-    ax.plot(dates, values, color=chart_colors["Price"], linestyle='-', linewidth=2, label='Price')
+def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
+    """Plot JSON data in the GUI with candlestick chart, RSI chart (if available), and trade ratios."""
+    dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
+    indicators = extract_indicators(json_data)
+    trade_indices, trade_ratios = extract_trade_data(json_data['result'][1])
+    rows = 1
+    cols = 1
+    
+    if 'RSI' or 'Normalize_MACD' in indicators:
+        price_row_height = 0.7
+        rsi_row_height = 0.3
+        rows += 1
+    else:
+        price_row_height = 1.0
+        rsi_row_height = 0.0
 
-    for indicator, indicator_values in indicators.items():
-        if indicator != "RSI":
-            values_indicator = [float(entry) if entry is not None else 0.0 for entry in indicator_values]
-            ax.plot(dates, values_indicator, color=chart_colors[indicator], linestyle='-', linewidth=2, label=indicator.upper())
+    row_heights=[price_row_height]
+    if 'RSI' or 'Normalize_MACD' in indicators:
+        row_heights.append(rsi_row_height)
 
-    ax.set_xlabel('Date', color='white')
-    ax.set_ylabel('Value', color='white')
-    ax.tick_params(axis='y', colors='white')
-    ax.tick_params(axis='x', rotation=45, colors='white')
-    ax.set_title(f"{data_combo.get()} ({strategy_combo.get()})", color='white')
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
-    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-    ax.legend(loc='upper left', bbox_to_anchor=(1, 1)).set_visible(True)
+    if len(trade_ratios) > 0: cols += 1
 
-def plot_trade_ratios(ax, trade_indices, trade_ratios):
-    """Plot the trade ratios on the given axis."""
-    ax.set_facecolor('#2b2b2b')
-    ax.axhline(y=1, color='#2F4858', linestyle='--', linewidth=1, label='')
-    ax.plot(trade_indices, trade_ratios, color='#F6AE2D', linestyle='-', linewidth=2, label='Trade Ratios')
-    ax.set_xlabel('Trade Index', color='white')
-    ax.set_ylabel('Ratio', color='white')
-    ax.tick_params(axis='y', colors='white')
-    ax.tick_params(axis='x', rotation=45, colors='white')
-    ax.set_title('Trade Ratios Over Time', color='white')
-    ax.legend(loc='upper left', bbox_to_anchor=(1, 1)).set_visible(True)
+    column_widths = [0.7] * cols  
+    if cols > 1:
+        column_widths[0] = 0.7  
 
-    # cumulative ratios
+    fig = make_subplots(rows=rows, cols=cols, shared_xaxes=True, vertical_spacing=0.25,
+                        row_heights=row_heights,
+                        column_widths=column_widths) 
+
+    fig.add_trace(go.Candlestick(x=dates, open=opens, high=highs, low=lows, close=closes), row=1, col=1)
+
+    for indicator in indicators:
+        row = 1
+        if indicator == 'RSI' or indicator == 'Normalize_MACD': row += 1
+        fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=row, col=1)
+
     if len(trade_ratios) > 0:
+        fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color=chart_colors['Test'])), row=1, col=2)
         cumulative_ratios = [trade_ratios[0]]
         for i in range(1, len(trade_ratios)):
             cumulative_ratio = cumulative_ratios[i - 1] * trade_ratios[i]
             cumulative_ratios.append(cumulative_ratio)
-        ax.plot(trade_indices, cumulative_ratios, color='#F26419', linestyle='-', linewidth=2, label='Cumulative Ratios')
-        ax.legend(loc='upper left', bbox_to_anchor=(1, 0.9)).set_visible(True)
-        #print("Final Cumulative Ratio:", cumulative_ratios[-1])
+        fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=1, col=2)
 
-        # adjust y-axis limits for better readability
-        max_ratio = max(max(trade_ratios), max(cumulative_ratios))
-        min_ratio = min(min(trade_ratios), min(cumulative_ratios))
-        ax.set_ylim(min_ratio - 0.1, max_ratio + 0.1)
-        ax.axhline(y=cumulative_ratios[-1], color='#2F4858', linestyle='--', linewidth=1)
+    # layout
+    fig.update_layout(title=f"{data_combo.get()} ({strategy_combo.get()})",
+                    xaxis_title='Date',
+                    yaxis_title='Price',
+                    xaxis_rangeslider_visible=False,
+                    plot_bgcolor='#161a25',
+                    paper_bgcolor='#161a25',
+                    font=dict(color='white'),
+                    yaxis=dict(gridcolor='#6c7386'),
+                    xaxis=dict(gridcolor='#6c7386'),
+                    yaxis2=dict(gridcolor='#6c7386'), 
+                    xaxis2=dict(gridcolor='#6c7386')) 
 
-def embed_plot_in_gui(fig, root):
-    """embed the Matplotlib plot in the Tkinter GUI"""
-    canvas = tkagg.FigureCanvasTkAgg(fig, master=root)
-    canvas.draw()
-    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    if 'RSI' or 'Normalize_MACD' in indicators:
+        fig.update_yaxes(range=[0, 100], row=2, col=1)
+        fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
 
-    toolbar = tk.Frame(root)
-    toolbar.pack(side=tk.TOP, fill=tk.X)
-    navigation_toolbar = NavigationToolbar2Tk(canvas, toolbar)
-    navigation_toolbar.update()
-    navigation_toolbar.configure(background='#2b2b2b')
-    for item in navigation_toolbar.winfo_children():
-        item.configure(bg='#2b2b2b')
+    os.makedirs('display/python/saved_results/', exist_ok=True)
+    plot_filename = 'display/python/saved_results/plot.html'
+    fig.write_html(plot_filename)
+    webbrowser.open(os.path.join(os.getcwd(), 'display', 'python', 'saved_results', 'plot.html'))
+
+def extract_ohlc_data(data):
+    """Extract OHLC data from the JSON data."""
+    dates, opens, highs, lows, closes, volume = zip(*data)
+    return dates, opens, highs, lows, closes
+
+def extract_indicators(json_data):
+    """Extract indicators data from the JSON data."""
+    indicators = {}
+    for indicator in json_data['result'][0]:
+        indicators[indicator] = json_data['result'][0][indicator]
+    return indicators
