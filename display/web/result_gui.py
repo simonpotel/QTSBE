@@ -10,14 +10,17 @@ from plotly.subplots import make_subplots
 chart_colors = {
     "Price": "#6c7386", #gunmetal (grey)
     "MA_100": "#B8336A", #raspberry rose (pink)
-    "MA_40": "#FF9B42", #sandy brown (yellow)
-    "MA_20": "#00A7E1", #picton blue (blue)
+    "MA_40": "#FF9B42", #sandy brown (orange)
+    "MA_20": "#F4D35E", #naples yellow (yellow)
     "Test": "#C73E1D", #sinopia (red)
     "RSI": "#9AB87A", #olivine (green)
     "EMA": "#F0A7A0", #melon (~red light)
     "EMA_MACD": "#F0A7A0", #melon (~red light)
     "MACD": "#5E4AE3", #majorelle blue (blue/purple)
-    "Normalize_MACD": "#947BD3" #tropical indigo
+    "Normalize_MACD": "#947BD3", #tropical indigo,
+    "Bollinger_Lower": "#A682FF", #forest green
+    "Bollinger_Rolling": "#A682FF",#forest green
+    "Bollinger_Upper": "#A682FF", #forest green
 }
 
 def fetch_and_show_data(data_combo, strategy_combo):
