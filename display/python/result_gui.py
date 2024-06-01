@@ -165,19 +165,20 @@ def plot_trade_ratios(ax, trade_indices, trade_ratios):
     ax.legend(loc='upper left', bbox_to_anchor=(1, 1)).set_visible(True)
 
     # cumulative ratios
-    cumulative_ratios = [trade_ratios[0]]
-    for i in range(1, len(trade_ratios)):
-        cumulative_ratio = cumulative_ratios[i - 1] * trade_ratios[i]
-        cumulative_ratios.append(cumulative_ratio)
-    ax.plot(trade_indices, cumulative_ratios, color='#F26419', linestyle='-', linewidth=2, label='Cumulative Ratios')
-    ax.legend(loc='upper left', bbox_to_anchor=(1, 0.9)).set_visible(True)
-    print("Final Cumulative Ratio:", cumulative_ratios[-1])
+    if len(trade_ratios) > 0:
+        cumulative_ratios = [trade_ratios[0]]
+        for i in range(1, len(trade_ratios)):
+            cumulative_ratio = cumulative_ratios[i - 1] * trade_ratios[i]
+            cumulative_ratios.append(cumulative_ratio)
+        ax.plot(trade_indices, cumulative_ratios, color='#F26419', linestyle='-', linewidth=2, label='Cumulative Ratios')
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 0.9)).set_visible(True)
+        print("Final Cumulative Ratio:", cumulative_ratios[-1])
 
-    # adjust y-axis limits for better readability
-    max_ratio = max(max(trade_ratios), max(cumulative_ratios))
-    min_ratio = min(min(trade_ratios), min(cumulative_ratios))
-    ax.set_ylim(min_ratio - 0.1, max_ratio + 0.1)
-    ax.axhline(y=cumulative_ratios[-1], color='#2F4858', linestyle='--', linewidth=1)
+        # adjust y-axis limits for better readability
+        max_ratio = max(max(trade_ratios), max(cumulative_ratios))
+        min_ratio = min(min(trade_ratios), min(cumulative_ratios))
+        ax.set_ylim(min_ratio - 0.1, max_ratio + 0.1)
+        ax.axhline(y=cumulative_ratios[-1], color='#2F4858', linestyle='--', linewidth=1)
 
 def embed_plot_in_gui(fig, root):
     """embed the Matplotlib plot in the Tkinter GUI"""
