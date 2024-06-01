@@ -1,8 +1,12 @@
 *.pyc
 /Logs
-api/strategies/*
-!api/strategies/default.py
-result.json
+
 data/bank/*
 !data/bank/Binance_BTCUSDT_1d.csv
+
+api/strategies/*
+!api/strategies/default.py
+!api/strategies/rsi_example.py
+
 display/python/saved_results/*
+display/web/saved_results/*

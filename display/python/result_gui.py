@@ -10,12 +10,12 @@ from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
 import os
 
 chart_colors = {
-    "price": "#6c7386", #gunmetal
-    "mm_100": "#B8336A", #raspberry rose
-    "mm_40": "#FF9B42", #sandy brown
-    "mm_20": "#00A7E1", #picton blue
-    "test": "#C73E1D", #sinopia
-    "rsi": "#9AB87A", #olivine
+    "Price": "#6c7386", #gunmetal
+    "MA_100": "#B8336A", #raspberry rose
+    "MA_40": "#FF9B42", #sandy brown
+    "MA_20": "#00A7E1", #picton blue
+    "Test": "#C73E1D", #sinopia
+    "RSI": "#9AB87A", #olivine
 }
 
 def fetch_and_show_data(data_combo, strategy_combo):
@@ -136,10 +136,10 @@ def extract_trade_data(trades):
 def plot_price_and_indicators(ax, dates, values, indicators, data_combo, strategy_combo):
     """Plot the price and indicators on the given axis."""
     ax.set_facecolor('#2b2b2b')
-    ax.plot(dates, values, color=chart_colors["price"], linestyle='-', linewidth=2, label='Price')
+    ax.plot(dates, values, color=chart_colors["Price"], linestyle='-', linewidth=2, label='Price')
 
     for indicator, indicator_values in indicators.items():
-        if indicator != "rsi":
+        if indicator != "RSI":
             values_indicator = [float(entry) if entry is not None else 0.0 for entry in indicator_values]
             ax.plot(dates, values_indicator, color=chart_colors[indicator], linestyle='-', linewidth=2, label=indicator.upper())
 
@@ -165,19 +165,20 @@ def plot_trade_ratios(ax, trade_indices, trade_ratios):
     ax.legend(loc='upper left', bbox_to_anchor=(1, 1)).set_visible(True)
 
     # cumulative ratios
-    cumulative_ratios = [trade_ratios[0]]
-    for i in range(1, len(trade_ratios)):
-        cumulative_ratio = cumulative_ratios[i - 1] * trade_ratios[i]
-        cumulative_ratios.append(cumulative_ratio)
-    ax.plot(trade_indices, cumulative_ratios, color='#F26419', linestyle='-', linewidth=2, label='Cumulative Ratios')
-    ax.legend(loc='upper left', bbox_to_anchor=(1, 0.9)).set_visible(True)
-    print("Final Cumulative Ratio:", cumulative_ratios[-1])
+    if len(trade_ratios) > 0:
+        cumulative_ratios = [trade_ratios[0]]
+        for i in range(1, len(trade_ratios)):
+            cumulative_ratio = cumulative_ratios[i - 1] * trade_ratios[i]
+            cumulative_ratios.append(cumulative_ratio)
+        ax.plot(trade_indices, cumulative_ratios, color='#F26419', linestyle='-', linewidth=2, label='Cumulative Ratios')
+        ax.legend(loc='upper left', bbox_to_anchor=(1, 0.9)).set_visible(True)
+        #print("Final Cumulative Ratio:", cumulative_ratios[-1])
 
-    # adjust y-axis limits for better readability
-    max_ratio = max(max(trade_ratios), max(cumulative_ratios))
-    min_ratio = min(min(trade_ratios), min(cumulative_ratios))
-    ax.set_ylim(min_ratio - 0.1, max_ratio + 0.1)
-    ax.axhline(y=cumulative_ratios[-1], color='#2F4858', linestyle='--', linewidth=1)
+        # adjust y-axis limits for better readability
+        max_ratio = max(max(trade_ratios), max(cumulative_ratios))
+        min_ratio = min(min(trade_ratios), min(cumulative_ratios))
+        ax.set_ylim(min_ratio - 0.1, max_ratio + 0.1)
+        ax.axhline(y=cumulative_ratios[-1], color='#2F4858', linestyle='--', linewidth=1)
 
 def embed_plot_in_gui(fig, root):
     """embed the Matplotlib plot in the Tkinter GUI"""

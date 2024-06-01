@@ -48,7 +48,11 @@ def get_data(pair, strategy):
         {"pair": pair, # string
          "strategy": strategy, # string
          "data": data, # tab of tabs of 2 elements
-         "result": result # indicators, trades, position
+         "result": (
+             result.indicators,
+             result.positions,
+             result.current_position
+             ) # result is an object of the class Positions in stats/positions.py
         })
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'

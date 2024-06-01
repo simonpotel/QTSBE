@@ -2,7 +2,7 @@ import numpy as np
 
 # Article to understand the RSI : https://admiralmarkets.com/fr/formation/articles/indicateurs-forex/indicateur-rsi
 
-def get_rsi(prices, window=14):
+def get_RSI(prices, window=14):
     """
     Calculate the Relative Strength Index (RSI) for a given price series.
 
