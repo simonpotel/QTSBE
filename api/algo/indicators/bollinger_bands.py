@@ -17,7 +17,6 @@ def get_bollinger_bands(prices, window=20, num_std_dev=2):
     rolling_mean = np.full_like(prices, np.nan)
     for i in range(window, len(prices) + 1):
         rolling_mean[i - 1] = np.mean(prices[i - window:i])
-    residuals = prices - rolling_mean
 
     # rolling standard deviation
     rolling_std = np.full_like(prices, np.nan)
