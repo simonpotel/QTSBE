@@ -38,7 +38,5 @@ strategy_combo.grid(row=1, column=1, pady=(10, 0), padx=10, sticky="ew")
 load_button = ctk.CTkButton(frame, text="Load", command=lambda: fetch_and_show_data(data_combo, strategy_combo))
 load_button.grid(row=2, column=0, columnspan=2, pady=(20, 10))
 
-frame.columnconfigure(0, weight=1)
-frame.columnconfigure(1, weight=3)
 
 root.mainloop()
