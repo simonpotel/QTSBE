@@ -108,9 +108,10 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
 
 
     # plot
-    plot_filename = 'temp_plot.html'
+    os.makedirs('display/web/saved_results/', exist_ok=True)
+    plot_filename = 'display/web/saved_results/plot.html'
     fig.write_html(plot_filename)
-    webbrowser.open(plot_filename)
+    webbrowser.open(os.path.join(os.getcwd(), 'display', 'web', 'saved_results', 'plot.html'))
 
 def extract_ohlc_data(data):
     """Extract OHLC data from the JSON data."""
