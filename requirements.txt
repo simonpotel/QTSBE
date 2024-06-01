@@ -3,3 +3,7 @@ matplotlib
 loguru
 ccxt
 tables
+plotly
+pandas
+kaleido
+tkinterweb
