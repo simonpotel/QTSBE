@@ -94,7 +94,8 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
     """Plot JSON data in the GUI with candlestick chart, RSI chart (if available), and trade ratios."""
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
     indicators = extract_indicators(json_data)
-    trade_indices, trade_ratios = extract_trade_data(json_data['result'][1])
+    trades = json_data['result'][1]
+    trade_indices, trade_ratios = extract_trade_data(trades)
     rows = 1
     cols = 1
     
@@ -134,6 +135,43 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
             cumulative_ratio = cumulative_ratios[i - 1] * trade_ratios[i]
             cumulative_ratios.append(cumulative_ratio)
         fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=1, col=2)
+
+    buy_dates = [trade['buy_date'] for trade in trades]
+    buy_prices = [trade['buy_price'] for trade in trades]
+    buy_indices = [trade['buy_index'] for trade in trades]  
+    buy_signals = [trade['buy_signals']['Buy_Signal'] for trade in trades] 
+
+    sell_dates = [trade['sell_date'] for trade in trades]
+    sell_prices = [trade['sell_price'] for trade in trades]
+    sell_indices = [trade['sell_index'] for trade in trades]  
+    sell_signals = [trade['sell_signals']['Sell_Signal'] for trade in trades] 
+
+    ratios = [trade['ratio'] for trade in trades]
+
+    # hover texts for the markets
+    buy_hover_texts = [f"Index: {index}<br>Price: {price}<br>Date: {date}<br>Buy Signal: {buy_signal}" for index, price, date, buy_signal in zip(buy_indices, buy_prices, buy_dates, buy_signals)]
+    sell_hover_texts = [f"Index: {index}<br>Price: {price}<br>Date: {date}<br>Ratio: {ratio}<br>Sell Signal: {sell_signal}" for index, price, date, ratio, sell_signal in zip(sell_indices, sell_prices, sell_dates, ratios, sell_signals)]
+
+    # plot buy/sell markes
+    fig.add_trace(go.Scatter(
+        x=buy_dates, 
+        y=buy_prices, 
+        mode='markers', 
+        name='Buy', 
+        marker=dict(symbol='triangle-up', color='#B0FE76', size=10),
+        hovertext=buy_hover_texts,  
+        hoverinfo='text'  
+    ), row=1, col=1)
+    fig.add_trace(go.Scatter(
+        x=sell_dates, 
+        y=sell_prices, 
+        mode='markers', 
+        name='Sell', 
+        marker=dict(symbol='triangle-down', color='#2DC7FF', size=10),
+        hovertext=sell_hover_texts,  
+        hoverinfo='text' 
+    ), row=1, col=1)
+
 
     # layout
     fig.update_layout(title=f"{data_combo.get()} ({strategy_combo.get()})",
