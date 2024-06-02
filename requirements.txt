@@ -5,5 +5,7 @@ ccxt
 tables
 plotly
 pandas
-kaleido
-tkinterweb
+flask
+flask_cors
+mysql
+mysqlclient
