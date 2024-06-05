@@ -89,8 +89,26 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- [Flask](https://flask.palletsprojects.com/) for the API Framework.
 - Note: The contents of the files in the indicators folder are not guaranteed to be completely accurate. Always review the code of each indicator before use.
+
+## Requirements
+
+To run this project, you'll need to install the following dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+- [customtkinter](https://pypi.org/project/customtkinter/): A custom themed version of Tkinter, providing enhanced visual elements and features for GUI development.
+- [matplotlib](https://pypi.org/project/matplotlib/): A comprehensive library for creating static, animated, and interactive visualizations in Python.
+- [loguru](https://pypi.org/project/loguru/): A logging library that provides an easy-to-use interface for logging in Python applications.
+- [ccxt](https://pypi.org/project/ccxt/): A cryptocurrency trading library that provides unified APIs for accessing trading data and executing trades across multiple cryptocurrency exchanges.
+- [tables](https://pypi.org/project/tables/): A package for managing hierarchical datasets and storing large data arrays efficiently in HDF5 format.
+- [plotly](https://pypi.org/project/plotly/): An open-source graphing library for creating interactive, publication-quality graphs and charts.
+- [pandas](https://pypi.org/project/pandas/): A powerful data manipulation and analysis library, providing data structures and functions for working with structured data.
+- [flask](https://pypi.org/project/Flask/): A lightweight web application framework for Python, providing tools for building web applications and APIs.
+- [flask_cors](https://pypi.org/project/Flask-Cors/): A Flask extension for handling Cross-Origin Resource Sharing (CORS), allowing web applications to make requests to domains outside of their own.
+- [mysql](https://pypi.org/project/mysql/): A MySQL database connector for Python, enabling interaction with MySQL databases using Python code.
+- [mysqlclient](https://pypi.org/project/mysqlclient/): A Python interface to MySQL, providing access to MySQL database servers from Python applications.
 
 ## Contact
 
