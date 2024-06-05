@@ -91,13 +91,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Note: The contents of the files in the indicators folder are not guaranteed to be completely accurate. Always review the code of each indicator before use.
 
-## Requirements
-
-To run this project, you'll need to install the following dependencies:
-```bash
-pip install -r requirements.txt
-```
-
+## Librairies
 - [customtkinter](https://pypi.org/project/customtkinter/): A custom themed version of Tkinter, providing enhanced visual elements and features for GUI development.
 - [matplotlib](https://pypi.org/project/matplotlib/): A comprehensive library for creating static, animated, and interactive visualizations in Python.
 - [loguru](https://pypi.org/project/loguru/): A logging library that provides an easy-to-use interface for logging in Python applications.
