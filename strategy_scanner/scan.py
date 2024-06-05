@@ -22,7 +22,7 @@ def scan_tokens(timeframe, strategy):
     start_time = time.time()
     best_pair = ""
     max_cumulative_ratio = 0
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=7) as executor:
         futures = [executor.submit(binance.fetch_and_save_ohlcv, symbol, timeframe) for symbol in symbols]
         print(f"{Fore.LIGHTMAGENTA_EX}Fetching and saving OHLCV data for all tokens...\r")
         for index, future in enumerate(futures, start=1):
