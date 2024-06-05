@@ -9,6 +9,18 @@ To start the Flask API, navigate to the QTSBE directory and run the following co
 python api/api.py
 ```
 
+You can now make requests via your web browser:
+
+```bash
+http://127.0.0.1:5000/QTSBE/<pair>/<strategy>
+```
+
+For example:
+
+```bash
+http://127.0.0.1:5000/QTSBE/Binance_BTCUSDT_1d/default
+```
+
 #### Debug Mode
 You can start the API in debug mode to access debugging information. 
 
