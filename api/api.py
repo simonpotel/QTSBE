@@ -25,15 +25,19 @@ def reload_loguru_config():
 reload_loguru_config()
 
 def import_strategies():
-    for file_name in os.listdir(strategies_folder): # loop through all files in the strategies folder
-        file_path = os.path.join(strategies_folder, file_name)
-        if os.path.isfile(file_path) and file_name.endswith(".py"): # check if the file is a Python file
-            name_without_extension = os.path.splitext(file_name)[0] # get the file name without the .py extension
-            spec = importlib.util.spec_from_file_location(name_without_extension, file_path) # create a module specification
-            module = importlib.util.module_from_spec(spec) # create a module from the specification
-            spec.loader.exec_module(module) # load the module
-            strategies[name_without_extension] = module # store the module in the dictionary
-            logger.debug(f"Content of strategies/{file_name} has been imported as module {name_without_extension}")
+    for root, dirs, files in os.walk(strategies_folder): # loop through all files in the strategies folder and subfolders
+        for file_name in files:
+            if file_name.endswith(".py"): # check if the file is a Python file
+                file_path = os.path.join(root, file_name)
+                name_without_extension = os.path.splitext(file_name)[0]
+                # create the strategy name with underscores for subdirectories
+                strategy_name = os.path.relpath(file_path, strategies_folder).replace(os.sep, '_').rsplit('.', 1)[0]
+                spec = importlib.util.spec_from_file_location(name_without_extension, file_path) # create a module specification
+                module = importlib.util.module_from_spec(spec) # create a module from the specification
+                spec.loader.exec_module(module) # load the module
+                strategies[strategy_name] = module # store the module in the dictionary
+                logger.debug(f"Content of {file_path} has been imported as module {strategy_name}")
+
 
 app = Flask(__name__)
 CORS(app, resources={r"/QTSBE/*": {"origins": "http://127.0.0.1"}})
