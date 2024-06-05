@@ -30,3 +30,4 @@ Here are the main features offered by the "display" module:
 
 - **Export and Share**: Exporting charts in various formats for integration into reports or presentations, as well as online sharing via URL links or integration into web applications.
 
+![image](https://github.com/simonpotel/QTSBE/blob/711bb2cecf12bdaef53d9d7a20f05e1971e4af59/files/display/python/full_view.png)
