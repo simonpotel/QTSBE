@@ -20,3 +20,13 @@ QTSBE/logs/
 ```
 
 Feel free to explore and analyze the logs for further insight into the API's behavior.
+
+### QTSBE/api/algo
+This directory houses all the algorithmic code utilized within the API.
+
+#### Data Retrieval
+The `api/algo/data/file.py` module enables the retrieval of data for the desired trading pair from the API request in the database.
+
+#### Indicators
+The `api/algo/indicators` directory contains all the indicators used for technical analysis. As a technical choice, I've opted not to import another library and have developed them from scratch.
+Feel free to explore the code for further understanding of the algorithmic processes and data handling within the API.
