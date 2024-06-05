@@ -1,6 +1,19 @@
 from datetime import datetime
 
 def get_position_stats(positions):
+    if len(positions.positions) == 0:
+        return {
+            'max_loss': 0,
+            'max_loss_buy_index': 0,
+            'max_loss_sell_index': 0,
+            'average_ratio': 0,
+            'all_ratios': [0],
+            'cumulative_ratios': [0],
+            'max_cumulative_ratio': 0,
+            'daily_average_ratio': 0,
+            'hourly_average_ratio': 0,
+            'average_position_duration': 0
+        }
     max_loss = float('-inf')
     max_loss_buy_index = None
     max_loss_sell_index = None
