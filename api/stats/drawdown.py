@@ -1,6 +1,15 @@
 def get_drawdowns_stats(positions):
     ratios = [trade['ratio'] for trade in positions.positions]
 
+    if not ratios:
+        return {
+            'max_drawdown': 0,
+            'total_drawdown': 0,
+            'stability_ratio': 0,
+            'max_drawdown_period': [0, 0],
+            'average_drawdown': 0
+        }
+
     max_drawdown = 0
     peak = ratios[0]
     start_index = 0
