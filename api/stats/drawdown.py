@@ -1,17 +1,3 @@
-# Maximum Drawdown: 
-# Largest percentage loss from a peak to a trough before a new peak is attained. 
-# It helps gauge the worst-case scenario for potential losses.
-
-# Total Drawdown:
-# The total drawdown represents the cumulative sum of all individual drawdowns 
-# experienced during a series of trades or over a specified period. 
-# It offers insight into the overall downside risk inherent in an investment strategy or portfolio.
-
-# Stability Ratio:
-# The stability ratio measures the efficiency of returns relative to the worst drawdown experienced. 
-# A higher stability ratio indicates better risk-adjusted returns, 
-# showing how effectively returns balance against the maximum drawdown.
-
 def get_drawdowns_stats(positions):
     ratios = [trade['ratio'] for trade in positions.positions]
 
@@ -20,6 +6,7 @@ def get_drawdowns_stats(positions):
     start_index = 0
     end_index = 0
     max_drawdown_period = None
+    drawdowns = []
 
     for i, ratio in enumerate(ratios):
         if ratio > peak:
@@ -33,15 +20,20 @@ def get_drawdowns_stats(positions):
         elif drawdown == max_drawdown:
             end_index = i
             max_drawdown_period = (positions.positions[start_index]['buy_date'], positions.positions[end_index]['sell_date'])
+        drawdowns.append(drawdown)
 
     total_drawdown = sum([(max(ratios[:i+1]) - ratios[i]) / max(ratios[:i+1]) for i in range(len(ratios))])
 
     total_return = sum(ratios) - len(ratios)
     stability_ratio = total_return / max_drawdown if max_drawdown != 0 else float('inf')
 
+    average_drawdown = sum(drawdowns) / len(drawdowns)
+
     return {
-        'max_drawdown': max_drawdown,
-        'total_drawdown': total_drawdown,
-        'stability_ratio': stability_ratio,
-        'max_drawdown_period': max_drawdown_period
+        'max_drawdown': max_drawdown,  # cargest percentage loss from a peak to a trough
+        'total_drawdown': total_drawdown,  # cumulative sum of all individual drawdowns
+        'stability_ratio': stability_ratio,  # efficiency of returns relative to the worst drawdown
+        'max_drawdown_period': max_drawdown_period,  # period during which the maximum drawdown occurred
+        'average_drawdown': average_drawdown  # average drawdown across all positions
     }
+
