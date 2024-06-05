@@ -11,6 +11,8 @@ from flask_cors import CORS
 from DEXcryptoLib.Lib import *
 from algo.data.file import *
 from stats.drawdown import get_drawdowns_stats
+from stats.positions import get_position_stats
+
 
 debug_mode = True
 strategies_folder = r"api/strategies" # path to the folder containing strategy files
@@ -59,7 +61,8 @@ def get_data(pair, strategy):
              result.current_position
              ), # result is an object of the class Positions in stats/positions.py
           "stats": 
-             {"drawdown:": get_drawdowns_stats(result)}
+             {"drawdown:": get_drawdowns_stats(result),
+              "positions": get_position_stats(result)}
         })
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
