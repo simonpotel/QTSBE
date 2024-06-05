@@ -7,7 +7,6 @@ import argparse
 class BinanceAPI:
     def __init__(self):
         self.exchange = ccxt.binance()
-
     def fetch_and_save_ohlcv(self, symbol, timeframe):
         """
         Function to fetch OHLCV data and save it to a CSV file.
@@ -15,7 +14,7 @@ class BinanceAPI:
         all_ohlcv = []  # List that will contain all data
         desired_timestamp = self.exchange.parse8601('2000-01-01T00:00:00Z')  # from now to desired_timestamp
         while True: 
-            print(f"Request: {timeframe} {datetime.utcfromtimestamp(desired_timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')}")
+            #print(f"Request: {timeframe} {datetime.utcfromtimestamp(desired_timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')}")
             ohlcv_batch = self.exchange.fetch_ohlcv(symbol, timeframe, since=desired_timestamp, limit=1000)
             if len(ohlcv_batch) == 0:
                 break  # no data until the desired timestamp, stop code
@@ -33,7 +32,7 @@ class BinanceAPI:
         filepath = os.path.join('data/bank/', filename)
         # save content
         df.to_csv(filepath, index=False)
-        print(f"All data has been saved in: {filepath}")
+        #print(f"All data has been saved in: {filepath}")
 
     def get_top_50_tokens_by_volume(self):
         """
@@ -57,7 +56,7 @@ class BinanceAPI:
         Function to fetch and save daily OHLCV data for the top 50 tokens by trading volume.
         """
         for symbol in tokens_list:
-            print(f"Fetching data for {symbol}")
+            #print(f"Fetching data for {symbol}")
             self.fetch_and_save_ohlcv(symbol, '1d')
 
     def get_recent_try_pairs(self):
