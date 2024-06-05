@@ -69,27 +69,6 @@ def get_data(pair, strategy):
 
     logger.info(f"Request pair: {pair} | strategy: {strategy}")
     logger.debug(f"Request response: {response}")
-
-    # structure of a response:
-    # the indicators set is unique to every strategies
-    # (example for spot):
-    #
-    #{
-    #    "data": [],
-    #    "pair": "Binance_THEPAIR",
-    #    "result": [
-    #        {
-    #            "mm_100": [],
-    #            "mm_20": [],
-    #            "rsi": []
-    #        },
-    #        [],
-    #        {}
-    #    ],
-    #    "strategy": "spot"
-    #}
-
-    # see more details about the structure of "result" in strategies/default.py
     return response
 
 if __name__ == '__main__':
