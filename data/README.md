@@ -33,4 +33,4 @@ python binance_api.py -symbol "ETH/USDT" -timeframe "1h"
 
 Please note that there are usage limits imposed by the Binance API. It allows a maximum of 600 requests per minute.
 
-The data format within the `bank/` directory is currently CSV, and there are plans to update it to HDF5 format in the future for better efficiency.
+The data format within the `bank/` directory is currently CSV.
