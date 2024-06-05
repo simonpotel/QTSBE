@@ -130,10 +130,7 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
 
     if len(trade_ratios) > 0:
         fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color=chart_colors['Test'])), row=1, col=2)
-        cumulative_ratios = [trade_ratios[0]]
-        for i in range(1, len(trade_ratios)):
-            cumulative_ratio = cumulative_ratios[i - 1] * trade_ratios[i]
-            cumulative_ratios.append(cumulative_ratio)
+        cumulative_ratios = [float(cumultative_ratio) for cumultative_ratio in json_data["stats"]["positions"]["cumulative_ratios"]]
         fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=1, col=2)
 
     buy_dates = [trade['buy_date'] for trade in trades]
@@ -146,7 +143,7 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
     sell_indices = [trade['sell_index'] for trade in trades]  
     sell_signals = [trade['sell_signals']['Sell_Signal'] for trade in trades] 
 
-    ratios = [trade['ratio'] for trade in trades]
+    ratios = [float(ratio) for ratio in json_data["stats"]["positions"]["all_ratios"]]
 
     # hover texts for the markets
     buy_hover_texts = [f"Index: {index}<br>Price: {price}<br>Date: {date}<br>Buy Signal: {buy_signal}" for index, price, date, buy_signal in zip(buy_indices, buy_prices, buy_dates, buy_signals)]
