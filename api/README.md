@@ -21,6 +21,8 @@ For example:
 http://127.0.0.1:5000/QTSBE/Binance_BTCUSDT_1d/default
 ```
 
+You can also use the tool in QTSBE/display/python/main.py
+
 #### Debug Mode
 You can start the API in debug mode to access debugging information. 
 
