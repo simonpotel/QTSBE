@@ -74,3 +74,32 @@ The `drawdown.py` module calculates risk statistics including:
 - **stability_ratio:** Efficiency of returns relative to the worst drawdown.
 - **max_drawdown_period:** Period during which the maximum drawdown occurred.
 - **average_drawdown:** Average drawdown across all positions.
+
+### QTSBE/api/strategies
+
+This directory, along with its subdirectories, serves as the repository for all Python files considered as strategies for the API. These strategies are loaded and utilized by the API.
+
+To understand the structure of a strategy, you can refer to an example file such as `strategies/default.py`.
+
+For private work environments, you can create a private repository and clone it into this `strategies` directory. Your cloned subdirectory and all your strategies will be loaded, ensuring privacy and confidentiality, and they will not be visible for open-source coding.
+
+Each strategy follows the same function structure:
+
+```python
+def analyse(data, prices):
+    """
+    Analyzes the provided data and prices to make trading decisions.
+
+    Parameters:
+    - data: Data required for analysis.
+    - prices: Price data for the trading pair.
+
+    Returns:
+    - positions: Object of the Positions class (via QTSBE/api/stats/trades.py).
+    """
+    # Your strategy implementation goes here
+```
+
+Ensure that your strategy function returns an object of the `positions` class, as defined in `QTSBE/api/stats/trades.py`.
+
+
