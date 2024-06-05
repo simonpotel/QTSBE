@@ -13,29 +13,35 @@
 # showing how effectively returns balance against the maximum drawdown.
 
 def get_drawdowns_stats(positions):
-    # all ratios from trades
     ratios = [trade['ratio'] for trade in positions.positions]
 
-    # max drawdown
     max_drawdown = 0
     peak = ratios[0]
-    for ratio in ratios:
+    start_index = 0
+    end_index = 0
+    max_drawdown_period = None
+
+    for i, ratio in enumerate(ratios):
         if ratio > peak:
             peak = ratio
         drawdown = (peak - ratio) / peak
         if drawdown > max_drawdown:
             max_drawdown = drawdown
+            start_index = i
+            end_index = i
+            max_drawdown_period = (positions.positions[start_index]['buy_date'], positions.positions[end_index]['sell_date'])
+        elif drawdown == max_drawdown:
+            end_index = i
+            max_drawdown_period = (positions.positions[start_index]['buy_date'], positions.positions[end_index]['sell_date'])
 
-    # total drawdown
     total_drawdown = sum([(max(ratios[:i+1]) - ratios[i]) / max(ratios[:i+1]) for i in range(len(ratios))])
 
-    # stability ratio
     total_return = sum(ratios) - len(ratios)
     stability_ratio = total_return / max_drawdown if max_drawdown != 0 else float('inf')
 
     return {
         'max_drawdown': max_drawdown,
         'total_drawdown': total_drawdown,
-        'stability_ratio': stability_ratio
+        'stability_ratio': stability_ratio,
+        'max_drawdown_period': max_drawdown_period
     }
-
