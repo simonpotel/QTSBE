@@ -10,6 +10,9 @@ from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from DEXcryptoLib.Lib import *
 from algo.data.file import *
+from stats.drawdown import get_drawdowns_stats
+from stats.positions import get_position_stats
+
 
 debug_mode = True
 strategies_folder = r"api/strategies" # path to the folder containing strategy files
@@ -56,34 +59,16 @@ def get_data(pair, strategy):
              result.indicators,
              result.positions,
              result.current_position
-             ) # result is an object of the class Positions in stats/positions.py
+             ), # result is an object of the class Positions in stats/positions.py
+          "stats": 
+             {"drawdown:": get_drawdowns_stats(result),
+              "positions": get_position_stats(result)}
         })
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
 
     logger.info(f"Request pair: {pair} | strategy: {strategy}")
     logger.debug(f"Request response: {response}")
-
-    # structure of a response:
-    # the indicators set is unique to every strategies
-    # (example for spot):
-    #
-    #{
-    #    "data": [],
-    #    "pair": "Binance_THEPAIR",
-    #    "result": [
-    #        {
-    #            "mm_100": [],
-    #            "mm_20": [],
-    #            "rsi": []
-    #        },
-    #        [],
-    #        {}
-    #    ],
-    #    "strategy": "spot"
-    #}
-
-    # see more details about the structure of "result" in strategies/default.py
     return response
 
 if __name__ == '__main__':
