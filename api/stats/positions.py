@@ -1,12 +1,16 @@
+from datetime import datetime
+
 def get_position_stats(positions):
     max_loss = float('-inf')
     max_loss_buy_index = None
     max_loss_sell_index = None
     total_ratio = 0
-    total_profit_ratio = 0
     all_ratios = []
     cumulative_ratios = []
-    max_cumulative_ratio = 1 # 1 (we start with no loss)
+    max_cumulative_ratio = 1  # 1 (we start with no loss)
+    total_days = 0
+    total_positions = len(positions.positions)
+
     for position in positions.positions:
         loss = position['sell_price'] - position['buy_price']
         if loss > max_loss:
@@ -18,9 +22,6 @@ def get_position_stats(positions):
         all_ratios.append(ratio)
         total_ratio += ratio
 
-        if ratio > 1:
-            total_profit_ratio += ratio - 1
-
         if not cumulative_ratios:
             cumulative_ratios.append(ratio)
         else:
@@ -28,16 +29,28 @@ def get_position_stats(positions):
             if cumulative_ratios[-1] > max_cumulative_ratio:
                 max_cumulative_ratio = cumulative_ratios[-1]
 
-    average_ratio = total_ratio / len(positions.positions)
-    average_annual_profit_ratio = total_profit_ratio / len(positions.positions)
+        buy_date = datetime.strptime(position['buy_date'], '%Y-%m-%d')
+        sell_date = datetime.strptime(position['sell_date'], '%Y-%m-%d')
+        duration = sell_date - buy_date
+        total_days += duration.days
+
+    average_ratio = total_ratio / total_positions
+
+    daily_average_ratio = average_ratio
+
+    hourly_average_ratio = daily_average_ratio / 24 
+
+    average_position_duration = total_days / total_positions
 
     return {
         'max_loss': max_loss,
         'max_loss_buy_index': max_loss_buy_index,
         'max_loss_sell_index': max_loss_sell_index,
         'average_ratio': average_ratio,
-        'average_annual_profit_ratio': average_annual_profit_ratio,
         'all_ratios': all_ratios,
         'cumulative_ratios': cumulative_ratios,
-        'max_cumulative_ratio': max_cumulative_ratio
+        'max_cumulative_ratio': max_cumulative_ratio,
+        'daily_average_ratio': daily_average_ratio,
+        'hourly_average_ratio': hourly_average_ratio,
+        'average_position_duration': average_position_duration
     }
