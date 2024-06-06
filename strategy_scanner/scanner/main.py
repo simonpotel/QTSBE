@@ -33,8 +33,8 @@ def scan_tokens(timeframe, strategy, fetch_latest_data):
 
     if fetch_latest_data:
         with ThreadPoolExecutor(max_workers=7) as executor:
-            futures = {executor.submit(binance.fetch_and_save_ohlcv(symbol, timeframe)): symbol for symbol in symbols}
-            print(f"{Fore.LIGHTMAGENTA_EX}Fetching and saving OHLCV data for all tokens...\r")
+            futures = {executor.submit(binance.fetch_and_save_ohlcv, symbol, timeframe): symbol for symbol in symbols}
+            print(f"{Fore.LIGHTMAGENTA_EX}Fetching and saving OHLCV data for all tokens...\z")
             for index, future in enumerate(futures, start=1):
                 symbol = future.result()
                 cumulative_ratio, symbol = process_symbol(symbol, index, total_symbols, start_time)
