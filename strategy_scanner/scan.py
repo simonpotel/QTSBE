@@ -1,5 +1,5 @@
-from scanner.main import scan_tokens
+from scanner.main import *
 
-scan_tokens(timeframe='1d', 
-            strategy='QTS_pumpNC', 
+BiggestCRScanner(timeframe='1d', 
+            strategy='rsi_example', 
             fetch_latest_data=False)
