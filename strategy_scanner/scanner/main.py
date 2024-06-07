@@ -45,7 +45,7 @@ class TokenScanner:
         def process_symbol_wrapper(symbol, index):
             return self.process_symbol(symbol, index, total_symbols, start_time, timeframe, strategy, analysis_func, pbar)
 
-        with tqdm(total=total_symbols, desc="Processing scan", unit="symbol", ncols=100, dynamic_ncols=True, colour="YELLOW") as pbar:
+        with tqdm(total=total_symbols, desc="Processing scan", unit="symbol", ncols=100, dynamic_ncols=True, colour="BLUE") as pbar:
             with ThreadPoolExecutor(max_workers=7) as executor:
                 futures = {executor.submit(process_symbol_wrapper, symbol, index): symbol for index, symbol in enumerate(symbols, start=1)}
                 for index, future in enumerate(futures, start=1):
@@ -75,11 +75,11 @@ class TokenScanner:
                     })
                     pbar.update(1)
 
-        pbar.write(f"{Fore.YELLOW}{Style.BRIGHT}All tokens processed!")
-        pbar.write(f"{Fore.WHITE}Best Pairs for this strategy: {Fore.YELLOW}{tab_best_pairs}")
+        pbar.write(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}All tokens processed!")
+        pbar.write(f"{Fore.WHITE}Best Pairs for this strategy: {Fore.LIGHTBLUE_EX}{tab_best_pairs}")
 
     def run(self, task_name, timeframe, strategy, fetch_latest_data):
-        print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.YELLOW}{strategy}\n{Fore.WHITE}Timeframe: {Fore.YELLOW}{timeframe}\n{Fore.WHITE}Task: {Fore.YELLOW}{task_name}\n{Fore.WHITE}Fetch Latest Data: {Fore.YELLOW}{fetch_latest_data}")
+        print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}\n{Fore.WHITE}Task: {Fore.LIGHTBLUE_EX}{task_name}\n{Fore.WHITE}Fetch Latest Data: {Fore.LIGHTBLUE_EX}{fetch_latest_data}")
         symbols = self.load_symbols()
         if task_name == "Latest POS":
             self.process_symbols(symbols, timeframe, strategy, fetch_latest_data, self.analyze_symbol, "Latest POS")
