@@ -1,15 +1,15 @@
 def get_drawdowns_stats(positions):
+    result_stats = {
+        'max_drawdown': 0,  # cargest percentage loss from a peak to a trough
+        'total_drawdown': 0,  # cumulative sum of all individual drawdowns
+        'stability_ratio': 0,  # efficiency of returns relative to the worst drawdown
+        'max_drawdown_period': 0,  # period during which the maximum drawdown occurred
+        'average_drawdown': 0  # average drawdown across all positions
+    }
+
     ratios = [trade['ratio'] for trade in positions.positions]
-
-    if not ratios:
-        return {
-            'max_drawdown': 0,
-            'total_drawdown': 0,
-            'stability_ratio': 0,
-            'max_drawdown_period': [0, 0],
-            'average_drawdown': 0
-        }
-
+    if len(ratios) < 1: return result_stats
+        
     max_drawdown = 0
     peak = ratios[0]
     start_index = 0
@@ -37,12 +37,11 @@ def get_drawdowns_stats(positions):
     stability_ratio = total_return / max_drawdown if max_drawdown != 0 else float('inf')
 
     average_drawdown = sum(drawdowns) / len(drawdowns)
+    result_stats['max_drawdown'] = max_drawdown
+    result_stats['total_drawdown'] = total_drawdown
+    result_stats['stability_ratio'] = stability_ratio
+    result_stats['max_drawdown_period'] = max_drawdown_period
+    result_stats['average_drawdown'] = average_drawdown
 
-    return {
-        'max_drawdown': max_drawdown,  # cargest percentage loss from a peak to a trough
-        'total_drawdown': total_drawdown,  # cumulative sum of all individual drawdowns
-        'stability_ratio': stability_ratio,  # efficiency of returns relative to the worst drawdown
-        'max_drawdown_period': max_drawdown_period,  # period during which the maximum drawdown occurred
-        'average_drawdown': average_drawdown  # average drawdown across all positions
-    }
+    return result_stats
 
