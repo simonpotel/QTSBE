@@ -31,7 +31,8 @@ def analyse(data, prices):
                     buy_price=prices[i],
                     buy_date=data[i][0],
                     buy_signals={
-                        "RSI": rsi[i]
+                        "RSI": rsi[i],
+                        "Buy_Signal": 1
                     }
                 )
         else:
@@ -41,7 +42,8 @@ def analyse(data, prices):
                     sell_price=prices[i],
                     sell_date=data[i][0],
                     sell_signals={
-                        "RSI": rsi[i]
+                        "RSI": rsi[i],
+                        "Sell_Signal": 1
                     }
                 )
 
