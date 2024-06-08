@@ -4,9 +4,6 @@ from discord_bot.config import get_bot_config
 
 bot_config = get_bot_config()  
 
-#async def help_command(message):
-    #await message.channel.send("Help")
-
 class MyClient(discord.Client):
     async def on_ready(self):
         """
@@ -21,10 +18,17 @@ class MyClient(discord.Client):
         """
         if message.author.id == self.user.id: 
             return # No response to itself
-              
-        # Check if the message starts with the correct prefix
-        if message.content.startswith(bot_config["prefix"]):
-            command = message.content[len(bot_config["prefix"]):].split()[0]  # Extract command
 
-client = MyClient(intents=discord.Intents.all())  # Declare the client object
-client.run(bot_config["token"])  # Log in the client (bot)
+        if message.channel.name == "chat":
+            if message.attachments:  
+                await message.channel.send("File has been detected")
+                for attachment in message.attachments:
+                    filename = attachment.filename
+                    if filename.endswith(".py"):
+                        file_content = await attachment.read()
+                        print(file_content.decode("utf-8"))  
+            else:
+                await message.channel.send("Unknown")
+
+client = MyClient(intents=discord.Intents.all())  # client object
+client.run(bot_config["token"])  # log the client (bot client)
