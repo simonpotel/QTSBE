@@ -10,3 +10,5 @@ api/strategies/*
 
 display/python/saved_results/*
 display/web/saved_results/*
+
+scan_result.json 
