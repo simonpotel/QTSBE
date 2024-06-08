@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 import requests
 from tqdm import tqdm
 import json
-import math 
+import math
 
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '..', 'data'))
 from binance_api import BinanceAPI
@@ -54,14 +54,24 @@ class BinanceScanner(object):
                 for future in futures:
                     future.result()  
 
+        drawdowns = []
+        positions_ratios = []
+
         with tqdm(total=total_symbols, desc="Processing scan", unit="symbol", ncols=100, dynamic_ncols=True, colour="BLUE") as pbar:
             with ThreadPoolExecutor(max_workers=7) as executor:
                 futures = {executor.submit(process_symbol_wrapper, symbol, index): symbol for index, symbol in enumerate(symbols, start=1)}
                 for index, future in enumerate(futures, start=1):
                     data, symbol, formatted_remaining_time = future.result()
                     if data and "stats" in data:
-                        if data["stats"]["positions"]["average_position_duration"] != 0:
-                            all_stats.append((symbol, data["stats"]))
+                        stats = data["stats"]
+                        if stats["positions"]["average_position_duration"] != 0:
+                            all_stats.append((symbol, stats))
+                            if "drawdown:" in stats:
+                                drawdowns.append((symbol, stats["drawdown:"]))
+                            elif "drawdowns" in stats:
+                                drawdowns.append((symbol, stats["drawdowns"]))
+                            if "positions" in stats and "max_cumulative_ratio" in stats["positions"]:
+                                positions_ratios.append((symbol, stats["positions"]["max_cumulative_ratio"]))
 
                     pbar.set_postfix({
                         'Symbol': symbol,
@@ -72,6 +82,7 @@ class BinanceScanner(object):
         pbar.write(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}All tokens processed!")
         all_stats_sorted = sorted(all_stats, key=lambda x: x[1]["positions"]["max_cumulative_ratio"], reverse=True)
         self.save_stats_to_json(all_stats_sorted)
+        self.save_additional_stats_to_json(drawdowns, positions_ratios)
 
     def save_stats_to_json(self, all_stats):
         result = {"tokens": []}
@@ -83,6 +94,53 @@ class BinanceScanner(object):
         with open('scan_result.json', 'w') as json_file:
             json.dump(result, json_file, indent=4)
         print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Results saved to scan_result.json")
+
+    def save_additional_stats_to_json(self, drawdowns, positions_ratios):
+        if drawdowns:
+            drawdowns_sorted = sorted(drawdowns, key=lambda x: x[1]["max_drawdown"], reverse=True)
+            max_drawdown = drawdowns_sorted[0]
+            min_drawdown = drawdowns_sorted[-1]
+            avg_drawdown = sum(dd[1]["max_drawdown"] for dd in drawdowns) / len(drawdowns)
+            max_drawdown_period = max(drawdowns, key=lambda x: x[1]["max_drawdown_period"])
+        else:
+            max_drawdown = ("N/A", {"max_drawdown": 0})
+            min_drawdown = ("N/A", {"max_drawdown": 0})
+            avg_drawdown = 0
+            max_drawdown_period = ("N/A", {"max_drawdown_period": 0})
+
+        if positions_ratios:
+            positions_ratios_sorted = sorted(positions_ratios, key=lambda x: x[1], reverse=True)
+            avg_ratio = sum(pr[1] for pr in positions_ratios) / len(positions_ratios)
+            max_ratio = positions_ratios_sorted[0]
+            print(positions_ratios_sorted)
+            min_ratio = positions_ratios_sorted[-1]
+        else:
+            avg_ratio = 0
+            max_ratio = ("N/A", 0)
+            min_ratio = ("N/A", 0)
+
+        additional_stats = {
+            "drawdowns": {
+                "max_drawdown": max_drawdown[1]["max_drawdown"],
+                "max_drawdown_pair": max_drawdown[0],
+                "min_drawdown": min_drawdown[1]["max_drawdown"],
+                "min_drawdown_pair": min_drawdown[0],
+                "average_drawdown": avg_drawdown,
+                "max_drawdown_period": max_drawdown_period[1]["max_drawdown_period"],
+                "max_drawdown_period_pair": max_drawdown_period[0],
+            },
+            "positions": {
+                "average_ratio": avg_ratio,
+                "max_ratio": max_ratio[1],
+                "max_ratio_pair": max_ratio[0],
+                "min_ratio": min_ratio[1],
+                "min_ratio_pair": min_ratio[0]
+            }
+        }
+
+        with open('additional_stats.json', 'w') as json_file:
+            json.dump(additional_stats, json_file, indent=4)
+        print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Additional statistics saved to additional_stats.json")
 
     def scan(self, timeframe, strategy, fetch_latest_data):
         print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}\n{Fore.WHITE}Fetch Latest Data: {Fore.LIGHTBLUE_EX}{fetch_latest_data}")
