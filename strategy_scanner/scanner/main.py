@@ -42,6 +42,13 @@ class TokenScanner:
         def process_symbol_wrapper(symbol, index):
             return self.process_symbol(symbol, index, total_symbols, start_time, timeframe, strategy, analysis_func)
 
+        if fetch_latest_data:
+            with ThreadPoolExecutor(max_workers=7) as executor:
+                futures = {executor.submit(self.binance.fetch_and_save_ohlcv, symbol, timeframe): symbol for symbol in symbols}
+                print(f"{Fore.LIGHTMAGENTA_EX}Fetching and saving OHLCV data for all tokens...\r")
+                for future in futures:
+                    future.result()  
+
         with tqdm(total=total_symbols, desc="Processing scan", unit="symbol", ncols=100, dynamic_ncols=True, colour="BLUE") as pbar:
             with ThreadPoolExecutor(max_workers=7) as executor:
                 futures = {executor.submit(process_symbol_wrapper, symbol, index): symbol for index, symbol in enumerate(symbols, start=1)}
