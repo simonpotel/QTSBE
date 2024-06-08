@@ -32,12 +32,23 @@ class MyClient(discord.Client):
                 await message.channel.send("?¿?")
 
     async def on_reaction_add(self, reaction, user):
-        if not user.bot:  
+        if not user.bot:
             message = reaction.message
             if message.reference:
-                replied_message_id = message.reference.message_id
-                original_message = await message.channel.fetch_message(replied_message_id)
-                await original_message.reply(f"{user.name} reacted {reaction.emoji}")
+                #replied_message_id = message.reference.message_id
+                #original_message = await message.channel.fetch_message(replied_message_id)
+                bot_reacted_emojis = [reaction.emoji for reaction in message.reactions if reaction.me]
+                if "1️⃣" in bot_reacted_emojis or "2️⃣" in bot_reacted_emojis:
+                    reacted_emojis_count = {emoji: bot_reacted_emojis.count(emoji) for emoji in ["1️⃣", "2️⃣"]}
+                    if reacted_emojis_count["1️⃣"] > 0 and reacted_emojis_count["2️⃣"] > 0:
+                        await message.remove_reaction("1️⃣", self.user)
+                        await message.remove_reaction("2️⃣", self.user)
+                        if reaction.emoji == "1️⃣":
+                            #logic
+                            print("1")
+                        elif reaction.emoji == "2️⃣":
+                            #logic
+                            print("2")
 
 client = MyClient(intents=discord.Intents.all())  # client object
 client.run(bot_config["token"])  # log the client (bot client)
