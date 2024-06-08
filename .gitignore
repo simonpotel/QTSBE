@@ -13,3 +13,4 @@ display/web/saved_results/*
 
 scan_result.json 
 additional_stats.json
+chatbot/config.json
