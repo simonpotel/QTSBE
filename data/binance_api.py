@@ -3,6 +3,7 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 import argparse
+from colorama import Fore, Style
 
 class BinanceAPI:
     def __init__(self):
@@ -14,8 +15,9 @@ class BinanceAPI:
         """
         all_ohlcv = []  # List that will contain all data
         desired_timestamp = self.exchange.parse8601('2000-01-01T00:00:00Z')  # from now to desired_timestamp
+        
         while True: 
-            print(f"Request: {timeframe} {datetime.utcfromtimestamp(desired_timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')}")
+            #print(f"{Fore.GREEN}Request{Fore.WHITE}: {Fore.LIGHTMAGENTA_EX}{symbol} {Fore.WHITE}{timeframe}: {datetime.utcfromtimestamp(desired_timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')}")
             ohlcv_batch = self.exchange.fetch_ohlcv(symbol, timeframe, since=desired_timestamp, limit=1000)
             if len(ohlcv_batch) == 0:
                 break  # no data until the desired timestamp, stop code
@@ -33,7 +35,8 @@ class BinanceAPI:
         filepath = os.path.join('data/bank/', filename)
         # save content
         df.to_csv(filepath, index=False)
-        print(f"All data has been saved in: {filepath}")
+        #print(f"{Fore.GREEN}All data has been saved in: {filepath}")
+        return symbol 
 
     def get_top_50_tokens_by_volume(self):
         """
@@ -48,7 +51,7 @@ class BinanceAPI:
 
         # print the top 50 tokens with their trading volumes
         for symbol, volume in top_50_volumes:
-            print(f"{symbol}: {volume}")
+            print(f"{Fore.YELLOW}{symbol}: {volume}")
 
         return [symbol for symbol, volume in top_50_volumes]
     
@@ -57,7 +60,7 @@ class BinanceAPI:
         Function to fetch and save daily OHLCV data for the top 50 tokens by trading volume.
         """
         for symbol in tokens_list:
-            print(f"Fetching data for {symbol}")
+            print(f"{Fore.CYAN}Fetching data for {symbol}")
             self.fetch_and_save_ohlcv(symbol, '1d')
 
     def get_recent_try_pairs(self):
@@ -70,7 +73,7 @@ class BinanceAPI:
         # Since we don't have the exact creation date, we'll assume the order in the list is by recency
         recent_try_pairs = try_pairs[-100:]  # Get the last 100 pairs
 
-        print("Recent 100 TRY trading pairs:")
+        print(f"{Fore.LIGHTMAGENTA_EX}Recent 100 TRY trading pairs:")
         for pair in recent_try_pairs:
             print(pair)
 
@@ -89,7 +92,7 @@ class BinanceAPI:
         variations = []
         
         for symbol in tickers:
-            print(f"Collected symbols: {len(variations)}/50 ({symbol})")
+            print(f"{Fore.RED}Collected symbols: {len(variations)}/50 ({symbol})")
             ohlcv = self.exchange.fetch_ohlcv(symbol, '1d', since=start_timestamp)
             if ohlcv:
                 df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
@@ -104,9 +107,8 @@ class BinanceAPI:
                 break
         
         least_volatile_tokens = sorted(variations, key=lambda x: abs(x[1]))[:50]
-        
         for symbol, variation in least_volatile_tokens:
-            print(f"{symbol}: {variation}")
+            print(f"{Fore.GREEN}{symbol}: {variation}")
 
         return [symbol for symbol, variation in least_volatile_tokens]
 
@@ -123,7 +125,7 @@ class BinanceAPI:
         variations = []
         
         for symbol in tickers:
-            print(f"Collected symbols: {len(variations)}/50 ({symbol})")
+            print(f"{Fore.BLUE}Collected symbols: {len(variations)}/50 ({symbol})")
             ohlcv = self.exchange.fetch_ohlcv(symbol, '1d', since=start_timestamp)
             if ohlcv:
                 df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
@@ -134,13 +136,13 @@ class BinanceAPI:
                     price_change = (df['close'].iloc[-1] - df['close'].iloc[0]) / df['close'].iloc[0]
                     variations.append((symbol, price_change))
             
-            if len(variations) >= 50: break
+            if len(variations) >= 50:
+                break
                 
-        
         most_volatile_tokens = sorted(variations, key=lambda x: abs(x[1]), reverse=True)[:50]
         
         for symbol, variation in most_volatile_tokens:
-            print(f"{symbol}: {variation}")
+            print(f"{Fore.MAGENTA}{symbol}: {variation}")
 
         return [symbol for symbol, variation in most_volatile_tokens]
 
@@ -153,4 +155,5 @@ if __name__ == "__main__":
 
     binance_data = BinanceAPI()
     binance_data.fetch_and_save_ohlcv(args.symbol, args.timeframe)
-    
+
+       

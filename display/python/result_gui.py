@@ -23,19 +23,17 @@ chart_colors = {
     "Bollinger_Upper": "#A682FF", #forest green
 }
 
-def fetch_and_show_data(data_combo, strategy_combo):
-    data_file = data_combo.get()
-    strategy = strategy_combo.get()
+def fetch_and_show_data(data_file, strategy):
     url = f"http://127.0.0.1:5000/QTSBE/{data_file}/{strategy}"
     
     try:
         response = requests.get(url)
         response.raise_for_status()
-        display_results_in_new_window(response.text, data_combo, strategy_combo, url)  
+        display_results_in_new_window(response.text, data_file, strategy, url)  
     except requests.RequestException as e:
         print("Request failed:", e)
 
-def display_results_in_new_window(response_text, data_combo, strategy_combo, url):
+def display_results_in_new_window(response_text, data_file, strategy, url):
     """display the fetched results in a new window with a plot and JSON data"""
     new_window = ctk.CTkToplevel()  
     new_window.title("Result: " + url)
@@ -47,7 +45,7 @@ def display_results_in_new_window(response_text, data_combo, strategy_combo, url
     display_json_data(json_data, text_frame)
     add_save_button(text_frame, json_data)
 
-    plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo)
+    plot_json_data_in_gui(json_data, graph_frame, data_file, strategy)
 
 def create_frames(new_window):
     """create and pack the text and graph frames in the new window."""
@@ -90,7 +88,7 @@ def extract_trade_data(trades):
     trade_ratios = [trade['ratio'] for trade in trades if 'ratio' in trade]
     return trade_indices, trade_ratios
 
-def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
+def plot_json_data_in_gui(json_data, graph_frame, data_file, strategy):
     """Plot JSON data in the GUI with candlestick chart, RSI chart (if available), and trade ratios."""
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
     indicators = extract_indicators(json_data)
@@ -171,7 +169,7 @@ def plot_json_data_in_gui(json_data, graph_frame, data_combo, strategy_combo):
 
 
     # layout
-    fig.update_layout(title=f"{data_combo.get()} ({strategy_combo.get()})",
+    fig.update_layout(title=f"{data_file} ({strategy})",
                     xaxis_title='Date',
                     yaxis_title='Price',
                     xaxis_rangeslider_visible=False,

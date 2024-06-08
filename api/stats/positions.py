@@ -39,8 +39,7 @@ def get_position_stats(positions):
             cumulative_ratios.append(ratio)
         else:
             cumulative_ratios.append(cumulative_ratios[-1] * ratio)
-            if cumulative_ratios[-1] > max_cumulative_ratio:
-                max_cumulative_ratio = cumulative_ratios[-1]
+        max_cumulative_ratio = cumulative_ratios[-1]
 
         buy_date = datetime.strptime(position['buy_date'], '%Y-%m-%d')
         sell_date = datetime.strptime(position['sell_date'], '%Y-%m-%d')
