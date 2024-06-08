@@ -32,7 +32,7 @@ scanner.scan(timeframe, strategy, fetch_latest_data)
 
 - `timeframe`: The timeframe for the OHLCV data (e.g., '1m', '5m', '1h', '1d').
 - `strategy`: The trading strategy to apply.
-- `fetch_latest_data`: Set to `True` to fetch the latest OHLCV data before analysis, or `False` to use existing data.
+- `fetch_latest_data`: Set to `True` to fetch the latest OHLCV data before analysis, or `False` to use existing data. Be careful with this parameter, dont use it too much, see `https://developers.binance.com/docs/derivatives/coin-margined-futures/error-code` -1003 TOO_MANY_REQUESTS#
 
 ### Output
 
