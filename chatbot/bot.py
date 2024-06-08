@@ -33,7 +33,11 @@ class MyClient(discord.Client):
 
     async def on_reaction_add(self, reaction, user):
         if not user.bot:  
-            print(f"{user.name} reacted with {reaction.emoji}")
+            message = reaction.message
+            if message.reference:
+                replied_message_id = message.reference.message_id
+                original_message = await message.channel.fetch_message(replied_message_id)
+                await original_message.reply(f"{user.name} reacted {reaction.emoji}")
 
 client = MyClient(intents=discord.Intents.all())  # client object
 client.run(bot_config["token"])  # log the client (bot client)
