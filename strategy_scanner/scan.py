@@ -1,5 +1,5 @@
-from scanner.main import *
+from BinanceScanner.scanner import BinanceScanner
 
-TokenScanner().scan(timeframe='1d', 
+BinanceScanner().scan(timeframe='1d', 
             strategy='rsi_example', 
-            fetch_latest_data=True)
+            fetch_latest_data=False)

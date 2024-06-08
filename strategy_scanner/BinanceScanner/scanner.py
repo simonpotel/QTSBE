@@ -6,14 +6,19 @@ from concurrent.futures import ThreadPoolExecutor
 import requests
 from tqdm import tqdm
 import json
+import math 
 
-from scanner.utils import format_time
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '..', 'data'))
 from binance_api import BinanceAPI
 
 init(autoreset=True)
 
-class TokenScanner:
+def format_time(seconds):
+    minutes = math.floor(seconds / 60)
+    seconds = math.ceil(seconds % 60)
+    return f"{minutes}m {seconds}s"
+
+class BinanceScanner(object):
     def __init__(self):
         self.binance = BinanceAPI()
 
@@ -83,4 +88,3 @@ class TokenScanner:
         print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}\n{Fore.WHITE}Fetch Latest Data: {Fore.LIGHTBLUE_EX}{fetch_latest_data}")
         symbols = self.load_symbols()
         self.process_symbols(symbols, timeframe, strategy, fetch_latest_data, self.analyze_symbol)
-
