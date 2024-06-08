@@ -21,14 +21,16 @@ class MyClient(discord.Client):
 
         if message.channel.name == "chat":
             if message.attachments:  
-                await message.channel.send("File has been detected")
+                await message.reply(":file_folder: Attachement(s) in your message, analyse..")
                 for attachment in message.attachments:
                     filename = attachment.filename
                     if filename.endswith(".py"):
                         file_content = await attachment.read()
-                        print(file_content.decode("utf-8"))  
+                        await message.reply("<:python:1249089145855283301> Python file has been scanned")
+                        content = file_content.decode("utf-8")
+                        print(content)  
             else:
-                await message.channel.send("Unknown")
+                await message.channel.send("?¿?")
 
 client = MyClient(intents=discord.Intents.all())  # client object
 client.run(bot_config["token"])  # log the client (bot client)
