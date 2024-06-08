@@ -29,6 +29,7 @@ class MyClient(discord.Client):
                         await message.reply("<:python:1249089145855283301> Python file has been scanned")
                         content = file_content.decode("utf-8")
                         print(content)  
+                        await message.channel.send("Select your action :\n:a: = Simple Analyse with Binance Pair of your choice\n:regional_indicator_s: = Global Scan with every Pairs of Binance")
             else:
                 await message.channel.send("?¿?")
 
