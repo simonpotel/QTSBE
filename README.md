@@ -83,6 +83,25 @@ QTSBE is an open-source project aimed at providing a robust environment for back
 
        ![image](https://github.com/simonpotel/QTSBE/blob/711bb2cecf12bdaef53d9d7a20f05e1971e4af59/files/display/python/rsi_MACD.png)
 
+## Scanner
+
+### BinanceScanner
+
+Powerful tool for analyzing Binance trading pairs within the quantitative trading strategy backtesting environment. It conducts comprehensive scans of all Binance pairs, queries the API with the specified strategy, and consolidates the results into a single file. 
+
+- **Comprehensive Analysis:** Analyzes all Binance trading pairs to provide insights into their performance.
+- **Strategy Integration:** Executes API queries with the user's specified strategy to evaluate pair performance.
+- **Key Metrics:** Calculates and presents essential metrics such as best and worst ratios, highest CR (Cumulative Ratio), and lowest drawdowns.
+- **Efficient Execution:** Conducts scans efficiently, enhancing productivity in strategy assessment and optimization.
+
+#### Usage
+To use the scanner, edit `strategy_scanner/scan.py` to specify your desired strategy and adjust any relevant arguments. Then, run the following command:
+
+```bash
+python strategy_scanner/scan.py
+```
+![image](https://github.com/simonpotel/QTSBE/blob/doc/files/strategy_scanner/BinanceScanner/scan_example.png)
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
