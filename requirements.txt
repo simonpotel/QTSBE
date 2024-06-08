@@ -9,3 +9,5 @@ flask
 flask_cors
 mysql
 mysqlclient
+colorama
+tqdm

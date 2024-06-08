@@ -1,7 +1,7 @@
 # QTSBE - Quantitative Trading Strategy Backtesting Environment
 
 <p align="center">
-  <img src="https://github.com/simonpotel/QTSBE/blob/711bb2cecf12bdaef53d9d7a20f05e1971e4af59/files/logo.jpg" width="400" height="400">
+  <img src="https://github.com/simonpotel/QTSBE/blob/9c94904d4af6ea5a44c2dd9e3aaa201d27abbf15/files/logo.jpeg" width="400" height="400">
 </p>
 
 QTSBE is an open-source project aimed at providing a robust environment for backtesting quantitative trading strategies. It includes an API developed in Python using Flask and an interface built with Python.
@@ -91,13 +91,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Note: The contents of the files in the indicators folder are not guaranteed to be completely accurate. Always review the code of each indicator before use.
 
-## Requirements
-
-To run this project, you'll need to install the following dependencies:
-```bash
-pip install -r requirements.txt
-```
-
+## Librairies
 - [customtkinter](https://pypi.org/project/customtkinter/): A custom themed version of Tkinter, providing enhanced visual elements and features for GUI development.
 - [matplotlib](https://pypi.org/project/matplotlib/): A comprehensive library for creating static, animated, and interactive visualizations in Python.
 - [loguru](https://pypi.org/project/loguru/): A logging library that provides an easy-to-use interface for logging in Python applications.
