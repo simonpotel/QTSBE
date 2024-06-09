@@ -6,9 +6,9 @@ import os
 import plotly.io as pio
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
-import customtkinter as ctk
-from discord_bot.embeds import reply_embed
+from discord_bot.embeds import reply_embed  
 
+# Chart colors dictionary
 chart_colors = {
     "Price": "#6c7386",
     "MA_100": "#B8336A",
@@ -25,70 +25,90 @@ chart_colors = {
     "Bollinger_Upper": "#A682FF",
 }
 
-async def fetch_and_show_data(message, data_file, strategy):
-    url = f"http://127.0.0.1:5000/QTSBE/{data_file}/{strategy}"
+async def fetch_and_send_data(message, data_file, strategy):
+    """
+    Function to fetch and send data to discord
+    """
     try:
-        response = requests.get(url)
-        response.raise_for_status()
-        json_data = response.json()
-
-        # create temp file for the discord attachment
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.json', mode='w', encoding='utf-8') as temp_file:
-            temp_file_name = temp_file.name
-            json.dump(json_data, temp_file, indent=4)
-
-        # extract stats
-        drawdown_stats = json_data.get('stats', {}).get('drawdown:', {})
-        positions_stats = json_data.get('stats', {}).get('positions', {})
-
-        # create an embed with the stats
-        embed = discord.Embed(
-            title=":chart_with_downwards_trend: Analyse",
-            description="Stats for the given data and strategy:",
-            color=discord.Color.dark_orange()
-        )
-
-        embed.add_field(name="Average Drawdown", value=f"{drawdown_stats.get('average_drawdown', 'N/A'):.4f}", inline=False)
-        embed.add_field(name="Max Drawdown", value=f"{drawdown_stats.get('max_drawdown', 'N/A'):.4f}", inline=False)
-        embed.add_field(name="Max Drawdown Period", value=f"{drawdown_stats.get('max_drawdown_period', ['N/A', 'N/A'])[0]} to {drawdown_stats.get('max_drawdown_period', ['N/A', 'N/A'])[1]}", inline=False)
-        embed.add_field(name="Stability Ratio", value=f"{drawdown_stats.get('stability_ratio', 'N/A'):.4f}", inline=False)
-        embed.add_field(name="Total Drawdown", value=f"{drawdown_stats.get('total_drawdown', 'N/A'):.4f}", inline=False)
-
-        embed.add_field(name="Average Position Duration", value=f"{positions_stats.get('average_position_duration', 'N/A'):.2f}", inline=False)
-        embed.add_field(name="Average Ratio", value=f"{positions_stats.get('average_ratio', 'N/A'):.4f}", inline=False)
-        embed.add_field(name="Daily Average Ratio", value=f"{positions_stats.get('daily_average_ratio', 'N/A'):.4f}", inline=False)
-        embed.add_field(name="Hourly Average Ratio", value=f"{positions_stats.get('hourly_average_ratio', 'N/A'):.4f}", inline=False)
-        embed.add_field(name="Max Cumulative Ratio", value=f"{positions_stats.get('max_cumulative_ratio', 'N/A'):.4f}", inline=False)
-        embed.add_field(name="Max Loss", value=f"{positions_stats.get('max_loss', 'N/A'):.6f}", inline=False)
-        embed.add_field(name="Max Loss Buy Index", value=f"{positions_stats.get('max_loss_buy_index', 'N/A')}", inline=False)
-        embed.add_field(name="Max Loss Sell Index", value=f"{positions_stats.get('max_loss_sell_index', 'N/A')}", inline=False)
-
-        file_json = discord.File(temp_file_name, filename=f"{data_file}_{strategy}.json")
-        
-        # generate figure
-        fig = generate_plot_figure(json_data, data_file, strategy)
-        os.makedirs('display/python/saved_results/', exist_ok=True)
-        plot_html_filename = 'display/python/saved_results/plot.html'
-        fig.write_html(plot_html_filename)
-        file_html = discord.File(plot_html_filename, filename=f"{data_file}_{strategy}.html")
-
-        # create temp file for the image
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.png', mode='wb') as temp_image:
-            temp_image_name = temp_image.name
-            pio.write_image(fig, temp_image_name)
-
-        file_image = discord.File(temp_image_name, filename=f"{data_file}_{strategy}.png")
-
-        await message.reply(embed=embed, files=[file_json, file_html,file_image])
-
-        # delete the temporary files
-        os.remove(temp_file_name)
-        os.remove(temp_image_name)
+        json_data = await fetch_data(data_file, strategy) # get data from the api 
+        temp_files = await save_json_and_image(json_data, data_file, strategy) # save json request data + HTML plot + HTML plot image
+        await send_data_to_discord(message, json_data, temp_files, data_file, strategy) # send all the data, html plot code and html plot image on discord channel
 
     except requests.RequestException as e:
         await reply_embed(message, "❌ Error", f"Request failed: {e}", discord.Color.brand_red())
     except Exception as e:
         await reply_embed(message, "❌ Error", f"An unexpected error occurred: {e}", discord.Color.brand_red())
+
+async def fetch_data(data_file, strategy):
+    url = f"http://127.0.0.1:5000/QTSBE/{data_file}/{strategy}" # url of the request
+    response = requests.get(url) # send the request to the api
+    response.raise_for_status() # checkout of the request status
+    return response.json() # request content from the api
+
+async def save_json_and_image(json_data, data_file, strategy):
+    temp_files = {} # here we create temp files to not save anything since its will be save on discord
+
+    # wite json data to a temp file
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.json', mode='w', encoding='utf-8') as temp_file:
+        json.dump(json_data, temp_file, indent=4)
+        temp_files['json'] = temp_file.name
+
+    fig = generate_plot_figure(json_data, data_file, strategy) # generate plot figure (chart), with indicators, etc
+    os.makedirs('display/python/saved_results/', exist_ok=True) # spot where the code is saved (may we find a better a spot later)
+    plot_html_filename = f'display/python/saved_results/{data_file}_{strategy}.html' # name file 
+    fig.write_html(plot_html_filename) # write the html code generated by plotly
+    temp_files['html'] = plot_html_filename # temp file here
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.png', mode='wb') as temp_image: # generate the image of the HTML plot in a temp file
+        pio.write_image(fig, temp_image.name)
+        temp_files['image'] = temp_image.name # stock the temp file name of the html plot img
+
+    return temp_files # {json, html, image} temp files
+
+async def send_data_to_discord(message, json_data, temp_files, data_file, strategy):
+    drawdown_stats = json_data.get('stats', {}).get('drawdown:', {}) # data of drawdown from api request
+    positions_stats = json_data.get('stats', {}).get('positions', {}) # data of positions from api request
+
+    embed = create_embed(drawdown_stats, positions_stats) # create an embeds of the the content of drawdown/positions
+
+    # file objects discord for attachements
+    file_json = discord.File(temp_files['json'], filename=f"{data_file}_{strategy}.json")
+    file_html = discord.File(temp_files['html'], filename=f"{data_file}_{strategy}.html")
+    file_image = discord.File(temp_files['image'], filename=f"{data_file}_{strategy}.png")
+
+    # reply to the original command message from the author with : 
+    # - the embed with drawdown/positions stats
+    # - full content of the api request in a json file
+    # - a HTML code made by plotly to see the graphic with indicators and revelants ratios, etc
+    # - image (a screen) of the html graphic generated before
+    await message.reply(embed=embed, files=[file_json, file_html, file_image]) # send the reply message
+
+    # delete every temp files
+    for file_path in temp_files.values():
+        os.remove(file_path) 
+
+def create_embed(drawdown_stats, positions_stats):
+    embed = discord.Embed(
+        title=":chart_with_downwards_trend: Analyse",
+        description="Stats for the given data and strategy:",
+        color=discord.Color.dark_orange()
+    )
+
+    embed.add_field(name="Average Drawdown", value=f"{drawdown_stats.get('average_drawdown', 'N/A'):.4f}", inline=False)
+    embed.add_field(name="Max Drawdown", value=f"{drawdown_stats.get('max_drawdown', 'N/A'):.4f}", inline=False)
+    embed.add_field(name="Max Drawdown Period", value=f"{drawdown_stats.get('max_drawdown_period', ['N/A', 'N/A'])[0]} to {drawdown_stats.get('max_drawdown_period', ['N/A', 'N/A'])[1]}", inline=False)
+    embed.add_field(name="Stability Ratio", value=f"{drawdown_stats.get('stability_ratio', 'N/A'):.4f}", inline=False)
+    embed.add_field(name="Total Drawdown", value=f"{drawdown_stats.get('total_drawdown', 'N/A'):.4f}", inline=False)
+    embed.add_field(name="Average Position Duration", value=f"{positions_stats.get('average_position_duration', 'N/A'):.2f}", inline=False)
+    embed.add_field(name="Average Ratio", value=f"{positions_stats.get('average_ratio', 'N/A'):.4f}", inline=False)
+    embed.add_field(name="Daily Average Ratio", value=f"{positions_stats.get('daily_average_ratio', 'N/A'):.4f}", inline=False)
+    embed.add_field(name="Hourly Average Ratio", value=f"{positions_stats.get('hourly_average_ratio', 'N/A'):.4f}", inline=False)
+    embed.add_field(name="Max Cumulative Ratio", value=f"{positions_stats.get('max_cumulative_ratio', 'N/A'):.4f}", inline=False)
+    embed.add_field(name="Max Loss", value=f"{positions_stats.get('max_loss', 'N/A'):.6f}", inline=False)
+    embed.add_field(name="Max Loss Buy Index", value=f"{positions_stats.get('max_loss_buy_index', 'N/A')}", inline=False)
+    embed.add_field(name="Max Loss Sell Index", value=f"{positions_stats.get('max_loss_sell_index', 'N/A')}", inline=False)
+
+    return embed
 
 def generate_plot_figure(json_data, data_file, strategy):
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
@@ -97,8 +117,9 @@ def generate_plot_figure(json_data, data_file, strategy):
     trade_indices, trade_ratios = extract_trade_data(trades)
     rows = 1
     cols = 1
-    
-    if 'RSI' or 'Normalize_MACD' in indicators:
+
+    # determine plot layout based on indicators and trades
+    if 'RSI' in indicators or 'Normalize_MACD' in indicators:
         price_row_height = 0.7
         rsi_row_height = 0.3
         rows += 1
@@ -106,31 +127,39 @@ def generate_plot_figure(json_data, data_file, strategy):
         price_row_height = 1.0
         rsi_row_height = 0.0
 
-    row_heights=[price_row_height]
-    if 'RSI' or 'Normalize_MACD' in indicators:
+    row_heights = [price_row_height]
+    if 'RSI' in indicators or 'Normalize_MACD' in indicators:
         row_heights.append(rsi_row_height)
 
-    if len(trade_ratios) > 0: cols += 1
+    if len(trade_ratios) > 0:
+        cols += 1
 
-    column_widths = [0.7] * cols  
+    column_widths = [0.7] * cols
     if cols > 1:
-        column_widths[0] = 0.7  
+        column_widths[0] = 0.7
 
+    # create subplot figure
     fig = make_subplots(rows=rows, cols=cols, shared_xaxes=True, vertical_spacing=0.25,
-                        row_heights=row_heights,
-                        column_widths=column_widths) 
+                        row_heights=row_heights, column_widths=column_widths)
 
+    # candlestick plot (with pair data)
     fig.add_trace(go.Candlestick(x=dates, open=opens, high=highs, low=lows, close=closes), row=1, col=1)
 
+    # others plots for 'special' indicators
     for indicator in indicators:
         row = 1
-        if indicator == 'RSI' or indicator == 'Normalize_MACD': row += 1
-        fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=row, col=1)
+        if indicator == 'RSI' or indicator == 'Normalize_MACD':
+            row += 1
+        fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator,
+                                 line=dict(color=chart_colors[indicator])), row=row, col=1)
 
+    # add trades plot if any trade has been calulcated
     if len(trade_ratios) > 0:
-        fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color=chart_colors['Test'])), row=1, col=2)
-        cumulative_ratios = [float(cumultative_ratio) for cumultative_ratio in json_data["stats"]["positions"]["cumulative_ratios"]]
-        fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=1, col=2)
+        fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios',
+                                 line=dict(color=chart_colors['Test'])), row=1, col=2)
+        cumulative_ratios = [float(cumulative_ratio) for cumulative_ratio in json_data["stats"]["positions"]["cumulative_ratios"]]
+        fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios',
+                                 line=dict(color=chart_colors['MA_100'])), row=1, col=2)
 
     buy_dates = [trade['buy_date'] for trade in trades]
     buy_prices = [trade['buy_price'] for trade in trades]
@@ -181,6 +210,7 @@ def generate_plot_figure(json_data, data_file, strategy):
                     yaxis2=dict(gridcolor='#6c7386'), 
                     xaxis2=dict(gridcolor='#6c7386')) 
 
+    # size of the plot RSI/MACD
     if 'RSI' or 'Normalize_MACD' in indicators:
         fig.update_yaxes(range=[0, 100], row=2, col=1)
         fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
@@ -203,10 +233,13 @@ def extract_trade_data(trades):
     return trade_indices, trade_ratios
 
 async def analyse(client, message, args):
+    """
+    Function toggeled when the command is used
+    """
     if len(args) < 2:
         await reply_embed(message, "❌ Error", "You need to provide both the data and strategy arguments.", discord.Color.brand_red())
         return
 
     data = args[0]
     strategy = args[1]
-    await fetch_and_show_data(message, data, strategy)
+    await fetch_and_send_data(message, data, strategy)
