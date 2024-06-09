@@ -19,8 +19,8 @@ async def fetch_and_show_data(message, data_file, strategy):
         
         file = discord.File(temp_file_name, filename=f"{data_file}_{strategy}.json")
         embed = discord.Embed(
-            title=":chart_with_downwards_trend: Analyse",
-            description="Please see the attached file for the JSON data.",
+            title=f":chart_with_downwards_trend: Analyse {data_file} {strategy}",
+            description=f"Full JSON data on attachement.\nRequest URL: {url}",
             color=discord.Color.dark_orange()
         )
         
