@@ -11,3 +11,4 @@ mysql
 mysqlclient
 colorama
 tqdm
+aiofiles
