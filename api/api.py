@@ -8,7 +8,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".
 from loguru import logger
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
-from DEXcryptoLib.Lib import *
 from algo.data.file import *
 from stats.drawdown import get_drawdowns_stats
 from stats.positions import get_position_stats
