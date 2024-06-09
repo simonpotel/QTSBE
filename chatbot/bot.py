@@ -1,6 +1,7 @@
 import discord
 from discord import Activity, ActivityType
 from discord_bot.config import get_bot_config
+from discord_bot.commands.clear import clear
 from discord_bot.commands.analyse import analyse
 #from discord_bot.commands.scan import scan
 
@@ -8,6 +9,7 @@ from discord_bot.commands.analyse import analyse
 bot_config = get_bot_config()  
 
 commands = { 
+    'clear': clear,
     'analyse': analyse,
 #    'scan': scan
 }
