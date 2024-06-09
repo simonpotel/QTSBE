@@ -6,7 +6,7 @@ import os
 import plotly.io as pio
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
-from discord_bot.embeds import reply_embed  
+from discord_bot.embeds import reply_embed, create_embed
 
 # Chart colors dictionary
 chart_colors = {
@@ -29,9 +29,29 @@ async def fetch_and_send_data(message, data_file, strategy):
     """
     Function to fetch and send data to discord
     """
+    reply_msg = [None, f"Analyse: {data_file}, {strategy}", discord.Color.green()]
+    reply_msg[0] = await reply_embed(
+        message=message, 
+        title=reply_msg[1],
+        description=f"🔎 Searching",
+        color=reply_msg[2]
+    )
+    
     try:
+        await reply_msg[0].edit(embed=create_embed(
+            title=reply_msg[1], 
+            description="🛰️Request to the API (Local)", 
+            color=reply_msg[2]))
         json_data = await fetch_data(data_file, strategy) # get data from the api 
+        await reply_msg[0].edit(embed=create_embed(
+            title=reply_msg[1], 
+            description="📜 Save JSON Content, 📊 HTML Plot, and 🖼️ HTML Plot Image", 
+            color=reply_msg[2]))
         temp_files = await save_json_and_image(json_data, data_file, strategy) # save json request data + HTML plot + HTML plot image
+        await reply_msg[0].edit(embed=create_embed(
+            title=reply_msg[1], 
+            description="✅ Sending Data", 
+            color=reply_msg[2]))
         await send_data_to_discord(message, json_data, temp_files, data_file, strategy) # send all the data, html plot code and html plot image on discord channel
 
     except requests.RequestException as e:
@@ -69,7 +89,7 @@ async def send_data_to_discord(message, json_data, temp_files, data_file, strate
     drawdown_stats = json_data.get('stats', {}).get('drawdown:', {}) # data of drawdown from api request
     positions_stats = json_data.get('stats', {}).get('positions', {}) # data of positions from api request
 
-    embed = create_embed(drawdown_stats, positions_stats) # create an embeds of the the content of drawdown/positions
+    embed = create_stats_embed(drawdown_stats, positions_stats) # create an embeds of the the content of drawdown/positions
 
     # file objects discord for attachements
     file_json = discord.File(temp_files['json'], filename=f"{data_file}_{strategy}.json")
@@ -87,11 +107,11 @@ async def send_data_to_discord(message, json_data, temp_files, data_file, strate
     for file_path in temp_files.values():
         os.remove(file_path) 
 
-def create_embed(drawdown_stats, positions_stats):
+def create_stats_embed(drawdown_stats, positions_stats):
     embed = discord.Embed(
         title=":chart_with_downwards_trend: Analyse",
         description="Stats for the given data and strategy:",
-        color=discord.Color.dark_orange()
+        color=discord.Color.green()
     )
 
     embed.add_field(name="Average Drawdown", value=f"{drawdown_stats.get('average_drawdown', 'N/A'):.4f}", inline=False)

@@ -52,25 +52,25 @@ async def send_or_reply_embed(destination, title, description, color, is_reply=F
 
     # Send embed
     if is_reply:
-        await destination.reply(embed=embed)
+        return await destination.reply(embed=embed)
     else:
-        await destination.send(embed=embed)
+        return await destination.send(embed=embed)
 
 async def send_embed(channel, title, description, color):
     """
     This function sends an embed to a channel.
     """
-    await send_or_reply_embed(channel, title, description, color, is_reply=False)
+    return await send_or_reply_embed(channel, title, description, color, is_reply=False)
 
 async def reply_embed(message, title, description, color):
     """
     This function sends an embed as a reply to a message.
     """
-    await send_or_reply_embed(message, title, description, color, is_reply=True)
+    return await send_or_reply_embed(message, title, description, color, is_reply=True)
 
 async def error(message, error):
     """
     Sends an error embed in the channel.
     """
     if not message: return
-    await send_embed(message.channel, "❌ Error", error, discord.Color.brand_red())
+    return await send_embed(message.channel, "❌ Error", error, discord.Color.brand_red())
