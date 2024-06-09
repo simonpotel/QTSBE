@@ -6,6 +6,7 @@ import os
 import plotly.io as pio
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
+import customtkinter as ctk
 from discord_bot.embeds import reply_embed
 
 chart_colors = {
@@ -31,7 +32,7 @@ async def fetch_and_show_data(message, data_file, strategy):
         response.raise_for_status()
         json_data = response.json()
 
-        # create temp file for the discord attachments
+        # create temp file for the discord attachment
         with tempfile.NamedTemporaryFile(delete=False, suffix='.json', mode='w', encoding='utf-8') as temp_file:
             temp_file_name = temp_file.name
             json.dump(json_data, temp_file, indent=4)
@@ -63,27 +64,33 @@ async def fetch_and_show_data(message, data_file, strategy):
         embed.add_field(name="Max Loss Sell Index", value=f"{positions_stats.get('max_loss_sell_index', 'N/A')}", inline=False)
 
         file_json = discord.File(temp_file_name, filename=f"{data_file}_{strategy}.json")
-
-        # generate HTML plot
-        fig, plot_html_filename = generate_plot_html(json_data, data_file, strategy)
-
+        
+        # generate figure
+        fig = generate_plot_figure(json_data, data_file, strategy)
+        os.makedirs('display/python/saved_results/', exist_ok=True)
+        plot_html_filename = 'display/python/saved_results/plot.html'
+        fig.write_html(plot_html_filename)
         file_html = discord.File(plot_html_filename, filename=f"{data_file}_{strategy}.html")
 
-        await message.reply(embed=embed, files=[file_json, file_html])
+        # create temp file for the image
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.png', mode='wb') as temp_image:
+            temp_image_name = temp_image.name
+            pio.write_image(fig, temp_image_name)
 
+        file_image = discord.File(temp_image_name, filename=f"{data_file}_{strategy}.png")
+
+        await message.reply(embed=embed, files=[file_json, file_html,file_image])
 
         # delete the temporary files
         os.remove(temp_file_name)
-        os.remove(plot_html_filename)
+        os.remove(temp_image_name)
 
     except requests.RequestException as e:
         await reply_embed(message, "❌ Error", f"Request failed: {e}", discord.Color.brand_red())
     except Exception as e:
         await reply_embed(message, "❌ Error", f"An unexpected error occurred: {e}", discord.Color.brand_red())
 
-
-    
-def generate_plot_html(json_data, data_file, strategy):
+def generate_plot_figure(json_data, data_file, strategy):
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
     indicators = extract_indicators(json_data)
     trades = json_data['result'][1]
@@ -161,7 +168,6 @@ def generate_plot_html(json_data, data_file, strategy):
         hoverinfo='text' 
     ), row=1, col=1)
 
-
     # layout
     fig.update_layout(title=f"{data_file} ({strategy})",
                     xaxis_title='Date',
@@ -179,11 +185,7 @@ def generate_plot_html(json_data, data_file, strategy):
         fig.update_yaxes(range=[0, 100], row=2, col=1)
         fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
 
-    os.makedirs('display/python/saved_results/', exist_ok=True)
-    plot_filename = 'display/python/saved_results/plot.html'
-    fig.write_html(plot_filename)
-
-    return fig, plot_filename
+    return fig
 
 def extract_ohlc_data(data):
     dates, opens, highs, lows, closes, volume = zip(*data)
