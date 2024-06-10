@@ -19,16 +19,22 @@ def get_file_data(pair):
 
 pair = "Binance_BTCUSDT_1d"
 data = get_file_data(pair) 
-lowest = 0
-highest = len(data)-1
-prices = [float(entry[1].replace(',', ''))  for entry in data[lowest:highest + 1]] 
-fibonacci_retracement_levels = get_fibonacci_retracement_levels(prices, 0, highest - lowest)
+if not data:
+    sys.exit("Data retrieval failed.")
+    
+first_index = 0
+second_index = len(data)-1
+
+prices = [entry[4] for entry in data]
+
+fibonacci_retracement_levels = get_fibonacci_retracement_levels(prices, first_index, second_index)
+
 fig = go.Figure(data=[go.Candlestick(
-    x=list(range(lowest, highest + 1)),  
-    open=[entry[1] for entry in data[lowest:highest + 1]],
-    high=[entry[2] for entry in data[lowest:highest + 1]],
-    low=[entry[3] for entry in data[lowest:highest + 1]],
-    close=[entry[4] for entry in data[lowest:highest + 1]]
+    x=[index for index in range(first_index, second_index + 1, 1)],  
+    open=[entry[1] for entry in data[first_index:second_index + 1]],
+    high=[entry[2] for entry in data[first_index:second_index + 1]],
+    low=[entry[3] for entry in data[first_index:second_index + 1]],
+    close=[entry[4] for entry in data[first_index:second_index + 1]]
 )])
 
 levels = list(fibonacci_retracement_levels.keys())
@@ -42,6 +48,7 @@ for level, color, name in zip(fibonacci_retracement_levels.values(), ['blue', 'g
         text=f"Fib Retracement: {name}",
         showarrow=False
     )
+
 fig.update_layout(
     title=f"{pair} : Fibonacci Retracement Levels",
     xaxis_title='Date',
