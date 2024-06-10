@@ -19,19 +19,20 @@ def get_file_data(pair):
 
 pair = "Binance_BTCUSDT_1d"
 data = get_file_data(pair) 
-prices = [float(entry[1].replace(',', ''))  for entry in data] 
-fibonacci_retracement_levels = get_fibonacci_retracement_levels(prices, 0, len(data)-1)
+lowest = 0
+highest = len(data)-1
+prices = [float(entry[1].replace(',', ''))  for entry in data[lowest:highest + 1]] 
+fibonacci_retracement_levels = get_fibonacci_retracement_levels(prices, 0, highest - lowest)
 fig = go.Figure(data=[go.Candlestick(
-    x=list(range(len(data))),  
-    open=[entry[1] for entry in data],
-    high=[entry[2] for entry in data],
-    low=[entry[3] for entry in data],
-    close=[entry[4] for entry in data]
+    x=list(range(lowest, highest + 1)),  
+    open=[entry[1] for entry in data[lowest:highest + 1]],
+    high=[entry[2] for entry in data[lowest:highest + 1]],
+    low=[entry[3] for entry in data[lowest:highest + 1]],
+    close=[entry[4] for entry in data[lowest:highest + 1]]
 )])
 
-colors = ['blue', 'green', 'red', 'orange', 'purple', 'magenta']
 levels = list(fibonacci_retracement_levels.keys())
-for level, color, name in zip(fibonacci_retracement_levels.values(), colors, levels):
+for level, color, name in zip(fibonacci_retracement_levels.values(), ['blue', 'green', 'red', 'orange', 'purple', 'magenta'], levels):
     fig.add_hline(y=level, line_dash="dash", line_color=color, name=f"Fib Retracement: {name}")
     fig.add_annotation(
         xref="paper",
