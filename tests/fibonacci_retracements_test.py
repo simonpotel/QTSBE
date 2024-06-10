@@ -30,8 +30,17 @@ fig = go.Figure(data=[go.Candlestick(
 )])
 
 colors = ['blue', 'green', 'red', 'orange', 'purple', 'magenta']
-for level, color in zip(fibonacci_retracement_levels.values(), colors):
-    fig.add_hline(y=level, line_dash="dash", line_color=color, name=f"Fib Retracement: {level:.2f}")
+levels = list(fibonacci_retracement_levels.keys())
+for level, color, name in zip(fibonacci_retracement_levels.values(), colors, levels):
+    fig.add_hline(y=level, line_dash="dash", line_color=color, name=f"Fib Retracement: {name}")
+    fig.add_annotation(
+        xref="paper",
+        yref="y",
+        x=1.02,
+        y=level,
+        text=f"Fib Retracement: {name}",
+        showarrow=False
+    )
 fig.update_layout(
     title=f"{pair} : Fibonacci Retracement Levels",
     xaxis_title='Date',
