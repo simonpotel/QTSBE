@@ -11,3 +11,6 @@ mysql
 mysqlclient
 colorama
 tqdm
+aiofiles
+selenium
+kaleido
