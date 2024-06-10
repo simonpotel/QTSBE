@@ -28,7 +28,11 @@ class BinanceScanner(object):
     def analyze_symbol(self, symbol, timeframe, strategy):
         url = f"http://127.0.0.1:5000/QTSBE/Binance_{symbol.replace('/', '')}_{timeframe}/{strategy}"
         response = requests.get(url)
-        return response.json()
+        try:
+            return response.json()
+        except requests.exceptions.JSONDecodeError:
+            print(f"Invalid JSON response for {symbol}: {response.text}")
+            return {}  # Return an empty dictionary or handle as appropriate
 
     def process_symbol(self, symbol, index, total_symbols, start_time, timeframe, strategy, analysis_func):
         elapsed_time = time.time() - start_time
@@ -62,16 +66,17 @@ class BinanceScanner(object):
                 futures = {executor.submit(process_symbol_wrapper, symbol, index): symbol for index, symbol in enumerate(symbols, start=1)}
                 for index, future in enumerate(futures, start=1):
                     data, symbol, formatted_remaining_time = future.result()
-                    if data and "stats" in data:
-                        stats = data["stats"]
-                        if stats["positions"]["average_position_duration"] != 0:
-                            all_stats.append((symbol, stats))
-                            if "drawdown:" in stats:
-                                drawdowns.append((symbol, stats["drawdown:"]))
-                            elif "drawdowns" in stats:
-                                drawdowns.append((symbol, stats["drawdowns"]))
-                            if "positions" in stats and "max_cumulative_ratio" in stats["positions"]:
-                                positions_ratios.append((symbol, stats["positions"]["max_cumulative_ratio"]))
+                    if data != {}:
+                        if data and "stats" in data:
+                            stats = data["stats"]
+                            if stats["positions"]["average_position_duration"] != 0:
+                                all_stats.append((symbol, stats))
+                                if "drawdown:" in stats:
+                                    drawdowns.append((symbol, stats["drawdown:"]))
+                                elif "drawdowns" in stats:
+                                    drawdowns.append((symbol, stats["drawdowns"]))
+                                if "positions" in stats and "max_cumulative_ratio" in stats["positions"]:
+                                    positions_ratios.append((symbol, stats["positions"]["max_cumulative_ratio"]))
 
                     pbar.set_postfix({
                         'Symbol': symbol,
