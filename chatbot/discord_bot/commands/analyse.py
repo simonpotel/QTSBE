@@ -114,19 +114,20 @@ def create_stats_embed(drawdown_stats, positions_stats):
         color=discord.Color.green()
     )
 
-    embed.add_field(name="Average Drawdown", value=f"{drawdown_stats.get('average_drawdown', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Max Drawdown", value=f"{drawdown_stats.get('max_drawdown', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Max Drawdown Period", value=f"{drawdown_stats.get('max_drawdown_period', ['N/A', 'N/A'])[0]} to {drawdown_stats.get('max_drawdown_period', ['N/A', 'N/A'])[1]}", inline=False)
-    embed.add_field(name="Stability Ratio", value=f"{drawdown_stats.get('stability_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Total Drawdown", value=f"{drawdown_stats.get('total_drawdown', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Average Position Duration", value=f"{positions_stats.get('average_position_duration', 'N/A'):.2f}", inline=False)
-    embed.add_field(name="Average Ratio", value=f"{positions_stats.get('average_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Daily Average Ratio", value=f"{positions_stats.get('daily_average_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Hourly Average Ratio", value=f"{positions_stats.get('hourly_average_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Max Cumulative Ratio", value=f"{positions_stats.get('max_cumulative_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Max Loss", value=f"{positions_stats.get('max_loss', 'N/A'):.6f}", inline=False)
-    embed.add_field(name="Max Loss Buy Index", value=f"{positions_stats.get('max_loss_buy_index', 'N/A')}", inline=False)
-    embed.add_field(name="Max Loss Sell Index", value=f"{positions_stats.get('max_loss_sell_index', 'N/A')}", inline=False)
+    for key, value in drawdown_stats.items():
+        if key == 'max_drawdown_period':
+            value_str = f"{value[0]} to {value[1]}"
+        else:
+            value_str = f"{value:.4f}" if isinstance(value, (int, float)) else str(value)
+        embed.add_field(name=key.replace('_', ' ').title(), value=value_str, inline=False)
+    
+    for key, value in positions_stats.items():
+        value_str = f"{value:.4f}" if isinstance(value, (int, float)) else str(value)
+        if key in ['average_position_duration']:
+            value_str = f"{value:.2f}"
+        elif key in ['max_loss']:
+            value_str = f"{value:.6f}"
+        embed.add_field(name=key.replace('_', ' ').title(), value=value_str, inline=False)
 
     return embed
 
