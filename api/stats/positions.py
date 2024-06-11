@@ -1,4 +1,5 @@
 from datetime import datetime
+from collections import defaultdict
 
 def get_position_stats(positions):
     result_stats = {
@@ -12,7 +13,9 @@ def get_position_stats(positions):
         'all_ratios': [],
         'cumulative_ratios': [],
         'max_cumulative_ratio': 1,
-        'average_position_duration': 0
+        'average_position_duration': 0,
+        'buy_signals_count': {},
+        'sell_signals_count': {}
     }
 
     lowest_ratio = float('inf')
@@ -55,6 +58,17 @@ def get_position_stats(positions):
         sell_date = datetime.strptime(position['sell_date'], '%Y-%m-%d')
         duration = sell_date - buy_date
         total_days += duration.days
+        
+        if position['buy_signals']["Buy_Signal"] not in result_stats['buy_signals_count']:
+            result_stats['buy_signals_count'][position['buy_signals']["Buy_Signal"]] = 1
+        else:
+            result_stats['buy_signals_count'][position['buy_signals']["Buy_Signal"]] += 1
+
+        if position['sell_signals']["Sell_Signal"] not in result_stats['sell_signals_count']:
+            result_stats['sell_signals_count'][position['sell_signals']["Sell_Signal"]] = 1
+        else:
+            result_stats['sell_signals_count'][position['sell_signals']["Sell_Signal"]] += 1
+
 
     average_ratio = total_ratio / total_positions
     average_position_duration = total_days / total_positions
