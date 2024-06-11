@@ -17,7 +17,8 @@ def get_fibonacci_retracement_levels(prices, start_index, end_index):
     sub_prices = prices[start_index:end_index + 1]
     low_price = float(min(sub_prices))
     high_price = float(max(sub_prices))
-    if low_price >= high_price:
+    print(low_price, high_price)
+    if low_price > high_price:
         raise ValueError("Invalid price values. Ensure low_price < high_price.")
     
     price_range = high_price - low_price
