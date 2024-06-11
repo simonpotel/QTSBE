@@ -151,3 +151,28 @@ class BinanceScanner(object):
         print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}\n{Fore.WHITE}Fetch Latest Data: {Fore.LIGHTBLUE_EX}{fetch_latest_data}")
         symbols = self.load_symbols()
         self.process_symbols(symbols, timeframe, strategy, fetch_latest_data, self.analyze_symbol)
+
+    def rank_symbols_by_recent_buy_date(self, timeframe, strategy):
+        print(f"{Fore.WHITE}{Style.BRIGHT}Ranking Symbols by Most Recent Buy Date for Strategy: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}")
+        symbols = self.load_symbols()
+
+        def analyze_and_get_recent_buy_date(symbol):
+            data = self.analyze_symbol(symbol, timeframe, strategy)
+            if data and "result" in data and len(data["result"]) >= 3:
+                result = data["result"][2]
+                if result and "buy_date" in result:
+                    return result["buy_date"], symbol
+            return None
+
+        valid_symbols = []
+        with ThreadPoolExecutor(max_workers=7) as executor:
+            futures = {executor.submit(analyze_and_get_recent_buy_date, symbol): symbol for symbol in symbols}
+            for index, future in enumerate(futures):
+                result = future.result()
+                if result:
+                    print(result, str(index)+"/"+str(len(futures)))
+                    valid_symbols.append(result)
+
+        print(" ")
+        ranked_symbols = sorted(valid_symbols, key=lambda x: x[0], reverse=True)
+        return ranked_symbols
