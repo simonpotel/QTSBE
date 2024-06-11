@@ -1,5 +1,4 @@
 from datetime import datetime
-from collections import defaultdict
 
 def get_position_stats(positions):
     result_stats = {
