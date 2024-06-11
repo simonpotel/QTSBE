@@ -1,4 +1,5 @@
 from datetime import datetime
+from collections import defaultdict
 
 def get_position_stats(positions):
     result_stats = {
@@ -14,7 +15,8 @@ def get_position_stats(positions):
         'max_cumulative_ratio': 1,
         'average_position_duration': 0,
         'buy_signals_count': {},
-        'sell_signals_count': {}
+        'sell_signals_count': {},
+        'yearly_ratio': {} 
     }
 
     if not positions.positions:
@@ -46,6 +48,14 @@ def get_position_stats(positions):
         result_stats['buy_signals_count'][buy_signal] = result_stats['buy_signals_count'].get(buy_signal, 0) + 1
         result_stats['sell_signals_count'][sell_signal] = result_stats['sell_signals_count'].get(sell_signal, 0) + 1
 
+        sell_year = sell_date.year
+        if not sell_year in result_stats['yearly_ratio']:
+            result_stats['yearly_ratio'][sell_year] = 1
+        result_stats['yearly_ratio'][sell_year] = result_stats['yearly_ratio'][sell_year]*ratio
+
+    for year in result_stats['yearly_ratio']:
+        result_stats['yearly_ratio'][year] = round(result_stats['yearly_ratio'][year], 3)
+
     result_stats.update({
         'average_ratio': total_ratio / len(positions.positions),
         'cumulative_ratios': cumulative_ratios,
@@ -54,3 +64,4 @@ def get_position_stats(positions):
     })
 
     return result_stats
+    
