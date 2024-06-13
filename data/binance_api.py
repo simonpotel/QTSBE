@@ -166,7 +166,7 @@ class BinanceAPI:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Fetch and save OHLCV data from Binance.')
     parser.add_argument('-symbol', type=str, default='BTC/USDT', help='The trading pair symbol, e.g., "BTC/USDT".')
-    parser.add_argument('-timeframe', type=str, default='1m', help='The timeframe for the OHLCV data, e.g., "1d".')
+    parser.add_argument('-timeframe', type=str, default='1d', help='The timeframe for the OHLCV data, e.g., "1d".')
 
     args = parser.parse_args()
 
