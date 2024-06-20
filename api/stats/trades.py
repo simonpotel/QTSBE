@@ -1,3 +1,5 @@
+from datetime import datetime
+
 class Positions(object):
     def __init__(self):
         self.positions = []
@@ -14,6 +16,9 @@ class Positions(object):
             sell_price,
             sell_date,
             sell_signals):
+        buy_date_dt = datetime.strptime(buy_date, "%Y-%m-%d")
+        sell_date_dt = datetime.strptime(sell_date, "%Y-%m-%d")
+        position_duration = (sell_date_dt - buy_date_dt).days
         self.positions.append(
             {
                 'buy_index': buy_index,
@@ -24,7 +29,8 @@ class Positions(object):
                 'sell_price': sell_price,
                 'sell_date': sell_date,
                 'sell_signals': sell_signals,
-                'ratio': sell_price / buy_price
+                'ratio': sell_price / buy_price,
+                'position_duration': position_duration
             }
         )
 
