@@ -1,5 +1,34 @@
 from BinanceScanner.scanner import BinanceScanner
 
-BinanceScanner().scan(timeframe='1d', 
-            strategy='rsi_example', 
-            fetch_latest_data=False)
+scanner = BinanceScanner()
+
+specific_symbols = ['BTC/USDT', 
+                    'ETH/USDT', 
+                    'SOL/USDT', 
+                    'DOGE/USDT',
+                    'BNB/USDT',
+                    'MATIC/USDT',
+                    'AVAX/USDT',
+                    'LUNA/USDT',
+                    'XRP/USDT',
+                    'LINK/USDT',
+                    'RNDR/USDT',
+                    'ADA/USDT',
+                    'FTM/USDT',
+                    'XTZ/USDT',
+                    'SUI/USDT',
+                    'SEI/USDT',
+                    'NEAR/USDT',
+                    'ARB/USDT',
+                    'GRT/USDT',
+                    'TRB/USDT',
+                    'BAND/USDT',
+                    'UNI/USDT',         
+                    'SHIB/USDT',
+                    'PEPE/USDT',
+                    'TRX/USDT']
+timeframe = '1d'
+strategy = 'QTS_bollinger3_multi'
+fetch_latest_data = True
+
+scanner.scan(timeframe, strategy, fetch_latest_data, symbols=specific_symbols)
