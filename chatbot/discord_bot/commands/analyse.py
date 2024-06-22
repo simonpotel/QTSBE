@@ -88,13 +88,19 @@ async def save_json_and_image(json_data, data_file, strategy):
 async def send_data_to_discord(message, json_data, temp_files, data_file, strategy):
     drawdown_stats = json_data.get('stats', {}).get('drawdown:', {}) # data of drawdown from api request
     positions_stats = json_data.get('stats', {}).get('positions', {}) # data of positions from api request
+    current_position_stat =  json_data.get('result', [])[2]
 
-    embed = create_stats_embed(drawdown_stats, positions_stats) # create an embeds of the the content of drawdown/positions
+    embed = discord.Embed()
 
     # file objects discord for attachements
     file_json = discord.File(temp_files['json'], filename=f"{data_file}_{strategy}.json")
     file_html = discord.File(temp_files['html'], filename=f"{data_file}_{strategy}.html")
     file_image = discord.File(temp_files['image'], filename=f"{data_file}_{strategy}.png")
+
+    embed.set_thumbnail(url="https://github.com/simonpotel/QTSBE/blob/7ab243450e7adc18367859638b40855139e437b4/files/logo.jpeg?raw=true")
+
+    await send_stats_embed(message, drawdown_stats, positions_stats, current_position_stat) # create an embeds of the the content of drawdown/positions
+
 
     # reply to the original command message from the author with : 
     # - the embed with drawdown/positions stats
@@ -107,28 +113,47 @@ async def send_data_to_discord(message, json_data, temp_files, data_file, strate
     for file_path in temp_files.values():
         os.remove(file_path) 
 
-def create_stats_embed(drawdown_stats, positions_stats):
+async def send_stats_embed(message, drawdown_stats, positions_stats, current_position_stat):
     embed = discord.Embed(
-        title=":chart_with_downwards_trend: Analyse",
-        description="Stats for the given data and strategy:",
+        title="Drawdown Stats",
+        description="",
         color=discord.Color.green()
     )
 
-    embed.add_field(name="Average Drawdown", value=f"{drawdown_stats.get('average_drawdown', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Max Drawdown", value=f"{drawdown_stats.get('max_drawdown', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Max Drawdown Period", value=f"{drawdown_stats.get('max_drawdown_period', ['N/A', 'N/A'])[0]} to {drawdown_stats.get('max_drawdown_period', ['N/A', 'N/A'])[1]}", inline=False)
-    embed.add_field(name="Stability Ratio", value=f"{drawdown_stats.get('stability_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Total Drawdown", value=f"{drawdown_stats.get('total_drawdown', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Average Position Duration", value=f"{positions_stats.get('average_position_duration', 'N/A'):.2f}", inline=False)
-    embed.add_field(name="Average Ratio", value=f"{positions_stats.get('average_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Daily Average Ratio", value=f"{positions_stats.get('daily_average_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Hourly Average Ratio", value=f"{positions_stats.get('hourly_average_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Max Cumulative Ratio", value=f"{positions_stats.get('max_cumulative_ratio', 'N/A'):.4f}", inline=False)
-    embed.add_field(name="Max Loss", value=f"{positions_stats.get('max_loss', 'N/A'):.6f}", inline=False)
-    embed.add_field(name="Max Loss Buy Index", value=f"{positions_stats.get('max_loss_buy_index', 'N/A')}", inline=False)
-    embed.add_field(name="Max Loss Sell Index", value=f"{positions_stats.get('max_loss_sell_index', 'N/A')}", inline=False)
+    for key, value in drawdown_stats.items():
+        if key == 'max_drawdown_period':
+            value_str = f"{value[0]} to {value[1]}"
+        else:
+            value_str = f"{value:.4f}" if isinstance(value, (int, float)) else str(value)
+        embed.add_field(name=key.replace('_', ' ').title(), value=value_str, inline=False)
+    
+    await message.reply(embed=embed)
 
-    return embed
+    embed = discord.Embed(
+        title="Positions Stats",
+        description="",
+        color=discord.Color.green()
+    )
+
+    for key, value in positions_stats.items():
+        value_str = f"{value:.4f}" if isinstance(value, (int, float)) else str(value)
+        if key in ['average_position_duration']:
+            value_str = f"{value:.2f}"
+        elif key in ['max_loss']:
+            value_str = f"{value:.6f}"
+        embed.add_field(name=key.replace('_', ' ').title(), value=value_str, inline=False)
+
+    await message.reply(embed=embed)
+
+    embed = discord.Embed(
+        title="Current Position Stat",
+        description="",
+        color=discord.Color.green()
+    )
+    for key, value in current_position_stat.items():
+        embed.add_field(name=key.replace('_', ' ').title(), value=value, inline=False)
+    await message.reply(embed=embed)
+
 
 def generate_plot_figure(json_data, data_file, strategy):
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])

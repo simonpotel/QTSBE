@@ -28,7 +28,11 @@ class BinanceScanner(object):
     def analyze_symbol(self, symbol, timeframe, strategy):
         url = f"http://127.0.0.1:5000/QTSBE/Binance_{symbol.replace('/', '')}_{timeframe}/{strategy}"
         response = requests.get(url)
-        return response.json()
+        try:
+            return response.json()
+        except requests.exceptions.JSONDecodeError:
+            print(f"Invalid JSON response for {symbol}: {response.text}")
+            return {}  # Return an empty dictionary or handle as appropriate
 
     def process_symbol(self, symbol, index, total_symbols, start_time, timeframe, strategy, analysis_func):
         elapsed_time = time.time() - start_time
@@ -62,16 +66,17 @@ class BinanceScanner(object):
                 futures = {executor.submit(process_symbol_wrapper, symbol, index): symbol for index, symbol in enumerate(symbols, start=1)}
                 for index, future in enumerate(futures, start=1):
                     data, symbol, formatted_remaining_time = future.result()
-                    if data and "stats" in data:
-                        stats = data["stats"]
-                        if stats["positions"]["average_position_duration"] != 0:
-                            all_stats.append((symbol, stats))
-                            if "drawdown:" in stats:
-                                drawdowns.append((symbol, stats["drawdown:"]))
-                            elif "drawdowns" in stats:
-                                drawdowns.append((symbol, stats["drawdowns"]))
-                            if "positions" in stats and "max_cumulative_ratio" in stats["positions"]:
-                                positions_ratios.append((symbol, stats["positions"]["max_cumulative_ratio"]))
+                    if data != {}:
+                        if data and "stats" in data:
+                            stats = data["stats"]
+                            if stats["positions"]["average_position_duration"] != 0:
+                                all_stats.append((symbol, stats))
+                                if "drawdown:" in stats:
+                                    drawdowns.append((symbol, stats["drawdown:"]))
+                                elif "drawdowns" in stats:
+                                    drawdowns.append((symbol, stats["drawdowns"]))
+                                if "positions" in stats and "max_cumulative_ratio" in stats["positions"]:
+                                    positions_ratios.append((symbol, stats["positions"]["max_cumulative_ratio"]))
 
                     pbar.set_postfix({
                         'Symbol': symbol,
@@ -146,3 +151,28 @@ class BinanceScanner(object):
         print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}\n{Fore.WHITE}Fetch Latest Data: {Fore.LIGHTBLUE_EX}{fetch_latest_data}")
         symbols = self.load_symbols()
         self.process_symbols(symbols, timeframe, strategy, fetch_latest_data, self.analyze_symbol)
+
+    def rank_symbols_by_recent_buy_date(self, timeframe, strategy):
+        print(f"{Fore.WHITE}{Style.BRIGHT}Ranking Symbols by Most Recent Buy Date for Strategy: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}")
+        symbols = self.load_symbols()
+
+        def analyze_and_get_recent_buy_date(symbol):
+            data = self.analyze_symbol(symbol, timeframe, strategy)
+            if data and "result" in data and len(data["result"]) >= 3:
+                result = data["result"][2]
+                if result and "buy_date" in result:
+                    return result["buy_date"], symbol
+            return None
+
+        valid_symbols = []
+        with ThreadPoolExecutor(max_workers=7) as executor:
+            futures = {executor.submit(analyze_and_get_recent_buy_date, symbol): symbol for symbol in symbols}
+            for index, future in enumerate(futures):
+                result = future.result()
+                if result:
+                    print(result, str(index)+"/"+str(len(futures)))
+                    valid_symbols.append(result)
+
+        print(" ")
+        ranked_symbols = sorted(valid_symbols, key=lambda x: x[0], reverse=True)
+        return ranked_symbols

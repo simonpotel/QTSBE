@@ -4,6 +4,14 @@ import os
 from datetime import datetime, timedelta
 import argparse
 from colorama import Fore, Style
+import concurrent.futures
+
+def fetch_ohlcv_batch(exchange, symbol, timeframe, since_timestamp):
+    """
+    Function to fetch a batch of OHLCV data.
+    """
+    print(f"{Fore.GREEN}Request{Fore.WHITE}: {Fore.LIGHTMAGENTA_EX}{symbol} {Fore.WHITE}{timeframe}: {datetime.utcfromtimestamp(since_timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')}")
+    return exchange.fetch_ohlcv(symbol, timeframe, since=since_timestamp, limit=1000)
 
 class BinanceAPI:
     def __init__(self):
@@ -16,13 +24,23 @@ class BinanceAPI:
         all_ohlcv = []  # List that will contain all data
         desired_timestamp = self.exchange.parse8601('2000-01-01T00:00:00Z')  # from now to desired_timestamp
         
-        while True: 
-            #print(f"{Fore.GREEN}Request{Fore.WHITE}: {Fore.LIGHTMAGENTA_EX}{symbol} {Fore.WHITE}{timeframe}: {datetime.utcfromtimestamp(desired_timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')}")
-            ohlcv_batch = self.exchange.fetch_ohlcv(symbol, timeframe, since=desired_timestamp, limit=1000)
-            if len(ohlcv_batch) == 0:
-                break  # no data until the desired timestamp, stop code
-            all_ohlcv += ohlcv_batch  # add the collected data to the others ones
-            desired_timestamp = ohlcv_batch[-1][0] + 1  # update the timestamp for the next request
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            future_to_timestamp = {
+                executor.submit(fetch_ohlcv_batch, self.exchange, symbol, timeframe, desired_timestamp): desired_timestamp
+            }
+            
+            while future_to_timestamp:
+                for future in concurrent.futures.as_completed(future_to_timestamp):
+                    timestamp = future_to_timestamp.pop(future)
+                    ohlcv_batch = future.result()
+                    
+                    if len(ohlcv_batch) == 0:
+                        break  # no data until the desired timestamp, stop code
+                    
+                    all_ohlcv += ohlcv_batch  # add the collected data to the others ones
+                    desired_timestamp = ohlcv_batch[-1][0] + 1  # update the timestamp for the next request
+                    
+                    future_to_timestamp[executor.submit(fetch_ohlcv_batch, self.exchange, symbol, timeframe, desired_timestamp)] = desired_timestamp
 
         # convert data to DataFrame
         df = pd.DataFrame(all_ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
@@ -36,8 +54,7 @@ class BinanceAPI:
         # save content
         df.to_csv(filepath, index=False)
         #print(f"{Fore.GREEN}All data has been saved in: {filepath}")
-        return symbol 
-
+        return symbol
     def get_top_50_tokens_by_volume(self):
         """
         Function to print the top 50 tokens by trading volume.
