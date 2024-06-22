@@ -17,7 +17,9 @@ def get_position_stats(positions):
         'buy_signals_count': {},
         'sell_signals_count': {},
         'yearly_ratio': {}, 
-        'max_open_positions_period': ('', '', 0)  # ('start_date', 'end_date', max_open_positions)
+        'max_open_positions_period': ('', '', 0),  # ('start_date', 'end_date', max_open_positions)
+        'biggest_position_duration': 0,
+        'lowest_position_duration': float('inf')
     }
 
     if not positions.positions:
@@ -46,6 +48,11 @@ def get_position_stats(positions):
             result_stats['lowest_ratio'], result_stats['lowest_ratio_buy_index'], result_stats['lowest_ratio_sell_index'] = ratio, buy_index, sell_index
         if ratio > result_stats['biggest_ratio']:
             result_stats['biggest_ratio'], result_stats['biggest_ratio_buy_index'], result_stats['biggest_ratio_sell_index'] = ratio, buy_index, sell_index
+
+        if duration < result_stats['lowest_position_duration']:
+            result_stats['lowest_position_duration'] = duration
+        if duration > result_stats['biggest_position_duration']:
+            result_stats['biggest_position_duration'] = duration
 
         result_stats['buy_signals_count'][buy_signal] = result_stats['buy_signals_count'].get(buy_signal, 0) + 1
         result_stats['sell_signals_count'][sell_signal] = result_stats['sell_signals_count'].get(sell_signal, 0) + 1
