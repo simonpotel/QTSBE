@@ -150,8 +150,14 @@ async def send_stats_embed(message, drawdown_stats, positions_stats, current_pos
         description="",
         color=discord.Color.green()
     )
-    for key, value in current_position_stat.items():
-        embed.add_field(name=key.replace('_', ' ').title(), value=value, inline=False)
+    if isinstance(current_position_stat, list):
+        for idx, position in enumerate(current_position_stat, 1):
+            for key, value in position.items():
+                embed.add_field(name=f"{key.replace('_', ' ').title()} {idx}", value=value, inline=False)
+    else:
+        for key, value in current_position_stat.items():
+            embed.add_field(name=key.replace('_', ' ').title(), value=value, inline=False)
+    
     await message.reply(embed=embed)
 
 
