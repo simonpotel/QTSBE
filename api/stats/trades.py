@@ -1,7 +1,9 @@
+from datetime import datetime
+
 class Positions(object):
     def __init__(self):
         self.positions = []
-        self.current_position = {}
+        self.current_positions = []
         self.indicators = {}
 
     def add_trade(
@@ -14,6 +16,9 @@ class Positions(object):
             sell_price,
             sell_date,
             sell_signals):
+        buy_date_dt = datetime.strptime(buy_date, "%Y-%m-%d")
+        sell_date_dt = datetime.strptime(sell_date, "%Y-%m-%d")
+        position_duration = (sell_date_dt - buy_date_dt).days
         self.positions.append(
             {
                 'buy_index': buy_index,
@@ -24,7 +29,8 @@ class Positions(object):
                 'sell_price': sell_price,
                 'sell_date': sell_date,
                 'sell_signals': sell_signals,
-                'ratio': sell_price/buy_price
+                'ratio': sell_price / buy_price,
+                'position_duration': position_duration
             }
         )
 
@@ -34,46 +40,49 @@ class Positions(object):
             buy_price,
             buy_date,
             buy_signals):
-        #if self.current_position != {}: return False 
-        self.current_position = {
-                'buy_index': buy_index,
-                'buy_price': buy_price,
-                'buy_date': buy_date,
-                'buy_signals': buy_signals,
-        }
+        self.current_positions.append({
+            'buy_index': buy_index,
+            'buy_price': buy_price,
+            'buy_date': buy_date,
+            'buy_signals': buy_signals,
+        })
 
     def close_position(
             self,
+            buy_index,
             sell_index,
             sell_price,
             sell_date,
             sell_signals):
-        if self.current_position == {}: return False 
+        position = next((pos for pos in self.current_positions if pos['buy_index'] == buy_index), None)
+        if not position:
+            return False
 
         self.add_trade(
-            buy_index=self.current_position['buy_index'],
-            buy_price=self.current_position['buy_price'],
-            buy_date=self.current_position['buy_date'],
-            buy_signals=self.current_position['buy_signals'],
+            buy_index=position['buy_index'],
+            buy_price=position['buy_price'],
+            buy_date=position['buy_date'],
+            buy_signals=position['buy_signals'],
             sell_index=sell_index,
             sell_price=sell_price,
             sell_date=sell_date,
             sell_signals=sell_signals)
-        self.current_position = {}
+        self.current_positions = [pos for pos in self.current_positions if pos['buy_index'] != buy_index]
 
 if __name__ == "__main__":
     # Example positions on BTC (hypothetical data)
     # To understand how the class works
-    Positions = Positions()
+    positions = Positions()
 
     # 1st position
-    Positions.add_position(
+    positions.add_position(
         buy_index=1,
         buy_price=50000,
         buy_date="2023-01-01",
         buy_signals=[{'RSI': 30}]
     )
-    Positions.close_position(
+    positions.close_position(
+        buy_index=1,
         sell_index=2,
         sell_price=52000,
         sell_date="2023-02-01",
@@ -81,18 +90,19 @@ if __name__ == "__main__":
     )
 
     # 2nd position
-    Positions.add_position(
+    positions.add_position(
         buy_index=3,
         buy_price=51000,
         buy_date="2023-03-01",
         buy_signals=[{'RSI': 50}]
     )
-    Positions.close_position(
+    positions.close_position(
+        buy_index=3,
         sell_index=4,
         sell_price=47000,
         sell_date="2023-04-01",
         sell_signals=[{'RSI': 42}]
     )
 
-    for trade in Positions.positions:
+    for trade in positions.positions:
         print(trade)

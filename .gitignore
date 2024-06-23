@@ -12,5 +12,5 @@ display/python/saved_results/*
 display/web/saved_results/*
 
 scan_result.json 
-additional_stats.json
+global_stats.json
 chatbot/config.json

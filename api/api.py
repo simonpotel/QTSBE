@@ -57,7 +57,7 @@ def get_data(pair, strategy):
          "result": (
              result.indicators,
              result.positions,
-             result.current_position
+             result.current_positions
              ), # result is an object of the class Positions in stats/positions.py
           "stats": 
              {"drawdown:": get_drawdowns_stats(result),
