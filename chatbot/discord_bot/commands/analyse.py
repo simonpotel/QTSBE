@@ -160,7 +160,6 @@ async def send_stats_embed(message, drawdown_stats, positions_stats, current_pos
     
     await message.reply(embed=embed)
 
-
 def generate_plot_figure(json_data, data_file, strategy):
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
     indicators = extract_indicators(json_data)
@@ -169,7 +168,7 @@ def generate_plot_figure(json_data, data_file, strategy):
     rows = 1
     cols = 1
 
-    # determine plot layout based on indicators and trades
+    # Determine plot layout based on indicators and trades
     if 'RSI' in indicators or 'Normalize_MACD' in indicators:
         price_row_height = 0.7
         rsi_row_height = 0.3
@@ -189,14 +188,14 @@ def generate_plot_figure(json_data, data_file, strategy):
     if cols > 1:
         column_widths[0] = 0.7
 
-    # create subplot figure
+    # Create subplot figure
     fig = make_subplots(rows=rows, cols=cols, shared_xaxes=True, vertical_spacing=0.25,
                         row_heights=row_heights, column_widths=column_widths)
 
-    # candlestick plot (with pair data)
+    # Candlestick plot (main OHLC)
     fig.add_trace(go.Candlestick(x=dates, open=opens, high=highs, low=lows, close=closes), row=1, col=1)
 
-    # others plots for 'special' indicators
+    # Add other plots for indicators
     for indicator in indicators:
         row = 1
         if indicator == 'RSI' or indicator == 'Normalize_MACD':
@@ -204,7 +203,7 @@ def generate_plot_figure(json_data, data_file, strategy):
         fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator,
                                  line=dict(color=chart_colors[indicator])), row=row, col=1)
 
-    # add trades plot if any trade has been calulcated
+    # Add trades plot if there are trade ratios
     if len(trade_ratios) > 0:
         fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios',
                                  line=dict(color=chart_colors['Test'])), row=1, col=2)
@@ -212,57 +211,60 @@ def generate_plot_figure(json_data, data_file, strategy):
         fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios',
                                  line=dict(color=chart_colors['MA_100'])), row=1, col=2)
 
+    # Plot buy and sell markers
     buy_dates = [trade['buy_date'] for trade in trades]
     buy_prices = [trade['buy_price'] for trade in trades]
-    buy_indices = [trade['buy_index'] for trade in trades]  
-    buy_signals = [trade['buy_signals']['Buy_Signal'] for trade in trades] 
+    buy_indices = [trade['buy_index'] for trade in trades]
+    buy_signals = [trade['buy_signals']['Buy_Signal'] for trade in trades]
 
     sell_dates = [trade['sell_date'] for trade in trades]
     sell_prices = [trade['sell_price'] for trade in trades]
-    sell_indices = [trade['sell_index'] for trade in trades]  
-    sell_signals = [trade['sell_signals']['Sell_Signal'] for trade in trades] 
+    sell_indices = [trade['sell_index'] for trade in trades]
+    sell_signals = [trade['sell_signals']['Sell_Signal'] for trade in trades]
 
     ratios = [float(ratio) for ratio in json_data["stats"]["positions"]["all_ratios"]]
 
-    # hover texts for the markets
+    # Hover texts for buy and sell markers
     buy_hover_texts = [f"Index: {index}<br>Price: {price}<br>Date: {date}<br>Buy Signal: {buy_signal}" for index, price, date, buy_signal in zip(buy_indices, buy_prices, buy_dates, buy_signals)]
     sell_hover_texts = [f"Index: {index}<br>Price: {price}<br>Date: {date}<br>Ratio: {ratio}<br>Sell Signal: {sell_signal}" for index, price, date, ratio, sell_signal in zip(sell_indices, sell_prices, sell_dates, ratios, sell_signals)]
 
-    # plot buy/sell markes
+    # Plot buy and sell markers
     fig.add_trace(go.Scatter(
-        x=buy_dates, 
-        y=buy_prices, 
-        mode='markers', 
-        name='Buy', 
+        x=buy_dates,
+        y=buy_prices,
+        mode='markers',
+        name='Buy',
         marker=dict(symbol='triangle-up', color='#B0FE76', size=10),
-        hovertext=buy_hover_texts,  
-        hoverinfo='text'  
+        hovertext=buy_hover_texts,
+        hoverinfo='text'
     ), row=1, col=1)
     fig.add_trace(go.Scatter(
-        x=sell_dates, 
-        y=sell_prices, 
-        mode='markers', 
-        name='Sell', 
+        x=sell_dates,
+        y=sell_prices,
+        mode='markers',
+        name='Sell',
         marker=dict(symbol='triangle-down', color='#2DC7FF', size=10),
-        hovertext=sell_hover_texts,  
-        hoverinfo='text' 
+        hovertext=sell_hover_texts,
+        hoverinfo='text'
     ), row=1, col=1)
 
-    # layout
-    fig.update_layout(title=f"{data_file} ({strategy})",
-                    xaxis_title='Date',
-                    yaxis_title='Price',
-                    xaxis_rangeslider_visible=False,
-                    plot_bgcolor='#161a25',
-                    paper_bgcolor='#161a25',
-                    font=dict(color='white'),
-                    yaxis=dict(gridcolor='#6c7386'),
-                    xaxis=dict(gridcolor='#6c7386'),
-                    yaxis2=dict(gridcolor='#6c7386'), 
-                    xaxis2=dict(gridcolor='#6c7386')) 
+    # Update layout settings
+    fig.update_layout(
+        title=f"{data_file} ({strategy})",
+        xaxis_title='Date',
+        yaxis_title='Price',
+        xaxis_rangeslider_visible=False,
+        plot_bgcolor='#161a25',
+        paper_bgcolor='#161a25',
+        font=dict(color='white'),
+        yaxis=dict(gridcolor='#6c7386'),
+        xaxis=dict(gridcolor='#6c7386'),
+        yaxis2=dict(gridcolor='#6c7386'),
+        xaxis2=dict(gridcolor='#6c7386')
+    )
 
-    # size of the plot RSI/MACD
-    if 'RSI' or 'Normalize_MACD' in indicators:
+    # Adjust plot size for RSI/Normalize_MACD if they exist
+    if 'RSI' in indicators or 'Normalize_MACD' in indicators:
         fig.update_yaxes(range=[0, 100], row=2, col=1)
         fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
 
