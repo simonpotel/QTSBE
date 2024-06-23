@@ -38,7 +38,7 @@ def analyse(data, prices):
 
         # iterate over a copy of current_positions to avoid modification during iteration
         for position in positions.current_positions[:]:  
-            if rsi[i] > 50 and prices[i] / position['buy_price'] > 2:  # RSI > 50 and simple check ratio (⚠️ Don't do this)
+            if rsi[i] > 50 and prices[i] / position['buy_price'] > 1.10:  # RSI > 50 and simple check ratio (⚠️ Don't do this)
                 positions.close_position(
                     buy_index=position['buy_index'],
                     sell_index=i,
