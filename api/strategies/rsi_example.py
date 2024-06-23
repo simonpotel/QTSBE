@@ -1,5 +1,6 @@
 from algo.indicators.rsi import get_RSI
 from stats.trades import Positions
+from datetime import datetime
 #from api import logger
 
 # This example of analysis shows you 
@@ -11,8 +12,9 @@ from stats.trades import Positions
 # This is why, if you run this example on BTCUSDT since 2018, 
 # you will only have 20 transactions and only a 3x increase in your capital over 6 years. 
 
-def analyse(data, prices):
+def analyse(data, prices, start_ts, end_ts, multi_positions):
     positions = Positions()  
+    ts_format = "%Y-%m-%d"
 
     # indicators used in this strategy example
     rsi = get_RSI(prices, 14)
@@ -24,17 +26,20 @@ def analyse(data, prices):
     for i in range(len(prices) - 1):  # iterate through each price entry
         if rsi[i] is None: 
             continue  # no data on RSI (for the first data of prices)
+        if (start_ts and start_ts > datetime.strptime(data[i][0], ts_format)) or (end_ts and end_ts < datetime.strptime(data[i][0], ts_format)):
+            continue 
 
-        if rsi[i] < 40:  # RSI is less than 40, buy signal
-            positions.add_position(
-                buy_index=i,
-                buy_price=prices[i],
-                buy_date=data[i][0],
-                buy_signals={
-                    "RSI": rsi[i],
-                    "Buy_Signal": 1
-                }
-            )
+        if  (multi_positions == False and len(positions.current_positions) == 0) or multi_positions == True:
+            if rsi[i] < 40:  # RSI is less than 40, buy signal
+                positions.add_position(
+                    buy_index=i,
+                    buy_price=prices[i],
+                    buy_date=data[i][0],
+                    buy_signals={
+                        "RSI": rsi[i],
+                        "Buy_Signal": 1
+                    }
+                )
 
         # iterate over a copy of current_positions to avoid modification during iteration
         for position in positions.current_positions[:]:  

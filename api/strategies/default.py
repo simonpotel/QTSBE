@@ -7,7 +7,7 @@ from algo.indicators.bollinger_bands import get_bollinger_bands
 from stats.trades import Positions
 from api import logger
 
-def analyse(data, prices):
+def analyse(data, prices, start_ts, end_ts, multi_positions):
     positions = Positions()
 
     # indicators used in this strategy

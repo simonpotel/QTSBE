@@ -1,6 +1,7 @@
 import os
 import sys 
 import importlib.util
+from datetime import datetime
 
 # Add parent directories to sys.path to import modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -44,13 +45,18 @@ CORS(app, resources={r"/QTSBE/*": {"origins": "http://127.0.0.1"}})
 
 @app.route('/QTSBE/<pair>/<strategy>')
 def get_data(pair, strategy):
-    start_ts = request.args.get('start_ts')
-    end_ts = request.args.get('end_ts')
+    ts_format = "%Y-%m-%d"
+    start_ts = request.args.get('start_ts') 
+    end_ts = request.args.get('end_ts') 
+    multi_positions = request.args.get('multi_positions') 
+    multi_positions = bool(multi_positions) and (lambda s: s.lower() in {'true'})(multi_positions)
+    if start_ts: start_ts = datetime.strptime(start_ts, ts_format)
+    if end_ts: end_ts = datetime.strptime(end_ts, ts_format)
 
     data = get_file_data(pair)  
     prices = [float(entry[1].replace(',', '')) for entry in data]
 
-    result = strategies[strategy].analyse(data, prices, start_ts, end_ts)
+    result = strategies[strategy].analyse(data, prices, start_ts, end_ts, multi_positions)
 
     response = jsonify({
         "pair": pair,
@@ -69,7 +75,7 @@ def get_data(pair, strategy):
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
 
-    logger.info(f"Request pair: {pair} | strategy: {strategy} | start_ts: {start_ts} | end_ts: {end_ts}")
+    logger.info(f"Request pair: {pair} | strategy: {strategy} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions}")
     logger.debug(f"Request response: {response}")
     return response
 
