@@ -22,22 +22,25 @@ def analyse(data, prices):
     }
 
     for i in range(len(prices) - 1):  # iterate through each price entry
-        if rsi[i] is None: continue  # no data on RSI (for the first data of prices)
+        if rsi[i] is None: 
+            continue  # no data on RSI (for the first data of prices)
 
-        if positions.current_position == {}: # not already in a position
-            if rsi[i] < 40:  # RSI is less than 40, buy signal
-                positions.add_position(
-                    buy_index=i,
-                    buy_price=prices[i],
-                    buy_date=data[i][0],
-                    buy_signals={
-                        "RSI": rsi[i],
-                        "Buy_Signal": 1
-                    }
-                )
-        else:
-            if rsi[i] > 50 and prices[i]/positions.current_position['buy_price'] > 1.01:  # RSI > 55 and simple check ratio (⚠️ Dont do this)
+        if rsi[i] < 40:  # RSI is less than 40, buy signal
+            positions.add_position(
+                buy_index=i,
+                buy_price=prices[i],
+                buy_date=data[i][0],
+                buy_signals={
+                    "RSI": rsi[i],
+                    "Buy_Signal": 1
+                }
+            )
+
+        # iterate over a copy of current_positions to avoid modification during iteration
+        for position in positions.current_positions[:]:  
+            if rsi[i] > 50 and prices[i] / position['buy_price'] > 2:  # RSI > 50 and simple check ratio (⚠️ Don't do this)
                 positions.close_position(
+                    buy_index=position['buy_index'],
                     sell_index=i,
                     sell_price=prices[i],
                     sell_date=data[i][0],
@@ -48,4 +51,3 @@ def analyse(data, prices):
                 )
 
     return positions
-
