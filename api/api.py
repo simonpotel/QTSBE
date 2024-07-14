@@ -49,6 +49,7 @@ def get_data(pair, strategy):
     start_ts = request.args.get('start_ts') 
     end_ts = request.args.get('end_ts') 
     multi_positions = request.args.get('multi_positions') 
+    details = request.args.get('details') 
     multi_positions = bool(multi_positions) and (lambda s: s.lower() in {'true'})(multi_positions)
     if start_ts: start_ts = datetime.strptime(start_ts, ts_format)
     if end_ts: end_ts = datetime.strptime(end_ts, ts_format)
@@ -58,12 +59,12 @@ def get_data(pair, strategy):
 
     result = strategies[strategy].analyse(data, prices, start_ts, end_ts, multi_positions)
 
-    response = jsonify({
+    response_data = {
         "pair": pair,
         "strategy": strategy,
-        "data": data,
+        "data": data if details == "True" else [],
         "result": (
-            result.indicators,
+            result.indicators if details == "True" else [],
             result.positions,
             result.current_positions
         ),
@@ -71,11 +72,14 @@ def get_data(pair, strategy):
             "drawdown": get_drawdowns_stats(result),
             "positions": get_position_stats(result)
         }
-    })
+    }
+
+    response = jsonify(response_data)
+
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
 
-    logger.info(f"Request pair: {pair} | strategy: {strategy} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions}")
+    logger.info(f"Request pair: {pair} | strategy: {strategy} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
     logger.debug(f"Request response: {response}")
     return response
 
