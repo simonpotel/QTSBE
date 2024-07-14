@@ -87,7 +87,7 @@ class BinanceScanner(object):
         pbar.write(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}All tokens processed!")
         all_stats_sorted = sorted(all_stats, key=lambda x: x[1]["positions"]["max_cumulative_ratio"], reverse=True)
         self.save_stats_to_json(all_stats_sorted)
-        self.save_additional_stats_to_json(drawdowns, positions_ratios)
+        self.save_global_stats_to_json(drawdowns, positions_ratios)
 
     def save_stats_to_json(self, all_stats):
         result = {"tokens": []}
@@ -100,7 +100,7 @@ class BinanceScanner(object):
             json.dump(result, json_file, indent=4)
         print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Results saved to scan_result.json")
 
-    def save_additional_stats_to_json(self, drawdowns, positions_ratios):
+    def save_global_stats_to_json(self, drawdowns, positions_ratios):
         if drawdowns:
             drawdowns_sorted = sorted(drawdowns, key=lambda x: x[1]["max_drawdown"], reverse=True)
             max_drawdown = drawdowns_sorted[0]
@@ -116,15 +116,14 @@ class BinanceScanner(object):
         if positions_ratios:
             positions_ratios_sorted = sorted(positions_ratios, key=lambda x: x[1], reverse=True)
             avg_ratio = sum(pr[1] for pr in positions_ratios) / len(positions_ratios)
-            max_ratio = positions_ratios_sorted[0]
-            print(positions_ratios_sorted)
-            min_ratio = positions_ratios_sorted[-1]
+            max_ratio_cr = positions_ratios_sorted[0]
+            min_ratio_cr = positions_ratios_sorted[-1]
         else:
             avg_ratio = 0
-            max_ratio = ("N/A", 0)
-            min_ratio = ("N/A", 0)
+            max_ratio_cr = ("N/A", 0)
+            min_ratio_cr = ("N/A", 0)
 
-        additional_stats = {
+        global_stats = {
             "drawdowns": {
                 "max_drawdown": max_drawdown[1]["max_drawdown"],
                 "max_drawdown_pair": max_drawdown[0],
@@ -136,25 +135,27 @@ class BinanceScanner(object):
             },
             "positions": {
                 "average_ratio": avg_ratio,
-                "max_ratio": max_ratio[1],
-                "max_ratio_pair": max_ratio[0],
-                "min_ratio": min_ratio[1],
-                "min_ratio_pair": min_ratio[0]
+                "max_ratio_cr": max_ratio_cr[1],
+                "max_ratio_cr_pair": max_ratio_cr[0],
+                "min_ratio_cr": min_ratio_cr[1],
+                "min_ratio_cr_pair": min_ratio_cr[0]
             }
         }
 
-        with open('additional_stats.json', 'w') as json_file:
-            json.dump(additional_stats, json_file, indent=4)
-        print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Additional statistics saved to additional_stats.json")
+        with open('global_stats.json', 'w') as json_file:
+            json.dump(global_stats, json_file, indent=4)
+        print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Global statistics saved to global_stats.json")
 
-    def scan(self, timeframe, strategy, fetch_latest_data):
+    def scan(self, timeframe, strategy, fetch_latest_data, symbols=None):
         print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}\n{Fore.WHITE}Fetch Latest Data: {Fore.LIGHTBLUE_EX}{fetch_latest_data}")
-        symbols = self.load_symbols()
+        if symbols is None:
+            symbols = self.load_symbols()
         self.process_symbols(symbols, timeframe, strategy, fetch_latest_data, self.analyze_symbol)
 
-    def rank_symbols_by_recent_buy_date(self, timeframe, strategy):
+    def rank_symbols_by_recent_buy_date(self, timeframe, strategy, symbols=None):
         print(f"{Fore.WHITE}{Style.BRIGHT}Ranking Symbols by Most Recent Buy Date for Strategy: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}")
-        symbols = self.load_symbols()
+        if symbols is None:
+            symbols = self.load_symbols()
 
         def analyze_and_get_recent_buy_date(symbol):
             data = self.analyze_symbol(symbol, timeframe, strategy)

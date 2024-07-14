@@ -14,9 +14,9 @@ def list_files_in_directory(directory, extension):
                 files.append(name_without_extension)
     return files or ['None']
 
-def main(data=None, strategy=None):
+def main(data, strategy, start_ts, end_ts, multi_positions):
     if data and strategy:
-        fetch_and_show_data(data, strategy)
+        fetch_and_show_data(data, strategy, start_ts, end_ts, multi_positions)
     else:
         ctk.set_appearance_mode("dark")  # "light", "dark", "system"
         ctk.set_default_color_theme("dark-blue")  # "blue", "dark-blue", "green"
@@ -44,12 +44,15 @@ def main(data=None, strategy=None):
         strategy_combo.grid(row=1, column=1, pady=(10, 0), padx=10, sticky="ew")
 
         # button that makes a request in result_gui.py to the API and print the data
-        load_button = ctk.CTkButton(frame, text="Load", command=lambda: fetch_and_show_data(data_combo.get(), strategy_combo.get()))
+        load_button = ctk.CTkButton(frame, text="Load", command=lambda: fetch_and_show_data(data_combo.get(), strategy_combo.get(), start_ts, end_ts, multi_positions))
         load_button.grid(row=2, column=0, columnspan=2, pady=(20, 10))
 
         root.mainloop()
 
 if __name__ == "__main__":
-    data_arg = sys.argv[1] if len(sys.argv) > 1 else None
-    strategy_arg = sys.argv[2] if len(sys.argv) > 2 else None
-    main(data_arg, strategy_arg)
+    data_arg = sys.argv[1] 
+    strategy_arg = sys.argv[2]
+    start_ts = sys.argv[3] 
+    end_ts = sys.argv[4] 
+    multi_positions = sys.argv[5]
+    main(data_arg, strategy_arg, start_ts, end_ts, multi_positions)
