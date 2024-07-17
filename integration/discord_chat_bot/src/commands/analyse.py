@@ -6,7 +6,7 @@ import os
 import plotly.io as pio
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
-from discord_bot.embeds import reply_embed, create_embed
+from src.embeds import reply_embed, create_embed
 
 # Chart colors dictionary
 chart_colors = {

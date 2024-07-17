@@ -1,4 +1,4 @@
-## QTSBE/display
+## QTSBE/integration/plotly
 
 The "display" module offers powerful features for visualizing and analyzing financial data using the Binance API and Plotly. With a user-friendly interface and interactive charts, users can explore market trends, evaluate trading strategy performance, and make informed investment decisions.
 
