@@ -10,7 +10,7 @@ import math
 
 #sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '..', 'data'))
 #from binance_api import BinanceAPI
-from tools.data_fetch.binance_api import BinanceAPI
+from tools.data_fetch.binance.binance_api import BinanceAPI
 
 init(autoreset=True)
 
