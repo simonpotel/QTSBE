@@ -1,5 +1,5 @@
 import discord 
-from discord_bot.embeds import send_embed, error 
+from src.embeds import send_embed, error 
 
 async def clear(client, message, args):
     """

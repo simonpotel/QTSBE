@@ -24,17 +24,17 @@ chart_colors = {
 }
 
 def fetch_and_show_data(data_file, strategy, start_ts, end_ts, multi_positions):
-    url = f"http://127.0.0.1:5000/QTSBE/{data_file}/{strategy}?start_ts={start_ts}&end_ts={end_ts}&multi_positions={multi_positions}"
+    url = f"http://127.0.0.1:5000/QTSBE/{data_file}/{strategy}?start_ts={start_ts}&end_ts={end_ts}&multi_positions={multi_positions}&details=True"
     
     try:
         response = requests.get(url)
         response.raise_for_status()
-        display_results_in_new_window(response.text, data_file, strategy, url)  
+        plotly_results_in_new_window(response.text, data_file, strategy, url)  
     except requests.RequestException as e:
         print("Request failed:", e)
 
-def display_results_in_new_window(response_text, data_file, strategy, url):
-    """display the fetched results in a new window with a plot and JSON data"""
+def plotly_results_in_new_window(response_text, data_file, strategy, url):
+    """displplotlyay the fetched results in a new window with a plot and JSON data"""
     new_window = ctk.CTkToplevel()  
     new_window.title("Result: " + url)
     new_window.geometry("1200x800")
@@ -42,7 +42,7 @@ def display_results_in_new_window(response_text, data_file, strategy, url):
     text_frame, graph_frame = create_frames(new_window)
 
     json_data = json.loads(response_text)
-    display_json_data(json_data, text_frame)
+    plotly_json_data(json_data, text_frame)
     add_save_button(text_frame, json_data)
 
     plot_json_data_in_gui(json_data, graph_frame, data_file, strategy)
@@ -55,8 +55,8 @@ def create_frames(new_window):
     graph_frame.pack(fill="both", expand=True, side="right")
     return text_frame, graph_frame
 
-def display_json_data(json_data, text_frame):
-    """display formatted JSON request data in a text widget."""
+def plotly_json_data(json_data, text_frame):
+    """plotly formatted JSON request data in a text widget."""
     text_widget = ctk.CTkTextbox(text_frame, wrap="none")
     text_widget.pack(fill="both", expand=True)
     formatted_json = json.dumps(json_data, indent=4)
@@ -70,7 +70,7 @@ def add_save_button(text_frame, json_data):
 def save_to_file(content):
     """save JSON content to a file."""
     try:
-        os.makedirs('display/python/saved_results/', exist_ok=True)
+        os.makedirs('integrations/plotly/saved_results/', exist_ok=True)
         filename = generate_filename(content)
         with open(filename, "w") as file:
             file.write(json.dumps(content, indent=4))
@@ -80,7 +80,7 @@ def save_to_file(content):
 
 def generate_filename(content):
     """generate a filename based on the current timestamp, pair, and strategy."""
-    return f"display/python/saved_results/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}_{content['pair']}_{content['strategy']}.json"
+    return f"integrations/plotly/saved_results/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}_{content['pair']}_{content['strategy']}.json"
 
 def extract_trade_data(trades):
     """Extract trade indices and ratios from the trade data."""
@@ -185,10 +185,10 @@ def plot_json_data_in_gui(json_data, graph_frame, data_file, strategy):
         fig.update_yaxes(range=[0, 100], row=2, col=1)
         fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
 
-    os.makedirs('display/python/saved_results/', exist_ok=True)
-    plot_filename = 'display/python/saved_results/plot.html'
+    os.makedirs('integrations/plotly/saved_results/', exist_ok=True)
+    plot_filename = 'integrations/plotly/saved_results/plot.html'
     fig.write_html(plot_filename)
-    webbrowser.open(os.path.join(os.getcwd(), 'display', 'python', 'saved_results', 'plot.html'))
+    webbrowser.open(os.path.join(os.getcwd(), 'integrations', 'plotly', 'saved_results', 'plot.html'))
 
 def extract_ohlc_data(data):
     """Extract OHLC data from the JSON data."""

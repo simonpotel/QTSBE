@@ -1,10 +1,10 @@
 import discord
 from discord import Activity, ActivityType
-from discord_bot.embeds import reply_embed
-from discord_bot.config import get_bot_config
-from discord_bot.commands.clear import clear
-from discord_bot.commands.analyse import analyse
-#from discord_bot.commands.scan import scan
+from src.embeds import reply_embed
+from src.config import get_bot_config
+from src.commands.clear import clear
+from src.commands.analyse import analyse
+#from src.commands.scan import scan
 
 bot_config = get_bot_config()  
 
