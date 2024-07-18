@@ -9,7 +9,6 @@ api/strategies/*
 !api/strategies/default.py
 !api/strategies/rsi_example.py
 
-display/python/saved_results/*
-display/web/saved_results/*
+integrations/plotly/saved_results/*
 
-integration/discord_chat_bot/configs/bot.json
+integrations/discord_chat_bot/configs/bot.json
