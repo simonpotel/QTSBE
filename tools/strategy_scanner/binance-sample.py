@@ -1,4 +1,8 @@
+import os
+import sys
+sys.path.append(os.getcwd())
 from tools.strategy_scanner.binance.scanner import BinanceScanner
+
 scanner = BinanceScanner()
 
 specific_symbols = [
