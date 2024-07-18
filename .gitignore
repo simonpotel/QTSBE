@@ -1,5 +1,6 @@
 *.pyc
-/Logs
+logs/
+!logs/README.md
 
 data/bank/*
 !data/bank/Binance_BTCUSDT_1d.csv
@@ -11,6 +12,4 @@ api/strategies/*
 display/python/saved_results/*
 display/web/saved_results/*
 
-scan_result.json 
-global_stats.json
-chatbot/config.json
+integration/discord_chat_bot/configs/bot.json
