@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append(os.getcwd())
-from tools.data_fetch.yahoo_stock_exchange.finance import download_and_save
+from tools.data_fetch.yahoo_stock_exchange.yahoo import download_and_save
 
 if __name__ == "__main__":
     tickers = [
