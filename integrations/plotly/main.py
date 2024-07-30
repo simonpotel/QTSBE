@@ -1,5 +1,5 @@
 import sys
-from request_utils import fetch_and_show_data
+from utils.api_requests import fetch_and_show_data
 
 def main():
     if len(sys.argv) < 3:
