@@ -1,11 +1,17 @@
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import os
-import webbrowser
-from datetime import datetime 
+#import webbrowser
+#from datetime import datetime 
+
+theme = 'white' # black / white
 
 chart_colors = {
-    "Price": "#6c7386",
+    "Background": "white" if theme == 'white' else "black", # black
+    "increasing_line": "#1e90ff",
+    "increasing_fill": "#115290",
+    "decreasing_line": "#d17123",  #red: #be0000  | #orange: #d17123  | 
+    "decreasing_fill": "#eb7f26",  #red: #ff0000  | #orange: #eb7f26  | 
     "MA_100": "#B8336A",
     "MA_40": "#FF9B42",
     "MA_20": "#F4D35E",
@@ -69,7 +75,12 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
                         row_heights=row_heights,
                         column_widths=column_widths)
 
-    fig.add_trace(go.Candlestick(x=dates, open=opens, high=highs, low=lows, close=closes), row=1, col=1)
+    fig.add_trace(go.Candlestick(
+        x=dates, open=opens, high=highs, low=lows, close=closes,
+        name="Price", 
+        increasing_line_color=chart_colors['increasing_line'], decreasing_line_color=chart_colors['decreasing_line'], 
+        increasing_fillcolor=chart_colors['increasing_fill'], decreasing_fillcolor=chart_colors['decreasing_fill']
+    ), row=1, col=1)
 
     for indicator in indicators:
         row = 1
@@ -121,13 +132,13 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
                       xaxis_title='Date',
                       yaxis_title='Price',
                       xaxis_rangeslider_visible=False,
-                      plot_bgcolor='#161a25',
-                      paper_bgcolor='#161a25',
-                      font=dict(color='white'),
-                      yaxis=dict(gridcolor='#6c7386'),
-                      xaxis=dict(gridcolor='#6c7386'),
-                      yaxis2=dict(gridcolor='#6c7386'),
-                      xaxis2=dict(gridcolor='#6c7386'))
+                      plot_bgcolor=chart_colors['Background'],
+                      paper_bgcolor=chart_colors['Background'],
+                      font=dict(color="black" if theme == 'white' else "white"),
+                      yaxis=dict(gridcolor=chart_colors['Background']),
+                      xaxis=dict(gridcolor=chart_colors['Background']),
+                      yaxis2=dict(gridcolor=chart_colors['Background']),
+                      xaxis2=dict(gridcolor=chart_colors['Background']))
 
     if 'RSI' or 'Normalize_MACD' in indicators:
         fig.update_yaxes(range=[0, 100], row=2, col=1)
