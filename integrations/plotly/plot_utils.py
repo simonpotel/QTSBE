@@ -2,6 +2,7 @@ import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import os
 import webbrowser
+from datetime import datetime 
 
 chart_colors = {
     "Price": "#6c7386",
@@ -133,8 +134,9 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
 
     fig.show()
-    return 
-    os.makedirs('integrations/plotly/saved_results/', exist_ok=True)
-    plot_filename = 'integrations/plotly/saved_results/plot.html'
-    fig.write_html(plot_filename)
-    webbrowser.open(os.path.join(os.getcwd(), 'integrations', 'plotly', 'saved_results', 'plot.html'))
+
+    directory = 'integrations/plotly/saved_results/'
+    os.makedirs(directory, exist_ok=True)
+    plot_filename = f'plot_{data_file}_{strategy}.html'
+    fig.write_html(directory + plot_filename)
+    #webbrowser.open(os.path.join(os.getcwd(), 'integrations', 'plotly', 'saved_results', plot_filename)) # save html file
