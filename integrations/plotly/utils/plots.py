@@ -5,11 +5,12 @@ import os
 theme = 'white' # black / white
 
 chart_colors = {
-    "Background": "white" if theme == 'white' else "black", # black
+    "Background": theme, # black
     "increasing_line": "#1e90ff",
     "increasing_fill": "#115290",
     "decreasing_line": "#d17123",  #red: #be0000  | #orange: #d17123  | 
     "decreasing_fill": "#eb7f26",  #red: #ff0000  | #orange: #eb7f26  | 
+    "shapes": "#8288b0",
     "MA_100": "#B8336A",
     "MA_40": "#FF9B42",
     "MA_20": "#F4D35E",
@@ -60,8 +61,24 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
     if len(trade_ratios) > 0:
         rows += 1
 
-    # Create subplots with shared x-axis
-    fig = make_subplots(rows=rows, cols=cols, shared_xaxes='all', vertical_spacing=0.25)
+    if cols == 1 and rows == 2:
+        row_heights = [0.7, 0.3]
+        column_widths = [1]
+    elif cols == 2 and rows == 2:
+        row_heights = [0.75, 0.25]
+        column_widths = [0.75, 0.25]
+    else:
+        row_heights = [1]*rows
+        column_widths = [1]*column_widths
+
+    fig = make_subplots(
+        rows=rows,
+        cols=cols,
+        shared_xaxes='all',
+        vertical_spacing=0.25,
+        row_heights=row_heights,
+        column_widths=column_widths
+    )
 
     # Add candlestick chart to the first row, first column
     fig.add_trace(go.Candlestick(
@@ -71,11 +88,14 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         increasing_fillcolor=chart_colors['increasing_fill'], decreasing_fillcolor=chart_colors['decreasing_fill']
     ), row=1, col=1)
 
+
     # Add trade ratios chart to the second column if there are trade ratios
     if len(trade_ratios) > 0:
         fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color=chart_colors['Test'])), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
         cumulative_ratios = [float(cumulative_ratio) for cumulative_ratio in json_data["stats"]["positions"]["cumulative_ratios"]]
         fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
+        fig.add_shape(type="line", x0=min(trade_indices), y0=1, x1=max(trade_indices), y1=1, row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1, line=dict(color=chart_colors['shapes'], width=1.5))
+
 
     # Add RSI or Normalize_MACD chart to the second row if available
     if 'RSI' in indicators or 'Normalize_MACD' in indicators:
@@ -84,7 +104,7 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
                 fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=2, col=1)
         
         fig.update_yaxes(range=[0, 100], row=2, col=1)
-        fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
+        fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color=chart_colors['shapes'], width=2))
 
     # Add buy/sell markers to the price chart
     buy_dates = [trade['buy_date'] for trade in trades]
