@@ -51,15 +51,12 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
     trade_indices, trade_ratios = extract_trade_data(trades)
     
     # Determine the number of rows and columns based on indicators and trade ratios
-    rows = 1
+    rows = 2
     cols = 1
     bound_hundred_plot = True if 'RSI' in indicators or 'Normalize_MACD' in indicators else False 
 
-    if bound_hundred_plot:
+    if bound_hundred_plot and len(trade_ratios) > 0:
         cols += 1
-    
-    if len(trade_ratios) > 0:
-        rows += 1
 
     if cols == 1 and rows == 2:
         row_heights = [0.7, 0.3]
@@ -67,9 +64,6 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
     elif cols == 2 and rows == 2:
         row_heights = [0.75, 0.25]
         column_widths = [0.75, 0.25]
-    else:
-        row_heights = [1]*rows
-        column_widths = [1]*column_widths
 
     fig = make_subplots(
         rows=rows,
@@ -98,14 +92,17 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
 
 
     # Add RSI or Normalize_MACD chart to the second row if available
-    if 'RSI' in indicators or 'Normalize_MACD' in indicators:
-        for indicator in indicators:
-            if indicator == 'RSI' or indicator == 'Normalize_MACD':
-                fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=2, col=1)
-        
-        fig.update_yaxes(range=[0, 100], row=2, col=1)
-        fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color=chart_colors['shapes'], width=2))
+    for indicator in indicators:
+        if indicator == 'RSI' or indicator == 'Normalize_MACD':
+            fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=2, col=1)
+        else:
+            fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=1, col=1)
 
+
+    if bound_hundred_plot: 
+        #fig.update_yaxes(range=[0, 100], row=2, col=1)
+        fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color=chart_colors['shapes'], width=2))
+    
     # Add buy/sell markers to the price chart
     buy_dates = [trade['buy_date'] for trade in trades]
     buy_prices = [trade['buy_price'] for trade in trades]
