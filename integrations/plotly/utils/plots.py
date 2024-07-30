@@ -52,16 +52,18 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
     # Determine the number of rows and columns based on indicators and trade ratios
     rows = 1
     cols = 1
+    bound_hundred_plot = True if 'RSI' in indicators or 'Normalize_MACD' in indicators else False 
 
-    if 'RSI' in indicators or 'Normalize_MACD' in indicators:
+    if bound_hundred_plot:
         cols += 1
     
     if len(trade_ratios) > 0:
         rows += 1
 
-    fig = make_subplots(rows=rows, cols=cols, shared_xaxes=True, vertical_spacing=0.25)
+    # Create subplots with shared x-axis
+    fig = make_subplots(rows=rows, cols=cols, shared_xaxes='all', vertical_spacing=0.25)
 
-    # Add candlestick chart to the first row
+    # Add candlestick chart to the first row, first column
     fig.add_trace(go.Candlestick(
         x=dates, open=opens, high=highs, low=lows, close=closes,
         name="Price", 
@@ -71,18 +73,18 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
 
     # Add trade ratios chart to the second column if there are trade ratios
     if len(trade_ratios) > 0:
-        fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color=chart_colors['Test'])), row=2, col=1)
+        fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color=chart_colors['Test'])), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
         cumulative_ratios = [float(cumulative_ratio) for cumulative_ratio in json_data["stats"]["positions"]["cumulative_ratios"]]
-        fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=2, col=1)
+        fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
 
     # Add RSI or Normalize_MACD chart to the second row if available
     if 'RSI' in indicators or 'Normalize_MACD' in indicators:
         for indicator in indicators:
             if indicator == 'RSI' or indicator == 'Normalize_MACD':
-                fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=1, col=2)
+                fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=2, col=1)
         
-        fig.update_yaxes(range=[0, 100], row=1, col=2)
-        fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=1, col=2, line=dict(color="LightSkyBlue", width=3))
+        fig.update_yaxes(range=[0, 100], row=2, col=1)
+        fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
 
     # Add buy/sell markers to the price chart
     buy_dates = [trade['buy_date'] for trade in trades]
