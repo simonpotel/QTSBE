@@ -80,8 +80,41 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         cumulative_ratios = [float(cumulative_ratio) for cumulative_ratio in json_data["stats"]["positions"]["cumulative_ratios"]]
         fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=1, col=2)
 
-    # Add buy/sell markers and hover texts
-    # (Include this part of the code similar to the provided code)
+    buy_dates = [trade['buy_date'] for trade in trades]
+    buy_prices = [trade['buy_price'] for trade in trades]
+    buy_indices = [trade['buy_index'] for trade in trades]  
+    buy_signals = [trade['buy_signals']['Buy_Signal'] for trade in trades] 
+
+    sell_dates = [trade['sell_date'] for trade in trades]
+    sell_prices = [trade['sell_price'] for trade in trades]
+    sell_indices = [trade['sell_index'] for trade in trades]  
+    sell_signals = [trade['sell_signals']['Sell_Signal'] for trade in trades] 
+
+    ratios = [float(ratio) for ratio in json_data["stats"]["positions"]["all_ratios"]]
+
+    # hover texts for the markets
+    buy_hover_texts = [f"Index: {index}<br>Price: {price}<br>Date: {date}<br>Buy Signal: {buy_signal}" for index, price, date, buy_signal in zip(buy_indices, buy_prices, buy_dates, buy_signals)]
+    sell_hover_texts = [f"Index: {index}<br>Price: {price}<br>Date: {date}<br>Ratio: {ratio}<br>Sell Signal: {sell_signal}" for index, price, date, ratio, sell_signal in zip(sell_indices, sell_prices, sell_dates, ratios, sell_signals)]
+
+    # plot buy/sell markes
+    fig.add_trace(go.Scatter(
+        x=buy_dates, 
+        y=buy_prices, 
+        mode='markers', 
+        name='Buy', 
+        marker=dict(symbol='triangle-up', color='#B0FE76', size=10),
+        hovertext=buy_hover_texts,  
+        hoverinfo='text'  
+    ), row=1, col=1)
+    fig.add_trace(go.Scatter(
+        x=sell_dates, 
+        y=sell_prices, 
+        mode='markers', 
+        name='Sell', 
+        marker=dict(symbol='triangle-down', color='#2DC7FF', size=10),
+        hovertext=sell_hover_texts,  
+        hoverinfo='text' 
+    ), row=1, col=1)
 
     fig.update_layout(title=f"{data_file} ({strategy})",
                       xaxis_title='Date',
@@ -99,6 +132,8 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         fig.update_yaxes(range=[0, 100], row=2, col=1)
         fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color="LightSkyBlue", width=3))
 
+    fig.show()
+    return 
     os.makedirs('integrations/plotly/saved_results/', exist_ok=True)
     plot_filename = 'integrations/plotly/saved_results/plot.html'
     fig.write_html(plot_filename)
