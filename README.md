@@ -4,28 +4,32 @@
   <img src="https://github.com/simonpotel/QTSBE/blob/ed041293f294cd7a9caeff7c55f4baa0c3e93c61/files/logo.jpeg" width="400" height="400">
 </p>
 
-QTSBE is an open-source project aimed at providing a robust environment for backtesting quantitative trading strategies. It includes an API developed in Python using Flask and an interface built with Python.
+QTSBE is an open-source project designed to provide a robust environment for backtesting quantitative trading strategies. It includes an API developed in Python using Flask and an interface built with Python.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue">
-  <img src="https://img.shields.io/badge/Blockchain.com-121D33?logo=blockchaindotcom&logoColor=fff&style=for-the-badge"> 
-  <img src="https://img.shields.io/badge/Raspberry%20Pi-A22846?style=for-the-badge&logo=Raspberry%20Pi&logoColor=white">
+  <img src="https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white">
+  <img src="https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white">
+  <img src="https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white">
+  <img src="https://img.shields.io/badge/Plotly-%233F4F75.svg?style=for-the-badge&logo=plotly&logoColor=white">
+  <img src="https://img.shields.io/badge/Binance-FCD535?style=for-the-badge&logo=binance&logoColor=white">
+  <img src="https://img.shields.io/badge/Yahoo!-6001D2?style=for-the-badge&logo=Yahoo!&logoColor=white">
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black">
 </p>
 
 <p align="center">
   <img src="https://github.com/simonpotel/QTSBE/blob/dev_doc/assets/integration/plotly/white_2.png?raw=true" width="618.8" height="463.8">
 </p>
 
-
 ## Features
 
-- Comprehensive backtesting environment for quantitative trading strategies.
-- API for strategy implementation and testing.
-- Visualization tools for strategy performance.
-- Tool to fetch datas (from yfinance or Binance api)
-- Tool to apply your trading strategy to a list of cryptos/stck and see the stats of all in 5 seconds
-- Tests files to enhance developer usage
-- Easy customization of charts (plotly), indicators functions and strategies.
+- Backtesting environment for quantitative trading strategies. (Numpy / Pandas)
+- API for strategy implementation and testing. (Flask)
+- Visualization tools for strategy performance. (Plotly / Discord)
+- Tools to fetch data. (from yfinance or Binance API).
+- Tool to apply your trading strategy to a list of cryptos/stocks and see the stats of all.
+- Test files to enhance developer usage.
+- Easy customization of charts (Plotly), indicator functions, and strategies.
 
 ## Getting Started
 
@@ -64,12 +68,13 @@ QTSBE is an open-source project aimed at providing a robust environment for back
    - Start the GUI for visualizing the API response by running `integration/plotly/main.py`.
 
    ```bash
-   integration/plotly/main.py -data 'Binance_BTCUSDT_1d' -strategy 'rsi_example' -multi_positions False
+   python integration/plotly/main.py -data 'Binance_BTCUSDT_1d' -strategy 'rsi_example' -multi_positions False
    ```
 
    - The display tool allows you to select your strategy and the dataset to apply it to.
-   
+
 ## Customization
+
 ![image](https://github.com/simonpotel/QTSBE/blob/dev_doc/assets/integration/plotly/white_3.png?raw=true)
 ![image](https://github.com/simonpotel/QTSBE/blob/dev_doc/assets/integration/plotly/black_2.png?raw=true)
 ![image](https://github.com/simonpotel/QTSBE/blob/dev_doc/assets/integration/plotly/void.png?raw=true)
