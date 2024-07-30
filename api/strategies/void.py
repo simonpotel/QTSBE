@@ -8,9 +8,4 @@ from stats.trades import Positions
 from api import logger
 
 def analyse(data, prices, start_ts, end_ts, multi_positions):
-    positions = Positions()
-
-    positions.indicators = { 
-    }
-
-    return positions
+    return Positions()
