@@ -3,6 +3,9 @@ import sys
 import pandas as pd
 from datetime import datetime
 import yfinance as yf
+from colorama import Fore, Style, init
+
+init(autoreset=True)  # Initialize colorama
 
 sys.path.append(os.getcwd())
 
@@ -13,9 +16,11 @@ class YahooAPI:
 
     def download_and_save(self, tickers, interval='1d'):
         for ticker in tickers:
+            print(f"{Fore.CYAN}Downloading data for {ticker}")
             data = yf.download(ticker, interval=interval)
             filepath = os.path.join(self.data_dir, f'Yahoo_{ticker}_{interval}.csv')
             data.to_csv(filepath)
+            print(f"{Fore.GREEN}Data saved in: {filepath}")
 
     def update_ohlcv(self, ticker, interval='1d'):
         filepath = os.path.join(self.data_dir, f'Yahoo_{ticker}_{interval}.csv')
@@ -28,20 +33,21 @@ class YahooAPI:
 
             if not new_data.empty:
                 new_data.to_csv(filepath, mode='a', header=False)
-                print(f"{ticker}: Data updated successfully")
+                print(f"{Fore.GREEN}{ticker}: Data updated successfully")
             else:
-                print(f"{ticker}: No new data available")
+                print(f"{Fore.YELLOW}{ticker}: No new data available")
         else:
             self.download_and_save([ticker], interval=interval)
-            print(f"{ticker}: Data downloaded successfully")
+            print(f"{Fore.GREEN}{ticker}: Data downloaded successfully")
 
     def update_ohlcv_for_tickers(self, tickers, interval):
         for ticker in tickers:
+            print(f"{Fore.CYAN}Updating data for {ticker}")
             self.update_ohlcv(ticker)
 
 if __name__ == "__main__":
     tickers = [
-        'AAPL', 'MSFT' # ...
+        'AAPL', 'MSFT' # Add more tickers as needed
     ]
     
     yahoo_api = YahooAPI()

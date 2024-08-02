@@ -3,8 +3,10 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 import argparse
-from colorama import Fore, Style
+from colorama import Fore, Style, init
 import concurrent.futures
+
+init(autoreset=True)  # Initialize colorama
 
 def fetch_ohlcv_batch(exchange, symbol, timeframe, since_timestamp):
     """
@@ -53,8 +55,9 @@ class BinanceAPI:
         filepath = os.path.join('data/bank/', filename)
         # save content
         df.to_csv(filepath, index=False)
-        #print(f"{Fore.GREEN}All data has been saved in: {filepath}")
+        print(f"{Fore.GREEN}All data has been saved in: {filepath}")
         return symbol
+    
     def get_top_50_tokens_by_volume(self):
         """
         Function to print the top 50 tokens by trading volume.
@@ -196,21 +199,12 @@ class BinanceAPI:
         print(f"{Fore.GREEN}Updated data has been saved in: {filepath}")
 
     def update_ohlcv_for_symbols(self, symbols, timeframe='1d'):
-        """
-        Method to update the OHLCV data for a list of symbols.
-        """
+        """Method to update the OHLCV data for a list of symbols."""
         for symbol in symbols:
             print(f"{Fore.CYAN}Updating data for {symbol}")
             self.update_ohlcv(symbol, timeframe)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Fetch and save OHLCV data from Binance.')
-    parser.add_argument('-symbol', type=str, default='BTC/USDT', help='The trading pair symbol, e.g., "BTC/USDT".')
-    parser.add_argument('-timeframe', type=str, default='1d', help='The timeframe for the OHLCV data, e.g., "1d".')
-
-    args = parser.parse_args()
-
-    binance_data = BinanceAPI()
-    binance_data.fetch_and_save_ohlcv(args.symbol, args.timeframe)
-
-       
+    parser.add_argument('-symbol', type=str, default='BTC/USDT', help='The trading pair symbol, e.g., “BTC/USDT”.')
+    parser.add_argument('-timeframe', type=str, default='1d', help='The timeframe for the OHLCV data, e.g., “1d”.')
