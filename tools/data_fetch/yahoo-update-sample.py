@@ -10,4 +10,4 @@ if __name__ == "__main__":
     ]
 
     yahoo_api = YahooAPI()
-    yahoo_api.update_ohlcv(tickers, interval='1d')
+    yahoo_api.update_ohlcv_for_tickers(tickers, interval='1d')
