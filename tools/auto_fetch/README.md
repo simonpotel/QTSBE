@@ -6,7 +6,7 @@ This tool aims to update automatically a list of tokens.
 
 ## Create config.json
 
-```json
+```
 {
     'Yahoo'{
         ['AMZN', '1d'],
