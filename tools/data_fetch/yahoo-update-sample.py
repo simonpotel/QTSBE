@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append(os.getcwd())
-from tools.data_fetch.yahoo_stock_exchange.yahoo import YahooAPI
+from tools.data_fetch.yahoo.yahoo import YahooAPI
 
 if __name__ == "__main__":
     tickers = [
