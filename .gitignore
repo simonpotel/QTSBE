@@ -14,3 +14,4 @@ integrations/plotly/saved_results/*
 integrations/discord_chat_bot/configs/bot.json
 
 tools/auto_fetch/config.json
+tools/auto_fetch/logs/*
