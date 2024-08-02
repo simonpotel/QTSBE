@@ -2,14 +2,14 @@ import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import os
 
-theme = 'black' # black / white
+theme = 'white' # black / white
 
 chart_colors = {
     "Background": theme, # black
     "increasing_line": "#1e90ff",
     "increasing_fill": "#115290",
-    "decreasing_line": "#be0000",  #red: #be0000  | #orange: #d17123  | 
-    "decreasing_fill": "#ff0000",  #red: #ff0000  | #orange: #eb7f26  | 
+    "decreasing_line": "#d17123",  #red: #be0000  | #orange: #d17123  | 
+    "decreasing_fill": "#eb7f26",  #red: #ff0000  | #orange: #eb7f26  | 
     "shapes": "#8288b0",
     "MA_100": "#B8336A",
     "MA_40": "#FF9B42",
