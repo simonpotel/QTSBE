@@ -163,6 +163,46 @@ class BinanceAPI:
 
         return [symbol for symbol, variation in most_volatile_tokens]
 
+    def update_ohlcv(self, symbol, timeframe='1d'):
+        """
+        Method to update the OHLCV data for a given symbol and timeframe.
+        """
+        filename = f"Binance_{symbol.replace('/', '')}_{timeframe}.csv"
+        filepath = os.path.join('data/bank/', filename)
+        
+        if os.path.exists(filepath):
+            df_existing = pd.read_csv(filepath)
+            df_existing['timestamp'] = pd.to_datetime(df_existing['timestamp'])
+            last_timestamp = df_existing['timestamp'].max()
+            since_timestamp = int(last_timestamp.timestamp() * 1000)
+        else:
+            df_existing = pd.DataFrame()
+            since_timestamp = self.exchange.parse8601('2000-01-01T00:00:00Z')
+
+        new_data = self.exchange.fetch_ohlcv(symbol, timeframe, since=since_timestamp)
+        if not new_data:
+            print(f"{Fore.RED}No new data for {symbol}")
+            return
+
+        df_new = pd.DataFrame(new_data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+        df_new['timestamp'] = pd.to_datetime(df_new['timestamp'], unit='ms')
+        
+        if not df_existing.empty:
+            df_combined = pd.concat([df_existing, df_new]).drop_duplicates(subset=['timestamp'], keep='last').reset_index(drop=True)
+        else:
+            df_combined = df_new
+        
+        df_combined.to_csv(filepath, index=False)
+        print(f"{Fore.GREEN}Updated data has been saved in: {filepath}")
+
+    def update_ohlcv_for_symbols(self, symbols, timeframe='1d'):
+        """
+        Method to update the OHLCV data for a list of symbols.
+        """
+        for symbol in symbols:
+            print(f"{Fore.CYAN}Updating data for {symbol}")
+            self.update_ohlcv(symbol, timeframe)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Fetch and save OHLCV data from Binance.')
     parser.add_argument('-symbol', type=str, default='BTC/USDT', help='The trading pair symbol, e.g., "BTC/USDT".')
