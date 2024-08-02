@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append(os.getcwd())
-from tools.data_fetch.yahoo_stock_exchange.yahoo import download_and_save
+from tools.data_fetch.yahoo_stock_exchange.yahoo import YahooAPI
 
 if __name__ == "__main__":
     tickers = [
@@ -26,6 +26,11 @@ if __name__ == "__main__":
     
     tickers = [ticker_corrections.get(ticker, ticker) for ticker in tickers]
     
+    yahoo_api = YahooAPI()
+    yahoo_api.download_and_save(tickers, interval='1d')
+
+    # tickers details :
+
     # AAPL: Apple Inc. - Manufacturer of electronic devices, software, and digital services (iPhone, Mac, iPad).
     # MSFT: Microsoft Corporation - Developer of software, hardware, and cloud services (Windows, Office, Azure).
     # GOOGL: Alphabet Inc. - Parent company of Google, specializing in online search services, advertising, and technology.
@@ -126,5 +131,3 @@ if __name__ == "__main__":
     # MMC: Marsh & McLennan Companies, Inc. - Professional services firm specializing in insurance brokerage and risk management.
     # USB: U.S. Bancorp - Financial services holding company for U.S. Bank.
     # DHR: Danaher Corporation - Global science and technology innovator focusing on diagnostics, life sciences, and environmental solutions.
-
-    download_and_save(tickers=tickers, interval='1d')
