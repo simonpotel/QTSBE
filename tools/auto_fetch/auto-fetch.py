@@ -48,7 +48,7 @@ def main():
 
         logger.success(f"Fetch cycle completed")
 
-        time.sleep(60)
+        time.sleep(15)
 
 if __name__ == "__main__":
     main()
