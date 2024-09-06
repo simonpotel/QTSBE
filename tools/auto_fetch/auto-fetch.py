@@ -31,24 +31,23 @@ def main():
     yahoo_api = YahooAPI()
     binance_api = BinanceAPI()
 
-    while True:
-        logger.success(f"Starting fetch cycle")
+    logger.success(f"Starting fetch cycle")
 
-        try:
-            for ticker, interval in config['Yahoo']:
-                yahoo_api.update_ohlcv(ticker, interval)
-        except Exception as e:
-            logger.error(f"Error fetching Yahoo data: {e}")
+    try:
+        for ticker, interval in config['Yahoo']:
+            yahoo_api.update_ohlcv(ticker, interval)
+    except Exception as e:
+        logger.error(f"Error fetching Yahoo data: {e}")
 
-        try:
-            for symbol, interval in config['Binance']:
-                binance_api.update_ohlcv(symbol, interval)
-        except Exception as e:
-            logger.error(f"Error fetching Binance data: {e}")
+    try:
+        for symbol, interval in config['Binance']:
+            binance_api.update_ohlcv(symbol, interval)
+    except Exception as e:
+        logger.error(f"Error fetching Binance data: {e}")
 
-        logger.success(f"Fetch cycle completed")
-
-        time.sleep(15)
+    logger.success(f"Fetch cycle completed")
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
+        time.sleep(15)
