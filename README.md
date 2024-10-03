@@ -18,7 +18,7 @@ QTSBE is an open-source project designed to provide a robust environment for bac
 </p>
 
 <p align="center">
-  <img src="https://github.com/simonpotel/QTSBE/blob/dev_doc/assets/integration/plotly/white_2.png?raw=true" width="618.8" height="463.8">
+  <img src="https://github.com/simonpotel/QTSBE/blob/dev/assets/integration/plotly/white_2.png?raw=true" width="618.8" height="463.8">
 </p>
 
 ## Features
@@ -75,9 +75,9 @@ QTSBE is an open-source project designed to provide a robust environment for bac
 
 ## Customization
 
-![image](https://github.com/simonpotel/QTSBE/blob/dev_doc/assets/integration/plotly/white_3.png?raw=true)
-![image](https://github.com/simonpotel/QTSBE/blob/dev_doc/assets/integration/plotly/black_2.png?raw=true)
-![image](https://github.com/simonpotel/QTSBE/blob/dev_doc/assets/integration/plotly/void.png?raw=true)
+![image](https://github.com/simonpotel/QTSBE/blob/dev/assets/integration/plotly/white_3.png?raw=true)
+![image](https://github.com/simonpotel/QTSBE/blob/dev/assets/integration/plotly/black_2.png?raw=true)
+![image](https://github.com/simonpotel/QTSBE/blob/dev/assets/integration/plotly/void.png?raw=true)
 
 ## License
 
