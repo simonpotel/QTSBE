@@ -1,4 +1,4 @@
-file_to_run="tools/api/api.py"
+file_to_run="api/api.py"
 
 while true
 do
