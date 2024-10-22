@@ -122,8 +122,10 @@ async def send_data_to_discord(message, json_data, temp_files, data_file, strate
     file_image = discord.File(temp_files['image'], filename=f"{
                               data_file}_{strategy}.png")
 
-    embed.set_thumbnail(
-        url="https://github.com/simonpotel/QTSBE/blob/7ab243450e7adc18367859638b40855139e437b4/files/logo.jpeg?raw=true")
+    embed.set_footer(
+        text=f"Requested by {message.author.name} on {message.created_at.strftime('%Y-%m-%d %H:%M:%S')}",
+        icon_url="https://github.com/simonpotel/QTSBE/blob/18d3a85b1517c915743fe880a0945f49eba4a2a5/assets/logo.jpeg?raw=true"
+    )
 
     # create an embeds of the the content of drawdown/positions
     await send_stats_embed(message, drawdown_stats, positions_stats, current_position_stat)
