@@ -1,6 +1,8 @@
 *.pyc
-logs/*
-!logs/README.md
+.DS_Store
+
+api/logs/*
+!api/logs/README.md
 
 data/bank/*
 !data/bank/Binance_BTCUSDT_1d.csv

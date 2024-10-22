@@ -21,9 +21,9 @@ def reload_loguru_config():
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")
     if debug_mode:
-        logger.add(r"logs/debug.log", level="DEBUG")
+        logger.add(r"api/logs/debug.log", level="DEBUG")
     else:
-        logger.add(r"logs/logs.log", level="INFO")
+        logger.add(r"api/logs/logs.log", level="INFO")
 
 reload_loguru_config()
 
