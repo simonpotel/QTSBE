@@ -64,14 +64,22 @@ QTSBE is an open-source project designed to provide a robust environment for bac
 3. **Access the API:**
    - Get the API response in your web browser: `http://127.0.0.1:5000/QTSBE/<data_set>/<your_strategy_name>`.
 
-4. **Visualize Results:**
-   - Start the GUI for visualizing the API response by running `integration/plotly/main.py`.
-
-   ```bash
-   python integration/plotly/main.py -data 'Binance_BTCUSDT_1d' -strategy 'rsi_example' -multi_positions False
-   ```
-
-   - The display tool allows you to select your strategy and the dataset to apply it to.
+4. **Visualize Results (integrations):**
+   
+     - Use Plotly Chart representation:
+    
+       ```bash
+       sh tests/integrations/plotly_unit.sh
+       ```
+  
+     - Use discord bot and following commands:
+    
+       Configure the bot in `integrations/discord_chat_bot/bot.py`
+    
+       ```bash
+       sh sh/discord_chat_bot.sh
+       ```
+     
 
 ## Customization
 
