@@ -85,7 +85,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Note: The contents of the files in the indicators folder are not guaranteed to be completely accurate. Always review the code of each indicator before use.
+Note: The contents of the files in the indicators folder are not guaranteed to be completely accurate. Always review the code of each indicator before use.
 
 ---
 
