@@ -4,19 +4,32 @@
   <img src="https://github.com/simonpotel/QTSBE/blob/ed041293f294cd7a9caeff7c55f4baa0c3e93c61/files/logo.jpeg" width="400" height="400">
 </p>
 
-QTSBE is an open-source project aimed at providing a robust environment for backtesting quantitative trading strategies. It includes an API developed in Python using Flask and an interface built with Python.
+QTSBE is an open-source project designed to provide a robust environment for backtesting quantitative trading strategies. It includes an API developed in Python using Flask and an interface built with Python.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue">
-  <img src="https://img.shields.io/badge/Blockchain.com-121D33?logo=blockchaindotcom&logoColor=fff&style=for-the-badge"> 
-  <img src="https://img.shields.io/badge/Raspberry%20Pi-A22846?style=for-the-badge&logo=Raspberry%20Pi&logoColor=white">
+  <img src="https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white">
+  <img src="https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white">
+  <img src="https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white">
+  <img src="https://img.shields.io/badge/Plotly-%233F4F75.svg?style=for-the-badge&logo=plotly&logoColor=white">
+  <img src="https://img.shields.io/badge/Binance-FCD535?style=for-the-badge&logo=binance&logoColor=white">
+  <img src="https://img.shields.io/badge/Yahoo!-6001D2?style=for-the-badge&logo=Yahoo!&logoColor=white">
+  <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black">
+</p>
+
+<p align="center">
+  <img src="https://github.com/simonpotel/QTSBE/blob/dev/assets/integration/plotly/white_2.png?raw=true" width="618.8" height="463.8">
 </p>
 
 ## Features
 
-- Comprehensive backtesting environment for quantitative trading strategies.
-- API for strategy implementation and testing.
-- Visualization tools for strategy performance.
+- Backtesting environment for quantitative trading strategies. (Numpy / Pandas)
+- API for strategy implementation and testing. (Flask)
+- Visualization tools for strategy performance. (Plotly / Discord)
+- Tools to fetch data. (from yfinance or Binance API).
+- Tool to apply your trading strategy to a list of cryptos/stocks and see the stats of all.
+- Test files to enhance developer usage.
+- Easy customization of charts (Plotly), indicator functions, and strategies.
 
 ## Getting Started
 
@@ -52,55 +65,19 @@ QTSBE is an open-source project aimed at providing a robust environment for back
    - Get the API response in your web browser: `http://127.0.0.1:5000/QTSBE/<data_set>/<your_strategy_name>`.
 
 4. **Visualize Results:**
-   - Start the GUI for visualizing the API response by running `display/python/main_gui.py`.
+   - Start the GUI for visualizing the API response by running `integration/plotly/main.py`.
 
    ```bash
-   python display/python/main_gui.py
+   python integration/plotly/main.py -data 'Binance_BTCUSDT_1d' -strategy 'rsi_example' -multi_positions False
    ```
 
    - The display tool allows you to select your strategy and the dataset to apply it to.
 
-   Example of the default strategy:
+## Customization
 
-   ![image](https://github.com/simonpotel/QTSBE/assets/155122848/c276e11b-043b-4d45-a58c-a0d776ac9da2)
-
-5. **Real Strategy Stats:**
-   - Example of a simple strategy based on Bollinger Bands:
-
-     - Full menu view:
-
-       ![image](https://github.com/simonpotel/QTSBE/blob/711bb2cecf12bdaef53d9d7a20f05e1971e4af59/files/display/python/full_view.png)
-       
-     - Price Chart:
-
-       ![image](https://github.com/simonpotel/QTSBE/blob/711bb2cecf12bdaef53d9d7a20f05e1971e4af59/files/display/python/price.png)
-       
-     - Trade Ratio and Cumulative Returns:
-
-       ![image](https://github.com/simonpotel/QTSBE/blob/711bb2cecf12bdaef53d9d7a20f05e1971e4af59/files/display/python/ratio_cumultative.png)
-       
-     - RSI and MACD Graphs:
-
-       ![image](https://github.com/simonpotel/QTSBE/blob/711bb2cecf12bdaef53d9d7a20f05e1971e4af59/files/display/python/rsi_MACD.png)
-
-## Scanner
-
-### BinanceScanner
-
-Powerful tool for analyzing Binance trading pairs within the quantitative trading strategy backtesting environment. It conducts comprehensive scans of all Binance pairs, queries the API with the specified strategy, and consolidates the results into a single file. 
-
-- **Comprehensive Analysis:** Analyzes all Binance trading pairs to provide insights into their performance.
-- **Strategy Integration:** Executes API queries with the user's specified strategy to evaluate pair performance.
-- **Key Metrics:** Calculates and presents essential metrics such as best and worst ratios, highest CR (Cumulative Ratio), and lowest drawdowns.
-- **Efficient Execution:** Conducts scans efficiently, enhancing productivity in strategy assessment and optimization.
-
-#### Usage
-To use the scanner, edit `strategy_scanner/scan.py` to specify your desired strategy and adjust any relevant arguments. Then, run the following command:
-
-```bash
-python strategy_scanner/scan.py
-```
-![image](https://github.com/simonpotel/QTSBE/blob/doc/files/strategy_scanner/BinanceScanner/scan_example.png)
+![image](https://github.com/simonpotel/QTSBE/blob/dev/assets/integration/plotly/white_3.png?raw=true)
+![image](https://github.com/simonpotel/QTSBE/blob/dev/assets/integration/plotly/black_2.png?raw=true)
+![image](https://github.com/simonpotel/QTSBE/blob/dev/assets/integration/plotly/void.png?raw=true)
 
 ## License
 
@@ -110,19 +87,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Note: The contents of the files in the indicators folder are not guaranteed to be completely accurate. Always review the code of each indicator before use.
 
-## Librairies
-- [customtkinter](https://pypi.org/project/customtkinter/): A custom themed version of Tkinter, providing enhanced visual elements and features for GUI development.
-- [matplotlib](https://pypi.org/project/matplotlib/): A comprehensive library for creating static, animated, and interactive visualizations in Python.
-- [loguru](https://pypi.org/project/loguru/): A logging library that provides an easy-to-use interface for logging in Python applications.
-- [ccxt](https://pypi.org/project/ccxt/): A cryptocurrency trading library that provides unified APIs for accessing trading data and executing trades across multiple cryptocurrency exchanges.
-- [tables](https://pypi.org/project/tables/): A package for managing hierarchical datasets and storing large data arrays efficiently in HDF5 format.
-- [plotly](https://pypi.org/project/plotly/): An open-source graphing library for creating interactive, publication-quality graphs and charts.
-- [pandas](https://pypi.org/project/pandas/): A powerful data manipulation and analysis library, providing data structures and functions for working with structured data.
-- [flask](https://pypi.org/project/Flask/): A lightweight web application framework for Python, providing tools for building web applications and APIs.
-- [flask_cors](https://pypi.org/project/Flask-Cors/): A Flask extension for handling Cross-Origin Resource Sharing (CORS), allowing web applications to make requests to domains outside of their own.
-- [mysql](https://pypi.org/project/mysql/): A MySQL database connector for Python, enabling interaction with MySQL databases using Python code.
-- [mysqlclient](https://pypi.org/project/mysqlclient/): A Python interface to MySQL, providing access to MySQL database servers from Python applications.
-
-## Contact
+---
 
 For questions or inquiries, feel free to contact me on [LinkedIn](https://www.linkedin.com).

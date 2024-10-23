@@ -1,6 +1,8 @@
 *.pyc
-logs/*
-!logs/README.md
+.DS_Store
+
+api/logs/*
+!api/logs/README.md
 
 data/bank/*
 !data/bank/Binance_BTCUSDT_1d.csv
@@ -8,7 +10,11 @@ data/bank/*
 api/strategies/*
 !api/strategies/default.py
 !api/strategies/rsi_example.py
+!api/strategies/void.py
 
 integrations/plotly/saved_results/*
 
 integrations/discord_chat_bot/configs/bot.json
+
+tools/auto_fetch/config.json
+tools/auto_fetch/logs/*

@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append(os.getcwd())
-from tools.data_fetch.binance.binance_api import BinanceAPI
+from tools.data_fetch.binance.binance import BinanceAPI
 
 binance_api = BinanceAPI()
 
