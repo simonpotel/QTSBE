@@ -71,7 +71,7 @@ class BinanceScanner(object):
                         if data and "stats" in data:
                             stats = data["stats"]
                             if stats["positions"]["average_position_duration"] != 0:
-                                all_stats.append((symbol, stats))
+                                all_stats.append((symbol, stats, data))
                                 if "drawdown:" in stats:
                                     drawdowns.append((symbol, stats["drawdown:"]))
                                 elif "drawdowns" in stats:
@@ -92,14 +92,15 @@ class BinanceScanner(object):
 
     def save_stats_to_json(self, all_stats):
         result = {"tokens": []}
-        for symbol, stats in all_stats:
+        for symbol, _, data in all_stats:
             result["tokens"].append({
                 "symbol": symbol,
-                "stats": stats
+                "data": data
             })
         with open('scan_result.json', 'w') as json_file:
             json.dump(result, json_file, indent=4)
         print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Results saved to scan_result.json")
+
 
     def save_global_stats_to_json(self, drawdowns, positions_ratios):
         if drawdowns:
