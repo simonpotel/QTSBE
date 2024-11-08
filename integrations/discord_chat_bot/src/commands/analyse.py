@@ -123,7 +123,7 @@ async def send_data_to_discord(message, json_data, temp_files, data_file, strate
                               data_file}_{strategy}.png")
 
     embed.set_footer(
-        text=f"Requested by {message.author.name} on {message.created_at.strftime('%Y-%m-%d %H:%M:%S')}",
+        text=f"Requested by {message.author.name} on {message.created_at.strftime('%Y-%m-%d %H:%M:%S %H:%M:%S')}",
         icon_url="https://github.com/simonpotel/QTSBE/blob/18d3a85b1517c915743fe880a0945f49eba4a2a5/assets/logo.jpeg?raw=true"
     )
 

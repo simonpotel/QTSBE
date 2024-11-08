@@ -26,7 +26,7 @@ def save_to_file(content):
         print("Failed to save content:", e)
 
 def generate_filename(content):
-    return f"integrations/plotly/saved_results/{datetime.now().strftime('%Y-%m-%d %H-%M-%S')}_{content['pair']}_{content['strategy']}.json"
+    return f"integrations/plotly/saved_results/{datetime.now().strftime('%Y-%m-%d %H:%M:%S %H-%M-%S')}_{content['pair']}_{content['strategy']}.json"
 
 def extract_trade_data(trades):
     trade_indices = list(range(1, len(trades) + 1))

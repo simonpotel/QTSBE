@@ -12,7 +12,7 @@ def fetch_ohlcv_batch(exchange, symbol, timeframe, since_timestamp):
     """
     Function to fetch a batch of OHLCV data.
     """
-    print(f"{Fore.GREEN}Request{Fore.WHITE}: {Fore.LIGHTMAGENTA_EX}{symbol} {Fore.WHITE}{timeframe}: {datetime.utcfromtimestamp(since_timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"{Fore.GREEN}Request{Fore.WHITE}: {Fore.LIGHTMAGENTA_EX}{symbol} {Fore.WHITE}{timeframe}: {datetime.utcfromtimestamp(since_timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S %H:%M:%S')}")
     return exchange.fetch_ohlcv(symbol, timeframe, since=since_timestamp, limit=1000)
 
 class BinanceAPI:

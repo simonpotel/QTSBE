@@ -33,7 +33,7 @@ class YahooAPI:
         if os.path.exists(filepath):
             existing_data = pd.read_csv(filepath)
             last_date = existing_data['timestamp'].iloc[-1]
-            last_datetime = datetime.strptime(last_date, '%Y-%m-%d')
+            last_datetime = datetime.strptime(last_date, '%Y-%m-%d %H:%M:%S')
             print(f"Last date in existing data: {last_date}")
 
             new_data = yf.download(ticker, start=last_datetime, interval=interval)
