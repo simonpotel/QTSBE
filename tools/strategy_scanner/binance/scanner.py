@@ -70,14 +70,13 @@ class BinanceScanner(object):
                     if data != {}:
                         if data and "stats" in data:
                             stats = data["stats"]
-                            if stats["positions"]["average_position_duration"] != 0:
-                                all_stats.append((symbol, stats, data))
-                                if "drawdown:" in stats:
-                                    drawdowns.append((symbol, stats["drawdown:"]))
-                                elif "drawdowns" in stats:
-                                    drawdowns.append((symbol, stats["drawdowns"]))
-                                if "positions" in stats and "max_cumulative_ratio" in stats["positions"]:
-                                    positions_ratios.append((symbol, stats["positions"]["max_cumulative_ratio"]))
+                            all_stats.append((symbol, stats, data))
+                            if "drawdown:" in stats:
+                                drawdowns.append((symbol, stats["drawdown:"]))
+                            elif "drawdowns" in stats:
+                                drawdowns.append((symbol, stats["drawdowns"]))
+                            if "positions" in stats and "max_cumulative_ratio" in stats["positions"]:
+                                positions_ratios.append((symbol, stats["positions"]["max_cumulative_ratio"]))
 
                     pbar.set_postfix({
                         'Symbol': symbol,
