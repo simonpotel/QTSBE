@@ -71,7 +71,7 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
     positions.indicators = {key: list(value) for key, value in indicators.indicators.items()}
 
     for i in range(len(data)):
-        data_date = datetime.strptime(data[i][0], "%Y-%m-%d")  # Convert string to datetime
+        data_date = datetime.strptime(data[i][0], "%Y-%m-%d %H:%M:%S")  # Convert string to datetime
         if start_ts and data_date < start_ts:
             continue
         if end_ts and data_date > end_ts:
@@ -83,7 +83,7 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
                 positions.add_position(
                     buy_index=i,
                     buy_price=data[i][3],
-                    buy_date=data_date.strftime("%Y-%m-%d"),
+                    buy_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
                     buy_signals={'Buy_Signal':signal}
                 )
 
@@ -94,14 +94,14 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
                     buy_index=position['buy_index'],
                     sell_index=i,
                     sell_price=data[i][2],
-                    sell_date=data_date.strftime("%Y-%m-%d"),
+                    sell_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
                     sell_signals={'Sell_Signal': signal}
                 )
             elif signal == 1 and multi_positions:
                 positions.add_position(
                     buy_index=i,
                     buy_price=data[i][3],
-                    buy_date=data_date.strftime("%Y-%m-%d"),
+                    buy_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
                     buy_signals={'Buy_Signal':signal}
                 )
 
@@ -109,7 +109,7 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
 
 @app.route('/QTSBE/<pair>/<strategy>')
 def get_data(pair, strategy):
-    ts_format = "%Y-%m-%d"
+    ts_format = "%Y-%m-%d %H:%M:%S"
     start_ts = request.args.get('start_ts')
     end_ts = request.args.get('end_ts')
     multi_positions = request.args.get('multi_positions')
@@ -122,6 +122,9 @@ def get_data(pair, strategy):
         end_ts = datetime.strptime(end_ts, ts_format)
 
     data = get_file_data(pair)
+    for row in data:
+        if len(row[0]) == 10:  # Check if the date string is in the format "YYYY-MM-DD"
+            row[0] += " 00:00:00"
 
     result = analyse(data, start_ts, end_ts, multi_positions, strategies[strategy])
 

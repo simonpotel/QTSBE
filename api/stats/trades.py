@@ -17,8 +17,8 @@ class Positions(object):
             sell_date,
             sell_signals):
         try:
-            buy_date_dt = datetime.strptime(buy_date, "%Y-%m-%d")
-            sell_date_dt = datetime.strptime(sell_date, "%Y-%m-%d")
+            buy_date_dt = datetime.strptime(buy_date, "%Y-%m-%d %H:%M:%S")
+            sell_date_dt = datetime.strptime(sell_date, "%Y-%m-%d %H:%M:%S")
         except ValueError as e:
             print(f"Error parsing dates: {e}")
             return
@@ -29,11 +29,11 @@ class Positions(object):
             {
             'buy_index': buy_index,
             'buy_price': buy_price,
-            'buy_date': buy_date_dt.strftime("%Y-%m-%d"),
+            'buy_date': buy_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
             'buy_signals': buy_signals,
             'sell_index': sell_index,
             'sell_price': sell_price,
-            'sell_date': sell_date_dt.strftime("%Y-%m-%d"),
+            'sell_date': sell_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
             'sell_signals': sell_signals,
             'ratio': sell_price / buy_price,
             'position_duration': position_duration
@@ -47,7 +47,7 @@ class Positions(object):
             buy_date,
             buy_signals):
         try:
-            buy_date_dt = datetime.strptime(buy_date, "%Y-%m-%d")
+            buy_date_dt = datetime.strptime(buy_date, "%Y-%m-%d %H:%M:%S")
         except ValueError as e:
             print(f"Error parsing buy date: {e}")
             return
@@ -55,7 +55,7 @@ class Positions(object):
         self.current_positions.append({
             'buy_index': buy_index,
             'buy_price': buy_price,
-            'buy_date': buy_date_dt.strftime("%Y-%m-%d"),
+            'buy_date': buy_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
             'buy_signals': buy_signals,
         })
 
@@ -67,7 +67,7 @@ class Positions(object):
             sell_date,
             sell_signals):
         try:
-            sell_date_dt = datetime.strptime(sell_date, "%Y-%m-%d")
+            sell_date_dt = datetime.strptime(sell_date, "%Y-%m-%d %H:%M:%S")
         except ValueError as e:
             print(f"Error parsing sell date: {e}")
             return False
@@ -83,7 +83,7 @@ class Positions(object):
             buy_signals=position['buy_signals'],
             sell_index=sell_index,
             sell_price=sell_price,
-            sell_date=sell_date_dt.strftime("%Y-%m-%d"),
+            sell_date=sell_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
             sell_signals=sell_signals)
         self.current_positions = [pos for pos in self.current_positions if pos['buy_index'] != buy_index]
 

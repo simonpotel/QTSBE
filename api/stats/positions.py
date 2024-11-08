@@ -33,8 +33,8 @@ def get_position_stats(positions):
     for position in positions.positions:
         ratio = position['ratio']
         buy_index, sell_index = position['buy_index'], position['sell_index']
-        buy_date = datetime.strptime(position['buy_date'], '%Y-%m-%d')
-        sell_date = datetime.strptime(position['sell_date'], '%Y-%m-%d')
+        buy_date = datetime.strptime(position['buy_date'], '%Y-%m-%d %H:%M:%S')
+        sell_date = datetime.strptime(position['sell_date'], '%Y-%m-%d %H:%M:%S')
         duration = (sell_date - buy_date).days
         buy_signal = position['buy_signals']["Buy_Signal"]
         sell_signal = position['sell_signals']["Sell_Signal"]
@@ -99,8 +99,8 @@ def get_position_stats(positions):
         'cumulative_ratios': cumulative_ratios,
         'max_cumulative_ratio': cumulative_ratios[-1],
         'average_position_duration': total_days / len(positions.positions),
-        'max_open_positions_period': (max_open_period_start.strftime('%Y-%m-%d') if max_open_period_start else '',
-                                      max_open_period_end.strftime('%Y-%m-%d') if max_open_period_end else '',
+        'max_open_positions_period': (max_open_period_start.strftime('%Y-%m-%d %H:%M:%S') if max_open_period_start else '',
+                                      max_open_period_end.strftime('%Y-%m-%d %H:%M:%S') if max_open_period_end else '',
                                       max_open_positions)
     })
 
