@@ -5,6 +5,7 @@ class Positions(object):
         self.positions = []
         self.current_positions = []
         self.indicators = {}
+        self.broker_fees = 0.35 # Default broker fees in %
 
     def add_trade(
             self,
@@ -35,7 +36,7 @@ class Positions(object):
             'sell_price': sell_price,
             'sell_date': sell_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
             'sell_signals': sell_signals,
-            'ratio': sell_price / buy_price,
+            'ratio': ((sell_price / buy_price) * (1-(self.broker_fees/100))),
             'position_duration': position_duration
             }
         )
@@ -57,6 +58,7 @@ class Positions(object):
             'buy_price': buy_price,
             'buy_date': buy_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
             'buy_signals': buy_signals,
+            'active_stats': (None, None)
         })
 
     def close_position(
