@@ -68,17 +68,17 @@ class Indicators(object):
 
 def buy_signal(open_position, data, index_check, indicators):
     if indicators["RSI"][index_check] is None:
-        return -2
+        return -2, None
     if indicators["RSI"][index_check] < 40:
-        return 1
-    return -2
+        return 1, data[index_check][4]
+    return 0, None
 
 
 def sell_signal(open_position, data, index_check, indicators):
     if indicators["RSI"][index_check] is None:
-        return -1
+        return -1, None
     if open_position.get('buy_signal') == 1 or open_position.get('buy_signals', {}).get('Buy_Signal') == 1:
         if open_position['buy_index'] < index_check < len(data):
             if indicators["RSI"][index_check] > 50 and data[index_check][2] / open_position['buy_price'] > 1.10:
-                return 1
-    return -1
+                return 1, data[index_check][4]
+    return 0, None
