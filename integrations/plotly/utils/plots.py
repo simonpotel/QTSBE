@@ -2,27 +2,27 @@ import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import os
 
-theme = 'white' # black / white
+theme = '#151924' # black / white
 
 chart_colors = {
     "Background": theme, # black
-    "increasing_line": "#1e90ff",
-    "increasing_fill": "#115290",
-    "decreasing_line": "#d17123",  #red: #be0000  | #orange: #d17123  | 
-    "decreasing_fill": "#eb7f26",  #red: #ff0000  | #orange: #eb7f26  | 
+    "increasing_line": "#A5D6A7", #blue: #1e90ff  | #green: #00ff00  |
+    "increasing_fill": "#A5D6A7", #blue: #115290  | #green: #00b300  |
+    "decreasing_line": "#F7515F",  #red: #be0000  | #orange: #d17123  | 
+    "decreasing_fill": "#F7515F",  #red: #ff0000  | #orange: #eb7f26  | 
     "shapes": "#8288b0",
     "MA_100": "#B8336A",
     "MA_40": "#FF9B42",
-    "MA_20": "#F4D35E",
+    "MA_20": "#F4D35E", 
     "Test": "#C73E1D",
     "RSI": "#9AB87A",
     "EMA": "#F0A7A0",
     "EMA_MACD": "#F0A7A0",
     "MACD": "#5E4AE3",
     "Normalize_MACD": "#947BD3",
-    "Bollinger_Lower": "#A682FF",
-    "Bollinger_Rolling": "#A682FF",
-    "Bollinger_Upper": "#A682FF",
+    "Bollinger_Lower": "#09917b",
+    "Bollinger_Rolling": "#2652cb",
+    "Bollinger_Upper": "#c9313f",
 }
 
 def extract_ohlc_data(data):
@@ -106,6 +106,9 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
     if bound_hundred_plot: 
         #fig.update_yaxes(range=[0, 100], row=2, col=1)
         fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color=chart_colors['shapes'], width=2))
+        fig.add_shape(type="line", x0=min(dates), y0=60, x1=max(dates), y1=60, row=2, col=1, line=dict(color='#D90368', width=2))
+        fig.add_shape(type="line", x0=min(dates), y0=40, x1=max(dates), y1=40, row=2, col=1, line=dict(color='#D90368', width=2))
+
     
     # Add buy/sell markers to the price chart
     buy_dates = [trade['buy_date'] for trade in trades]
@@ -130,7 +133,7 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         y=buy_prices, 
         mode='markers', 
         name='Buy', 
-        marker=dict(symbol='triangle-up', color='#B0FE76', size=10),
+        marker=dict(symbol='triangle-up', color='#16DB93', size=10),
         hovertext=buy_hover_texts,  
         hoverinfo='text'  
     ), row=1, col=1)
@@ -139,7 +142,7 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         y=sell_prices, 
         mode='markers', 
         name='Sell', 
-        marker=dict(symbol='triangle-down', color='#2DC7FF', size=10),
+        marker=dict(symbol='triangle-down', color='#EFEA5A', size=10),
         hovertext=sell_hover_texts,  
         hoverinfo='text' 
     ), row=1, col=1)

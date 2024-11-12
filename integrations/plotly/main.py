@@ -8,8 +8,8 @@ def main():
 
     data = None
     strategy = None
-    start_ts = "2000-01-01"
-    end_ts = "9999-01-01"
+    start_ts = "2000-01-01 00:00:00"
+    end_ts = "9999-01-01 00:00:00"
     multi_positions = "True"
 
     args = sys.argv[1:]

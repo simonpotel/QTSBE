@@ -77,32 +77,26 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
         if end_ts and data_date > end_ts:
             break
 
-        if not positions.current_positions or multi_positions:
-            signal = strategy["buy_signal"](positions.current_positions, data, i, indicators.indicators)
-            if signal == 1:
-                positions.add_position(
-                    buy_index=i,
-                    buy_price=data[i][3],
-                    buy_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
-                    buy_signals={'Buy_Signal':signal}
-                )
-
         for position in positions.current_positions[:]:
-            signal = strategy["sell_signal"](position, data, i, indicators.indicators)
-            if signal == -1:
+            sell_signal, sell_price = strategy["sell_signal"](position, data, i, indicators.indicators)
+            if sell_signal > 0:
                 positions.close_position(
                     buy_index=position['buy_index'],
                     sell_index=i,
-                    sell_price=data[i][2],
+                    sell_price=sell_price,
                     sell_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
-                    sell_signals={'Sell_Signal': signal}
+                    sell_signals={'Sell_Signal': sell_signal}
                 )
-            elif signal == 1 and multi_positions:
+            position['active_stats'] = (((data[i][4] / position['buy_price']) * (1 - (positions.broker_fees / 100))), data[i][0])
+
+        if len(positions.current_positions) == 0 or multi_positions:
+            buy_signal, buy_price  = strategy["buy_signal"](positions.current_positions, data, i, indicators.indicators)
+            if buy_signal > 0:
                 positions.add_position(
                     buy_index=i,
-                    buy_price=data[i][3],
+                    buy_price=buy_price,
                     buy_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
-                    buy_signals={'Buy_Signal':signal}
+                    buy_signals={'Buy_Signal':buy_signal}
                 )
 
     return positions
@@ -111,7 +105,15 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
 def get_data(pair, strategy):
     ts_format = "%Y-%m-%d %H:%M:%S"
     start_ts = request.args.get('start_ts')
+    if start_ts:
+        start_ts = start_ts.strip("'")
+        start_ts = start_ts.strip('"')
+
     end_ts = request.args.get('end_ts')
+    if end_ts:
+        end_ts = end_ts.strip("'")
+        end_ts = end_ts.strip('"')
+    
     multi_positions = request.args.get('multi_positions')
     details = request.args.get('details')
     multi_positions = bool(multi_positions) and (
