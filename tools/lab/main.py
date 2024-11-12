@@ -1,4 +1,3 @@
-from integrations.plotly.utils.plots import plot_json_data_in_gui
 import sys
 import os
 import tkinter as tk
@@ -9,6 +8,8 @@ import json
 
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), '..', '..')))
+
+from integrations.plotly.utils.plots import plot_json_data_in_gui
 
 
 class App(tk.Tk):
