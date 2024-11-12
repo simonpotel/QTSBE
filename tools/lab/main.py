@@ -41,6 +41,10 @@ class App(tk.Tk):
         self.hide_indicators_checkbox = tk.Checkbutton(
             self, text="Hide Indicators", variable=self.hide_indicators_var)
 
+        self.open_graphics_var = tk.BooleanVar(value=True)
+        self.open_graphics_checkbox = tk.Checkbutton(
+            self, text="Open Graphics", variable=self.open_graphics_var)
+
         self.load_button = tk.Button(
             self, text="Load", command=self.load_request)
 
@@ -58,7 +62,8 @@ class App(tk.Tk):
         self.strategy_combo.grid(row=3, column=1, padx=10, pady=10)
         self.hide_data_checkbox.grid(row=4, column=0, padx=10, pady=10)
         self.hide_indicators_checkbox.grid(row=4, column=1, padx=10, pady=10)
-        self.load_button.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
+        self.open_graphics_checkbox.grid(row=5, column=0, padx=10, pady=10)
+        self.load_button.grid(row=5, column=1, padx=10, pady=10)
         self.response_text.grid(
             row=6, column=0, columnspan=2, padx=10, pady=10)
 
@@ -96,17 +101,16 @@ class App(tk.Tk):
         strategy = self.strategy_combo.get()
 
         self.response_text.delete(1.0, tk.END)
-        self.response_text.insert(tk.END, f"Loading {api_source} {
-                                  pair} {timeframe} {strategy}...\n")
+        self.response_text.insert(tk.END, f"Loading {api_source} {pair} {timeframe} {strategy}...\n")
 
-        url = f"http://127.0.0.1:5000/QTSBE/{api_source}_{
-            pair}_{timeframe}/{strategy}?details=True"
+        url = f"http://127.0.0.1:5000/QTSBE/{api_source}_{pair}_{timeframe}/{strategy}?details=True"
         response = requests.get(url)
         self.response_text.delete(1.0, tk.END)
         try:
             data = response.json()
-            plot_json_data_in_gui(data, f"{api_source}_{
-                                  pair}_{timeframe}", strategy)
+
+            if self.open_graphics_var.get():
+                plot_json_data_in_gui(data, f"{api_source}_{pair}_{timeframe}", strategy)
 
             if self.hide_data_var.get():
                 data['data'] = []
