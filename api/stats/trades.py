@@ -58,7 +58,11 @@ class Positions(object):
             'buy_price': buy_price,
             'buy_date': buy_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
             'buy_signals': buy_signals,
-            'active_stats': (None, None)
+            'active_stats': {
+            "current_ratio": 1,
+            "current_date": buy_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "current_position_duration": 0
+            }
         })
 
     def close_position(
