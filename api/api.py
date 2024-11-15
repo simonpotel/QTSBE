@@ -87,7 +87,7 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
                     sell_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
                     sell_signals={'Sell_Signal': sell_signal}
                 )
-            position[''] = {
+            position['active_stats'] = {
                 "current_ratio": (data[i][4] / position['buy_price']) * (1 - (positions.broker_fees / 100)),
                 "current_date": data[i][0],
                 "current_position_duration": (data_date - datetime.strptime(position['buy_date'], "%Y-%m-%d %H:%M:%S")).days
