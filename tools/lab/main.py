@@ -33,6 +33,12 @@ class App(tk.Tk):
         self.strategy_label = tk.Label(self, text="Strategy")
         self.strategy_combo = ttk.Combobox(self, values=self.load_strategies())
 
+        self.start_ts_label = tk.Label(self, text="Start Timestamp")
+        self.start_ts_entry = tk.Entry(self)
+
+        self.end_ts_label = tk.Label(self, text="End Timestamp")
+        self.end_ts_entry = tk.Entry(self)
+
         self.hide_data_var = tk.BooleanVar(value=True)
         self.hide_data_checkbox = tk.Checkbutton(
             self, text="Hide Data", variable=self.hide_data_var)
@@ -60,12 +66,16 @@ class App(tk.Tk):
         self.timeframe_combo.grid(row=2, column=1, padx=10, pady=10)
         self.strategy_label.grid(row=3, column=0, padx=10, pady=10)
         self.strategy_combo.grid(row=3, column=1, padx=10, pady=10)
-        self.hide_data_checkbox.grid(row=4, column=0, padx=10, pady=10)
-        self.hide_indicators_checkbox.grid(row=4, column=1, padx=10, pady=10)
-        self.open_graphics_checkbox.grid(row=5, column=0, padx=10, pady=10)
-        self.load_button.grid(row=5, column=1, padx=10, pady=10)
+        self.start_ts_label.grid(row=4, column=0, padx=10, pady=10)
+        self.start_ts_entry.grid(row=4, column=1, padx=10, pady=10)
+        self.end_ts_label.grid(row=5, column=0, padx=10, pady=10)
+        self.end_ts_entry.grid(row=5, column=1, padx=10, pady=10)
+        self.hide_data_checkbox.grid(row=6, column=0, padx=10, pady=10)
+        self.hide_indicators_checkbox.grid(row=6, column=1, padx=10, pady=10)
+        self.open_graphics_checkbox.grid(row=7, column=0, padx=10, pady=10)
+        self.load_button.grid(row=7, column=1, padx=10, pady=10)
         self.response_text.grid(
-            row=6, column=0, columnspan=2, padx=10, pady=10)
+            row=8, column=0, columnspan=2, padx=10, pady=10)
 
     def load_pairs(self):
         pairs = set()
@@ -99,11 +109,19 @@ class App(tk.Tk):
         pair = self.pair_combo.get()
         timeframe = self.timeframe_combo.get()
         strategy = self.strategy_combo.get()
+        start_ts = self.start_ts_entry.get()
+        end_ts = self.end_ts_entry.get()
 
         self.response_text.delete(1.0, tk.END)
         self.response_text.insert(tk.END, f"Loading {api_source} {pair} {timeframe} {strategy}...\n")
 
         url = f"http://127.0.0.1:5000/QTSBE/{api_source}_{pair}_{timeframe}/{strategy}?details=True"
+        
+        if start_ts:
+            url += f"&start_ts={start_ts}"
+        if end_ts:
+            url += f"&end_ts={end_ts}"
+
         response = requests.get(url)
         self.response_text.delete(1.0, tk.END)
         try:
@@ -122,7 +140,6 @@ class App(tk.Tk):
         except requests.exceptions.JSONDecodeError:
             self.response_text.insert(
                 tk.END, f"Invalid JSON response: {response.text}")
-
 
 if __name__ == "__main__":
     app = App()
