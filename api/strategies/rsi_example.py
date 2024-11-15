@@ -66,7 +66,8 @@ class Indicators(object):
         return {k: list(v) for k, v in indicators.items()}
 
 
-def buy_signal(open_position, data, index_check, indicators):
+def buy_signal(open_position, data, index_check, indicators, current_price=None):
+    if current_price is not None: data[index_check][4] = current_price
     if indicators["RSI"][index_check] is None:
         return -2, None
     if indicators["RSI"][index_check] < 40:
@@ -74,7 +75,8 @@ def buy_signal(open_position, data, index_check, indicators):
     return 0, None
 
 
-def sell_signal(open_position, data, index_check, indicators):
+def sell_signal(open_position, data, index_check, indicators, current_price=None):
+    if current_price is not None: data[index_check][4] = current_price
     if indicators["RSI"][index_check] is None:
         return -1, None
     if open_position.get('buy_signal') == 1 or open_position.get('buy_signals', {}).get('Buy_Signal') == 1:

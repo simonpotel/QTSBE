@@ -134,9 +134,9 @@ class Indicators(object):
         self.indicators['MA_40'] = get_MA([row[4] for row in data], 40)
         self.indicators['RSI'] = get_RSI([row[4] for row in data])
 
-def buy_signal(open_position, data, index_check, indicators):
+def buy_signal(open_position, data, index_check, indicators, current_price=None):
     return 0, None
 
 
-def sell_signal(open_position, data, index_check, indicators):
+def sell_signal(open_position, data, index_check, indicators, current_price=None):
     return 0, None
