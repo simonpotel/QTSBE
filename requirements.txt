@@ -3,7 +3,7 @@ matplotlib==3.8.2
 loguru==0.7.2
 ccxt==4.3.33
 plotly==5.22.0
-pandas==2.2.1
+pandas
 flask==3.0.2
 flask_cors==4.0.0
 colorama==0.4.6
