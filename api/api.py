@@ -40,9 +40,11 @@ def import_signals_and_indicators(strategies_folder="strategies"):
             if file_name.endswith(".py"):
                 file_path = os.path.join(root, file_name)
                 name_without_extension = os.path.splitext(file_name)[0]
-                strategy_name = os.path.relpath(file_path, strategies_folder).replace(os.sep, '_').rsplit('.', 1)[0]
+                strategy_name = os.path.relpath(file_path, strategies_folder).replace(
+                    os.sep, '_').rsplit('.', 1)[0]
                 try:
-                    spec = importlib.util.spec_from_file_location(name_without_extension, file_path)
+                    spec = importlib.util.spec_from_file_location(
+                        name_without_extension, file_path)
                     module = importlib.util.module_from_spec(spec)
                     spec.loader.exec_module(module)
                     buy_signal_func = getattr(module, 'buy_signal', None)
@@ -54,9 +56,11 @@ def import_signals_and_indicators(strategies_folder="strategies"):
                             "sell_signal": sell_signal_func,
                             "Indicators": indicators_class
                         }
-                        logger.debug(f"Imported strategy '{strategy_name}' from {file_path}")
+                        logger.debug(
+                            f"Imported strategy '{strategy_name}' from {file_path}")
                 except Exception as e:
-                    logger.error(f"Failed to import module '{strategy_name}' from {file_path}: {e}")
+                    logger.error(
+                        f"Failed to import module '{strategy_name}' from {file_path}: {e}")
     logger.info(f'Strategies: {strategies}')
     return strategies
 
@@ -64,21 +68,25 @@ def import_signals_and_indicators(strategies_folder="strategies"):
 app = Flask(__name__)
 CORS(app, resources={r"/QTSBE/*": {"origins": "http://127.0.0.1"}})
 
+
 def analyse(data, start_ts, end_ts, multi_positions, strategy):
     positions = Positions()
     indicators = strategy["Indicators"](data)
 
-    positions.indicators = {key: list(value) for key, value in indicators.indicators.items()}
+    positions.indicators = {key: list(value)
+                            for key, value in indicators.indicators.items()}
 
     for i in range(len(data)):
-        data_date = datetime.strptime(data[i][0], "%Y-%m-%d %H:%M:%S")  # Convert string to datetime
+        # Convert string to datetime
+        data_date = datetime.strptime(data[i][0], "%Y-%m-%d %H:%M:%S")
         if start_ts and data_date < start_ts:
             continue
         if end_ts and data_date > end_ts:
             break
 
         for position in positions.current_positions[:]:
-            sell_signal, sell_price = strategy["sell_signal"](position, data, i, indicators.indicators)
+            sell_signal, sell_price = strategy["sell_signal"](
+                position, data, i, indicators.indicators)
             if sell_signal > 0:
                 positions.close_position(
                     buy_index=position['buy_index'],
@@ -87,19 +95,25 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
                     sell_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
                     sell_signals={'Sell_Signal': sell_signal}
                 )
-            position['active_stats'] = (((data[i][4] / position['buy_price']) * (1 - (positions.broker_fees / 100))), data[i][0])
+            position['active_stats'] = {
+                "current_ratio": (data[i][4] / position['buy_price']) * (1 - (positions.broker_fees / 100)),
+                "current_date": data[i][0],
+                "current_position_duration": (data_date - datetime.strptime(position['buy_date'], "%Y-%m-%d %H:%M:%S")).days
+            }
 
         if len(positions.current_positions) == 0 or multi_positions:
-            buy_signal, buy_price  = strategy["buy_signal"](positions.current_positions, data, i, indicators.indicators)
+            buy_signal, buy_price = strategy["buy_signal"](
+                positions.current_positions, data, i, indicators.indicators)
             if buy_signal > 0:
                 positions.add_position(
                     buy_index=i,
                     buy_price=buy_price,
                     buy_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
-                    buy_signals={'Buy_Signal':buy_signal}
+                    buy_signals={'Buy_Signal': buy_signal}
                 )
 
     return positions
+
 
 @app.route('/QTSBE/<pair>/<strategy>')
 def get_data(pair, strategy):
@@ -113,7 +127,7 @@ def get_data(pair, strategy):
     if end_ts:
         end_ts = end_ts.strip("'")
         end_ts = end_ts.strip('"')
-    
+
     multi_positions = request.args.get('multi_positions')
     details = request.args.get('details')
     multi_positions = bool(multi_positions) and (
@@ -128,7 +142,8 @@ def get_data(pair, strategy):
         if len(row[0]) == 10:  # Check if the date string is in the format "YYYY-MM-DD"
             row[0] += " 00:00:00"
 
-    result = analyse(data, start_ts, end_ts, multi_positions, strategies[strategy])
+    result = analyse(data, start_ts, end_ts,
+                     multi_positions, strategies[strategy])
 
     response_data = {
         "pair": pair,
@@ -150,8 +165,7 @@ def get_data(pair, strategy):
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
 
-    logger.info(f"Request pair: {pair} | strategy: {strategy} | start_ts: {
-                start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
+    logger.info(f"Request pair: {pair} | strategy: {strategy} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
     logger.debug(f"Request response: {response}")
     return response
 
