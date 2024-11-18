@@ -51,6 +51,10 @@ class App(tk.Tk):
         self.open_graphics_checkbox = tk.Checkbutton(
             self, text="Open Graphics", variable=self.open_graphics_var)
 
+        self.multi_positions_var = tk.BooleanVar(value=False)
+        self.multi_positions_checkbox = tk.Checkbutton(
+            self, text="Multi Positions", variable=self.multi_positions_var)
+
         self.load_button = tk.Button(
             self, text="Load", command=self.load_request)
 
@@ -73,9 +77,10 @@ class App(tk.Tk):
         self.hide_data_checkbox.grid(row=6, column=0, padx=10, pady=10)
         self.hide_indicators_checkbox.grid(row=6, column=1, padx=10, pady=10)
         self.open_graphics_checkbox.grid(row=7, column=0, padx=10, pady=10)
-        self.load_button.grid(row=7, column=1, padx=10, pady=10)
+        self.multi_positions_checkbox.grid(row=7, column=1, padx=10, pady=10)
+        self.load_button.grid(row=8, column=0, columnspan=2, padx=10, pady=10)
         self.response_text.grid(
-            row=8, column=0, columnspan=2, padx=10, pady=10)
+            row=9, column=0, columnspan=2, padx=10, pady=10)
 
     def load_pairs(self):
         pairs = set()
@@ -111,11 +116,12 @@ class App(tk.Tk):
         strategy = self.strategy_combo.get()
         start_ts = self.start_ts_entry.get()
         end_ts = self.end_ts_entry.get()
+        multi_positions = self.multi_positions_var.get()
 
         self.response_text.delete(1.0, tk.END)
         self.response_text.insert(tk.END, f"Loading {api_source} {pair} {timeframe} {strategy}...\n")
 
-        url = f"http://127.0.0.1:5000/QTSBE/{api_source}_{pair}_{timeframe}/{strategy}?details=True"
+        url = f"http://127.0.0.1:5000/QTSBE/{api_source}_{pair}_{timeframe}/{strategy}?details=True&multi_positions={multi_positions}"
         
         if start_ts:
             url += f"&start_ts={start_ts}"
