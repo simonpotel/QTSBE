@@ -116,11 +116,11 @@ class BinanceScanner(object):
 
         if positions_ratios:
             positions_ratios_sorted = sorted(positions_ratios, key=lambda x: x[1], reverse=True)
-            avg_ratio = sum(pr[1] for pr in positions_ratios) / len(positions_ratios)
+            avg_ratio_cr = sum(pr[1] for pr in positions_ratios) / len(positions_ratios)
             max_ratio_cr = positions_ratios_sorted[0]
             min_ratio_cr = positions_ratios_sorted[-1]
         else:
-            avg_ratio = 0
+            avg_ratio_cr = 0
             max_ratio_cr = ("N/A", 0)
             min_ratio_cr = ("N/A", 0)
 
@@ -135,7 +135,7 @@ class BinanceScanner(object):
                 "max_drawdown_period_pair": max_drawdown_period[0],
             },
             "positions": {
-                "average_ratio": avg_ratio,
+                "avg_ratio_cr": avg_ratio_cr,
                 "max_ratio_cr": max_ratio_cr[1],
                 "max_ratio_cr_pair": max_ratio_cr[0],
                 "min_ratio_cr": min_ratio_cr[1],
