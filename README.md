@@ -101,10 +101,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 > [!CAUTION]  
-> Always review the code before using it. The documentation or the purpose of the code may not be updated, so please check everything you use.
-
-> [!CAUTION]  
-> Developers are not responsible for any loss, miscalculation, or related issues resulting in losing money. Check everything you use before using it.
+> Always review the code before using it. The documentation or the purpose of the code may not be updated, so please check everything you use. 
+> Developers are not responsible for any loss, miscalculation, or related issues resulting in losing money.
 
 ---
 
