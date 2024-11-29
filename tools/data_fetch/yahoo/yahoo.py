@@ -24,6 +24,7 @@ class YahooAPI:
                 'Close': 'close', 
                 'Volume': 'volume'
             }).drop(columns=['Adj Close'])
+            ticker = ticker.replace('/', '_')
             filepath = os.path.join(self.data_dir, f'Yahoo_{ticker}_{interval}.csv')
             data.to_csv(filepath, index=False)
             print(f"{Fore.GREEN}Data saved in: {filepath}")
