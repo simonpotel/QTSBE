@@ -2,14 +2,14 @@ import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import os
 
-theme = '#151924' # black / white
+theme = 'white' # black / white
 
 chart_colors = {
     "Background": theme, # black
-    "increasing_line": "#A5D6A7", #blue: #1e90ff  | #green: #00ff00  |
-    "increasing_fill": "#A5D6A7", #blue: #115290  | #green: #00b300  |
-    "decreasing_line": "#F7515F",  #red: #be0000  | #orange: #d17123  | 
-    "decreasing_fill": "#F7515F",  #red: #ff0000  | #orange: #eb7f26  | 
+    "increasing_line": "black", #blue: #1e90ff  | #green: #00ff00  |
+    "increasing_fill": "white", #blue: #115290  | #green: #00b300  |
+    "decreasing_line": "black",  #red: #be0000  | #orange: #d17123  | 
+    "decreasing_fill": "black",  #red: #ff0000  | #orange: #eb7f26  | 
     "shapes": "#8288b0",
     "MA_100": "#B8336A",
     "MA_40": "#FF9B42",
@@ -23,6 +23,7 @@ chart_colors = {
     "Bollinger_Lower": "#09917b",
     "Bollinger_Rolling": "#2652cb",
     "Bollinger_Upper": "#c9313f",
+    "Else": "#8FF7A7",
 }
 
 def extract_ohlc_data(data):
@@ -100,6 +101,8 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         if indicator == 'RSI' or indicator == 'Normalize_MACD':
             fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=2, col=1)
         else:
+            if indicator not in chart_colors.keys():
+                chart_colors[indicator] = chart_colors['Else']
             fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=1, col=1)
 
 
