@@ -18,23 +18,20 @@ The algorithm utilizes Binance API to fetch data for all available trading pairs
 To scan tokens with the option to fetch the latest data: (with scan.py)
 
 ```python
-from token_scanner import TokenScanner
+scanner = BinanceScanner()
 
-scanner = TokenScanner()
-timeframe = '1h'
-strategy = 'strategy_name'
+specific_symbols = [
+    "BTC/USDT",
+    "ETH/USDT"]
+
+timeframe = '1d'
+strategy = 'rsi_example'
 fetch_latest_data = True
+start_ts = '2020-01-01 00:00:00'
+end_ts = '2021-01-01 00:00:00'
 
-scanner.scan(timeframe, strategy, fetch_latest_data)
-```
-
-#### Parameters
-
-- `timeframe`: The timeframe for the OHLCV data (e.g., '1m', '5m', '1h', '1d').
-- `strategy`: The trading strategy to apply.
-- `fetch_latest_data`: Set to `True` to fetch the latest OHLCV data before analysis, or `False` to use existing data. Be careful with this parameter, dont use it too much, see `https://developers.binance.com/docs/derivatives/coin-margined-futures/error-code` -1003 TOO_MANY_REQUESTS#
+scanner.scan(timeframe, strategy, fetch_latest_data, symbols=specific_symbols, start_ts=start_ts, end_ts=end_ts)
 
 ### Output
 
-The results are saved in a JSON file named `scan_result.json`, containing statistics for each pair and indicating the best pairs according to the chosen strategy.
-
+Results are saved in `tools/strategy_scanner/_results` with `binance_`prefix.
