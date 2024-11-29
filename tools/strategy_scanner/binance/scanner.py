@@ -1,5 +1,4 @@
-import sys
-import os
+
 from colorama import init, Fore, Style
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -59,9 +58,7 @@ class BinanceScanner(object):
                 for future in futures:
                     future.result()  
 
-        drawdowns = []
-        positions_ratios = []
-
+        positions_stats = []
         with tqdm(total=total_symbols, desc="Processing scan", unit="symbol", ncols=100, dynamic_ncols=True, colour="BLUE") as pbar:
             with ThreadPoolExecutor(max_workers=7) as executor:
                 futures = {executor.submit(process_symbol_wrapper, symbol, index): symbol for index, symbol in enumerate(symbols, start=1)}
@@ -71,13 +68,8 @@ class BinanceScanner(object):
                         if data and "stats" in data:
                             stats = data["stats"]
                             all_stats.append((symbol, stats, data))
-                            if "drawdown:" in stats:
-                                drawdowns.append((symbol, stats["drawdown:"]))
-                            elif "drawdowns" in stats:
-                                drawdowns.append((symbol, stats["drawdowns"]))
-                            if "positions" in stats and "max_cumulative_ratio" in stats["positions"]:
-                                positions_ratios.append((symbol, stats["positions"]["max_cumulative_ratio"]))
-
+                            if "positions" in stats:
+                                positions_stats.append((symbol, stats))
                     pbar.set_postfix({
                         'Symbol': symbol,
                         'Time left': formatted_remaining_time,
@@ -87,7 +79,7 @@ class BinanceScanner(object):
         pbar.write(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}All tokens processed!")
         all_stats_sorted = sorted(all_stats, key=lambda x: x[1]["positions"]["max_cumulative_ratio"], reverse=True)
         self.save_stats_to_json(all_stats_sorted)
-        self.save_global_stats_to_json(drawdowns, positions_ratios)
+        self.save_global_stats_to_json(positions_stats)
 
     def save_stats_to_json(self, all_stats):
         result = {"tokens": []}
@@ -99,54 +91,97 @@ class BinanceScanner(object):
         with open('scan_result.json', 'w') as json_file:
             json.dump(result, json_file, indent=4)
         print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Results saved to scan_result.json")
-
-
-    def save_global_stats_to_json(self, drawdowns, positions_ratios):
-        if drawdowns:
-            drawdowns_sorted = sorted(drawdowns, key=lambda x: x[1]["max_drawdown"], reverse=True)
-            max_drawdown = drawdowns_sorted[0]
-            min_drawdown = drawdowns_sorted[-1]
-            avg_drawdown = sum(dd[1]["max_drawdown"] for dd in drawdowns) / len(drawdowns)
-            max_drawdown_period = max(drawdowns, key=lambda x: x[1]["max_drawdown_period"])
-        else:
-            max_drawdown = ("N/A", {"max_drawdown": 0})
-            min_drawdown = ("N/A", {"max_drawdown": 0})
-            avg_drawdown = 0
-            max_drawdown_period = ("N/A", {"max_drawdown_period": 0})
-
-        if positions_ratios:
-            positions_ratios_sorted = sorted(positions_ratios, key=lambda x: x[1], reverse=True)
-            avg_ratio_cr = sum(pr[1] for pr in positions_ratios) / len(positions_ratios)
-            max_ratio_cr = positions_ratios_sorted[0]
-            min_ratio_cr = positions_ratios_sorted[-1]
-        else:
-            avg_ratio_cr = 0
-            max_ratio_cr = ("N/A", 0)
-            min_ratio_cr = ("N/A", 0)
-
+    
+    def save_global_stats_to_json(self, positions_stats):
         global_stats = {
-            "drawdowns": {
-                "max_drawdown": max_drawdown[1]["max_drawdown"],
-                "max_drawdown_pair": max_drawdown[0],
-                "min_drawdown": min_drawdown[1]["max_drawdown"],
-                "min_drawdown_pair": min_drawdown[0],
-                "average_drawdown": avg_drawdown,
-                "max_drawdown_period": max_drawdown_period[1]["max_drawdown_period"],
-                "max_drawdown_period_pair": max_drawdown_period[0],
-            },
             "positions": {
-                "avg_ratio_cr": avg_ratio_cr,
-                "max_ratio_cr": max_ratio_cr[1],
-                "max_ratio_cr_pair": max_ratio_cr[0],
-                "min_ratio_cr": min_ratio_cr[1],
-                "min_ratio_cr_pair": min_ratio_cr[0]
+                "all_ratios": [],
+                "average_position_duration": 0,
+                "average_ratio": 0,
+                "biggest_position_duration": 0,
+                "biggest_ratio": 0,
+                "biggest_ratio_symbol": None,
+                "lowest_position_duration": 0,
+                "lowest_ratio": 0,
+                "lowest_ratio_symbol": None,
+                "percent_above_1_ratio": 0,
+                "percent_below_1_ratio": 0,
+                "max_cumulative_ratio": 0,
+                "max_cumulative_symbol": None,
+                "min_cumulative_ratio": 0,
+                "min_cumulative_symbol": None,
+                "average_cumulative_ratio": 0,
+                "total_signals": 0,
+                "average_signals": {},
+                "yearly_best_symbol": {},
+                "yearly_worst_symbol": {},
+                "yearly_averages": {}
             }
         }
+        if positions_stats:
+            all_ratios = []
+            cumulative_ratios = []
+            durations = []
+            buy_signals_count = {}
+            sell_signals_count = {}
+            yearly_data = {}
+            total_signals = 0
+
+            for symbol, stats in positions_stats:
+                ratios = stats["positions"].get("all_ratios", [])
+                all_ratios.extend(ratios)
+                cumulative_ratios.append(stats["positions"].get("max_cumulative_ratio", 0))
+                durations.append(stats["positions"].get("biggest_position_duration", 0))
+
+                for key, value in stats["positions"].get("buy_signals_count", {}).items():
+                    buy_signals_count[key] = buy_signals_count.get(key, 0) + value
+                    total_signals += value
+                for key, value in stats["positions"].get("sell_signals_count", {}).items():
+                    sell_signals_count[key] = sell_signals_count.get(key, 0) + value
+                    total_signals += value
+
+                for year, ratio in stats["positions"].get("yearly_ratio", {}).items():
+                    if year not in yearly_data:
+                        yearly_data[year] = []
+                    yearly_data[year].append((symbol, ratio))
+
+            above_1 = sum(1 for r in all_ratios if r > 1)
+            below_1 = sum(1 for r in all_ratios if r <= 1)
+            global_stats["positions"]["all_ratios"] = all_ratios
+            global_stats["positions"]["percent_above_1_ratio"] = (above_1 / len(all_ratios) * 100) if all_ratios else 0
+            global_stats["positions"]["percent_below_1_ratio"] = (below_1 / len(all_ratios) * 100) if all_ratios else 0
+            global_stats["positions"]["average_ratio"] = sum(all_ratios) / len(all_ratios) if all_ratios else 0
+            global_stats["positions"]["biggest_ratio"] = max(all_ratios) if all_ratios else 0
+            global_stats["positions"]["lowest_ratio"] = min(all_ratios) if all_ratios else 0
+            global_stats["positions"]["biggest_ratio_symbol"] = max(positions_stats, key=lambda x: max(x[1]["positions"].get("all_ratios", [0])) if x[1]["positions"].get("all_ratios") else 0)[0]
+            global_stats["positions"]["lowest_ratio_symbol"] = min(positions_stats, key=lambda x: min(x[1]["positions"].get("all_ratios", [float('inf')])) if x[1]["positions"].get("all_ratios") else float('inf'))[0]
+
+            global_stats["positions"]["average_position_duration"] = sum(durations) / len(durations) if durations else 0
+            global_stats["positions"]["biggest_position_duration"] = max(durations) if durations else 0
+
+            global_stats["positions"]["max_cumulative_ratio"] = max(cumulative_ratios) if cumulative_ratios else 0
+            global_stats["positions"]["min_cumulative_ratio"] = min(cumulative_ratios) if cumulative_ratios else 0
+            global_stats["positions"]["max_cumulative_symbol"] = max(positions_stats, key=lambda x: x[1]["positions"].get("max_cumulative_ratio", 0))[0]
+            global_stats["positions"]["min_cumulative_symbol"] = min(positions_stats, key=lambda x: x[1]["positions"].get("max_cumulative_ratio", float('inf')))[0]
+            global_stats["positions"]["average_cumulative_ratio"] = sum(cumulative_ratios) / len(cumulative_ratios) if cumulative_ratios else 0
+
+            global_stats["positions"]["total_signals"] = total_signals
+            total_signal_types = {**buy_signals_count, **sell_signals_count}
+            for signal, count in total_signal_types.items():
+                global_stats["positions"]["average_signals"][signal] = count / len(positions_stats)
+
+            for year, data in yearly_data.items():
+                best_symbol = max(data, key=lambda x: x[1])[0]
+                worst_symbol = min(data, key=lambda x: x[1])[0]
+                average_yearly_ratio = sum(ratio for _, ratio in data) / len(data)
+                global_stats["positions"]["yearly_best_symbol"][year] = best_symbol
+                global_stats["positions"]["yearly_worst_symbol"][year] = worst_symbol
+                global_stats["positions"]["yearly_averages"][year] = average_yearly_ratio
 
         with open('global_stats.json', 'w') as json_file:
             json.dump(global_stats, json_file, indent=4)
         print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Global statistics saved to global_stats.json")
-
+    
     def scan(self, timeframe, strategy, fetch_latest_data, symbols=None):
         print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}\n{Fore.WHITE}Fetch Latest Data: {Fore.LIGHTBLUE_EX}{fetch_latest_data}")
         if symbols is None:
