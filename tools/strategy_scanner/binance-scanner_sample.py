@@ -10,7 +10,9 @@ specific_symbols = [
 ]
 
 timeframe = '1d'
-strategy = 'rsi_example'
-fetch_latest_data = True
+strategy = 'QTS_fibo'
+fetch_latest_data = False
+start_ts = '2024-01-01 00:00:00'
+end_ts = '2025-01-01 00:00:00'
 
-scanner.scan(timeframe, strategy, fetch_latest_data, symbols=specific_symbols)
+scanner.scan(timeframe, strategy, fetch_latest_data, symbols=specific_symbols, start_ts=start_ts, end_ts=end_ts)

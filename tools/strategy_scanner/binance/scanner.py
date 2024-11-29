@@ -1,4 +1,3 @@
-
 from colorama import init, Fore, Style
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -7,8 +6,6 @@ from tqdm import tqdm
 import json
 import math
 
-#sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '..', 'data'))
-#from binance_api import BinanceAPI
 from tools.data_fetch.binance.binance import BinanceAPI
 
 init(autoreset=True)
@@ -25,8 +22,10 @@ class BinanceScanner(object):
     def load_symbols(self):
         return self.binance.exchange.load_markets()
 
-    def analyze_symbol(self, symbol, timeframe, strategy):
+    def analyze_symbol(self, symbol, timeframe, strategy, start_ts=None, end_ts=None):
         url = f"http://127.0.0.1:5000/QTSBE/Binance_{symbol.replace('/', '')}_{timeframe}/{strategy}"
+        if start_ts and end_ts:
+            url += f"?start_ts={start_ts}&end_ts={end_ts}"
         response = requests.get(url)
         try:
             return response.json()
@@ -34,22 +33,22 @@ class BinanceScanner(object):
             print(f"Invalid JSON response for {symbol}: {response.text}")
             return {}  # Return an empty dictionary or handle as appropriate
 
-    def process_symbol(self, symbol, index, total_symbols, start_time, timeframe, strategy, analysis_func):
+    def process_symbol(self, symbol, index, total_symbols, start_time, timeframe, strategy, analysis_func, start_ts=None, end_ts=None):
         elapsed_time = time.time() - start_time
         avg_time_per_token = elapsed_time / index
         remaining_time = avg_time_per_token * (total_symbols - index)
         formatted_remaining_time = format_time(remaining_time)
 
-        data = analysis_func(symbol, timeframe, strategy)
+        data = analysis_func(symbol, timeframe, strategy, start_ts, end_ts)
         return data, symbol, formatted_remaining_time
 
-    def process_symbols(self, symbols, timeframe, strategy, fetch_latest_data, analysis_func):
+    def process_symbols(self, symbols, timeframe, strategy, fetch_latest_data, analysis_func, start_ts=None, end_ts=None):
         total_symbols = len(symbols)
         start_time = time.time()
         all_stats = []
 
         def process_symbol_wrapper(symbol, index):
-            return self.process_symbol(symbol, index, total_symbols, start_time, timeframe, strategy, analysis_func)
+            return self.process_symbol(symbol, index, total_symbols, start_time, timeframe, strategy, analysis_func, start_ts, end_ts)
 
         if fetch_latest_data:
             with ThreadPoolExecutor(max_workers=7) as executor:
@@ -182,11 +181,11 @@ class BinanceScanner(object):
             json.dump(global_stats, json_file, indent=4)
         print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Global statistics saved to global_stats.json")
     
-    def scan(self, timeframe, strategy, fetch_latest_data, symbols=None):
+    def scan(self, timeframe, strategy, fetch_latest_data, symbols=None, start_ts=None, end_ts=None):
         print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}\n{Fore.WHITE}Fetch Latest Data: {Fore.LIGHTBLUE_EX}{fetch_latest_data}")
         if symbols is None:
             symbols = self.load_symbols()
-        self.process_symbols(symbols, timeframe, strategy, fetch_latest_data, self.analyze_symbol)
+        self.process_symbols(symbols, timeframe, strategy, fetch_latest_data, self.analyze_symbol, start_ts, end_ts)
 
     def rank_symbols_by_recent_buy_date(self, timeframe, strategy, symbols=None):
         print(f"{Fore.WHITE}{Style.BRIGHT}Ranking Symbols by Most Recent Buy Date for Strategy: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}")
