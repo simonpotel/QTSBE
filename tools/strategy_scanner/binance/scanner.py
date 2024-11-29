@@ -24,8 +24,14 @@ class BinanceScanner(object):
 
     def analyze_symbol(self, symbol, timeframe, strategy, start_ts=None, end_ts=None):
         url = f"http://127.0.0.1:5000/QTSBE/Binance_{symbol.replace('/', '')}_{timeframe}/{strategy}"
-        if start_ts and end_ts:
-            url += f"?start_ts={start_ts}&end_ts={end_ts}"
+        if start_ts or end_ts:
+            url += "?"
+        if start_ts:
+            url += f"start_ts={start_ts}"
+        if end_ts:  
+            if start_ts:
+                url += "&"
+            url += f"end_ts={end_ts}"
         response = requests.get(url)
         try:
             return response.json()
