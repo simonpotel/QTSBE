@@ -1,19 +1,17 @@
-from colorama import init, Fore, Style
+import os
 import time
-from concurrent.futures import ThreadPoolExecutor
-import requests
-from tqdm import tqdm
 import json
-import math
-
+import requests
+from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
+from colorama import Fore, Style
 from tools.data_fetch.binance.binance import BinanceAPI
 
-init(autoreset=True)
-
 def format_time(seconds):
-    minutes = math.floor(seconds / 60)
-    seconds = math.ceil(seconds % 60)
-    return f"{minutes}m {seconds}s"
+    mins, secs = divmod(seconds, 60)
+    hours, mins = divmod(mins, 60)
+    return f"{int(hours):02}:{int(mins):02}:{int(secs):02}"
 
 class BinanceScanner(object):
     def __init__(self):
@@ -83,21 +81,25 @@ class BinanceScanner(object):
 
         pbar.write(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}All tokens processed!")
         all_stats_sorted = sorted(all_stats, key=lambda x: x[1]["positions"]["max_cumulative_ratio"], reverse=True)
-        self.save_stats_to_json(all_stats_sorted)
-        self.save_global_stats_to_json(positions_stats)
+        self.save_stats_to_json(all_stats_sorted, strategy, start_ts, end_ts)
+        self.save_global_stats_to_json(positions_stats, strategy, start_ts, end_ts)
 
-    def save_stats_to_json(self, all_stats):
+    def save_stats_to_json(self, all_stats, strategy, start_ts, end_ts):
         result = {"tokens": []}
         for symbol, _, data in all_stats:
             result["tokens"].append({
                 "symbol": symbol,
                 "data": data
             })
-        with open('scan_result.json', 'w') as json_file:
+        date_str = datetime.now().strftime("%Y%m%d")
+        directory = f'tools/strategy_scanner/_results/binance_{date_str}-{start_ts}-{end_ts}-{strategy}'
+        os.makedirs(directory, exist_ok=True)
+        file_path = os.path.join(directory, 'scan_results.json')
+        with open(file_path, 'w') as json_file:
             json.dump(result, json_file, indent=4)
-        print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Results saved to scan_result.json")
+        print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Results saved to {file_path}")
     
-    def save_global_stats_to_json(self, positions_stats):
+    def save_global_stats_to_json(self, positions_stats, strategy, start_ts, end_ts):
         global_stats = {
             "positions": {
                 "all_ratios": [],
@@ -183,9 +185,13 @@ class BinanceScanner(object):
                 global_stats["positions"]["yearly_worst_symbol"][year] = worst_symbol
                 global_stats["positions"]["yearly_averages"][year] = average_yearly_ratio
 
-        with open('global_stats.json', 'w') as json_file:
+        date_str = datetime.now().strftime("%Y%m%d")
+        directory = f'tools/strategy_scanner/_results/binance_{date_str}-{start_ts}-{end_ts}-{strategy}'
+        os.makedirs(directory, exist_ok=True)
+        file_path = os.path.join(directory, 'global_stats.json')
+        with open(file_path, 'w') as json_file:
             json.dump(global_stats, json_file, indent=4)
-        print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Global statistics saved to global_stats.json")
+        print(f"{Fore.LIGHTBLUE_EX}{Style.BRIGHT}Global statistics saved to {file_path}")
     
     def scan(self, timeframe, strategy, fetch_latest_data, symbols=None, start_ts=None, end_ts=None):
         print(f"{Fore.WHITE}{Style.BRIGHT}Strategy Scanner: {Fore.LIGHTBLUE_EX}{strategy}\n{Fore.WHITE}Timeframe: {Fore.LIGHTBLUE_EX}{timeframe}\n{Fore.WHITE}Fetch Latest Data: {Fore.LIGHTBLUE_EX}{fetch_latest_data}")
