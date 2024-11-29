@@ -27,9 +27,8 @@ QTSBE is an open-source project designed to provide a robust environment for bac
 - API for strategy implementation and testing. (Flask)
 - Visualization tools for strategy performance. (Plotly / Discord)
 - Tools to fetch data. (from yfinance or Binance API).
-- Tool to apply your trading strategy to a list of cryptos/stocks and see the stats of all.
+- Tool to apply your trading strategy to a list of cryptos/stocks and see the stats of all. (Scanner)
 - Test files to enhance developer usage.
-- Easy customization of charts (Plotly), indicator functions, and strategies.
 
 ## Getting Started
 
@@ -63,6 +62,7 @@ QTSBE is an open-source project designed to provide a robust environment for bac
 
 3. **Access the API:**
    - Get the API response in your web browser: `http://127.0.0.1:5000/QTSBE/<data_set>/<your_strategy_name>`.
+     See others params in `api/README.md`
 
 4. **Visualize Results (integrations):**
    
@@ -79,9 +79,16 @@ QTSBE is an open-source project designed to provide a robust environment for bac
        ```bash
        sh sh/discord_chat_bot.sh
        ```
-     
 
-## Customization
+5.  **Fetch your data properly:**
+      Configure the file `tools/auto_fetch/config.json`using `tools/auto_fetch/README.md`
+      - Using auto_fetch tool:
+
+       ```bash
+        sh sh/auto_fetch.sh
+       ```
+
+## Charts
 
 ![image](https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/white_3.png?raw=true)
 ![image](https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/black_2.png?raw=true)
@@ -93,7 +100,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-Note: The contents of the files in the indicators folder are not guaranteed to be completely accurate. Always review the code of each indicator before use.
+> [!CAUTION]  
+> Always review the code before using it. The documentation or the purpose of the code may not be updated, so please check everything you use.
+
+> [!CAUTION]  
+> Developers are not responsible for any loss, miscalculation, or related issues resulting in losing money. Check everything you use before using it.
 
 ---
 
