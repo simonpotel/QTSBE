@@ -1,1 +1,3 @@
-# Files thats are used in the project
+# assets/
+
+Files thats are used in the project.

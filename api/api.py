@@ -10,7 +10,6 @@ import sys
 import importlib.util
 from datetime import datetime
 
-# Add parent directories to sys.path to import modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), "..", "..")))
