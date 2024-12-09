@@ -92,7 +92,7 @@ class BinanceScanner(object):
                 "data": data
             })
         date_str = datetime.now().strftime("%Y%m%d")
-        directory = f'tools/strategy_scanner/_results/binance_{date_str}-{start_ts}-{end_ts}-{strategy}'
+        directory = f'tools/strategy_scanner/_results/binance_{strategy}-{date_str}-{start_ts}-{end_ts}'
         os.makedirs(directory, exist_ok=True)
         file_path = os.path.join(directory, 'scan_results.json')
         with open(file_path, 'w') as json_file:
@@ -186,7 +186,7 @@ class BinanceScanner(object):
                 global_stats["positions"]["yearly_averages"][year] = average_yearly_ratio
 
         date_str = datetime.now().strftime("%Y%m%d")
-        directory = f'tools/strategy_scanner/_results/binance_{date_str}-{start_ts}-{end_ts}-{strategy}'
+        directory = f'tools/strategy_scanner/_results/binance_{strategy}-{date_str}-{start_ts}-{end_ts}'
         os.makedirs(directory, exist_ok=True)
         file_path = os.path.join(directory, 'global_stats.json')
         with open(file_path, 'w') as json_file:
