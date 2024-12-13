@@ -97,7 +97,10 @@ def get_position_stats(positions):
     result_stats.update({
         'average_ratio': total_ratio / len(positions.positions),
         'cumulative_ratios': cumulative_ratios,
-        'max_cumulative_ratio': cumulative_ratios[-1],
+        'min_cumulative_ratio': min(cumulative_ratios),
+        'max_cumulative_ratio': max(cumulative_ratios),
+        'final_cumulative_ratio': cumulative_ratios[-1],
+        'average_cumulative_ratio': sum(cumulative_ratios) / len(cumulative_ratios),
         'average_position_duration': total_days / len(positions.positions),
         'max_open_positions_period': (max_open_period_start.strftime('%Y-%m-%d %H:%M:%S') if max_open_period_start else '',
                                       max_open_period_end.strftime('%Y-%m-%d %H:%M:%S') if max_open_period_end else '',
