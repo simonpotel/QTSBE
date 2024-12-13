@@ -90,10 +90,16 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
 
     # Add trade ratios chart to the second column if there are trade ratios
     if len(trade_ratios) > 0:
-        fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color=chart_colors['Test'])), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
+        fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color='#DBB4AD')), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
         cumulative_ratios = [float(cumulative_ratio) for cumulative_ratio in json_data["stats"]["positions"]["cumulative_ratios"]]
-        fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color=chart_colors['MA_100'])), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
+        fig.add_trace(go.Scatter(x=trade_indices, y=cumulative_ratios, mode='lines', name='Cumulative Ratios', line=dict(color='#D30C7B')), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
         fig.add_shape(type="line", x0=min(trade_indices), y0=1, x1=max(trade_indices), y1=1, row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1, line=dict(color=chart_colors['shapes'], width=1.5))
+
+        min_ratio = min(trade_ratios)
+        fig.add_shape(type="line", x0=min(trade_indices), y0=min_ratio, x1=max(trade_indices), y1=min_ratio, row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1, line=dict(color='red', width=1.5, dash='dash'))
+
+        moving_avg_cumulative_ratios = [sum(cumulative_ratios[:i+1])/(i+1) for i in range(len(cumulative_ratios))]
+        fig.add_trace(go.Scatter(x=trade_indices, y=moving_avg_cumulative_ratios, mode='lines', name='Moving Avg Cumulative Ratios', line=dict(color='#FFE3DC')), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
 
 
     # Add RSI or Normalize_MACD chart to the second row if available
