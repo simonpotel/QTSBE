@@ -1,6 +1,6 @@
 def get_drawdowns_stats(positions):
     result_stats = {
-        'max_drawdown': 0,  # cargest percentage loss from a peak to a trough
+        'max_drawdown': 0,  # largest percentage loss from a peak to a trough
         'max_drawdown_period': 0,  # period during which the maximum drawdown occurred
         'average_drawdown': 0  # average drawdown across all positions
     }
@@ -18,7 +18,10 @@ def get_drawdowns_stats(positions):
     for i, ratio in enumerate(ratios):
         if ratio > peak:
             peak = ratio
-        drawdown = (peak - ratio) / peak
+        if peak != 0:
+            drawdown = (peak - ratio) / peak
+        else:
+            drawdown = 0
         if drawdown > max_drawdown:
             max_drawdown = drawdown
             start_index = i
@@ -29,11 +32,9 @@ def get_drawdowns_stats(positions):
             max_drawdown_period = (positions.positions[start_index]['buy_date'], positions.positions[end_index]['sell_date'])
         drawdowns.append(drawdown)
 
-
     average_drawdown = sum(drawdowns) / len(drawdowns)
     result_stats['max_drawdown'] = max_drawdown
     result_stats['max_drawdown_period'] = max_drawdown_period
     result_stats['average_drawdown'] = average_drawdown
 
     return result_stats
-
