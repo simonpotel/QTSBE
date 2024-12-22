@@ -19,7 +19,9 @@ def get_position_stats(positions):
         'yearly_ratio': {}, 
         'max_open_positions_period': ('', '', 0),  # ('start_date', 'end_date', max_open_positions)
         'biggest_position_duration': 0,
-        'lowest_position_duration': float('inf')
+        'lowest_position_duration': float('inf'),
+        'lowest_cr_ratio': float('inf'),
+        'lowest_cr_ratio_details': []  # Add this line to store the details
     }
 
     if not positions.positions:
@@ -94,6 +96,17 @@ def get_position_stats(positions):
     for year in result_stats['yearly_ratio']:
         result_stats['yearly_ratio'][year] = round(result_stats['yearly_ratio'][year], 3)
 
+    min_cr_ratio = float('inf')
+    current_cr_ratio = 1
+    cr_ratio_details = []  # Add this line to store the details
+    for ratio in result_stats['all_ratios']:
+        current_cr_ratio *= ratio
+        cr_ratio_details.append(current_cr_ratio)  # Add this line to store the details
+        if current_cr_ratio < min_cr_ratio:
+            min_cr_ratio = current_cr_ratio
+        if current_cr_ratio > 1:
+            current_cr_ratio = 1
+
     result_stats.update({
         'average_ratio': total_ratio / len(positions.positions),
         'cumulative_ratios': cumulative_ratios,
@@ -104,7 +117,9 @@ def get_position_stats(positions):
         'average_position_duration': total_days / len(positions.positions),
         'max_open_positions_period': (max_open_period_start.strftime('%Y-%m-%d %H:%M:%S') if max_open_period_start else '',
                                       max_open_period_end.strftime('%Y-%m-%d %H:%M:%S') if max_open_period_end else '',
-                                      max_open_positions)
+                                      max_open_positions),
+        'lowest_cr_ratio': min_cr_ratio,
+        'lowest_cr_ratio_details': cr_ratio_details  # Add this line to include the details in the result
     })
 
     return result_stats
