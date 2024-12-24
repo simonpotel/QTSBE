@@ -148,11 +148,11 @@ def get_data(pair, strategy):
         "pair": pair,
         "strategy": strategy,
         "data": data if details == "True" else [],
-        "result": (
-            result.indicators if details == "True" else [],
-            result.positions,
-            result.current_positions
-        ),
+        #"result": (
+        #    result.indicators if details == "True" else [],
+        #    result.positions,
+        #    result.current_positions
+        #),
         "stats": {
             "drawdown": get_drawdowns_stats(result),
             "positions": get_position_stats(result)
