@@ -21,21 +21,21 @@ class BinanceScanner(object):
         return self.binance.exchange.load_markets()
 
     def analyze_symbol(self, symbol, timeframe, strategy, start_ts=None, end_ts=None):
-        url = f"http://127.0.0.1:5000/QTSBE/Binance_{symbol.replace('/', '')}_{timeframe}/{strategy}"
-        if start_ts or end_ts:
-            url += "?"
+        data_file = f"Binance_{symbol.replace('/', '')}_{timeframe}"
+        url = f"http://127.0.0.1:5000/QTSBE/analyse?pair={data_file}&strategy={strategy}&details=True"
+        
         if start_ts:
-            url += f"start_ts={start_ts}"
-        if end_ts:  
-            if start_ts:
-                url += "&"
-            url += f"end_ts={end_ts}"
-        response = requests.get(url)
+            url += f"&start_ts={start_ts}"
+        if end_ts:
+            url += f"&end_ts={end_ts}"
+
         try:
+            response = requests.get(url)
+            response.raise_for_status()
             return response.json()
-        except requests.exceptions.JSONDecodeError:
-            print(f"Invalid JSON response for {symbol}: {response.text}")
-            return {}  # Return an empty dictionary or handle as appropriate
+        except Exception as e:
+            logger.error(f"Failed to analyze {symbol}: {e}")
+            return None
 
     def process_symbol(self, symbol, index, total_symbols, start_time, timeframe, strategy, analysis_func, start_ts=None, end_ts=None):
         elapsed_time = time.time() - start_time

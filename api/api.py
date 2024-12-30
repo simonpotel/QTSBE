@@ -109,61 +109,6 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
 
     return positions
 
-@cache.cached(timeout=60, query_string=True)
-@app.route('/QTSBE/<pair>/<strategy>')
-def get_data(pair, strategy):
-    ts_format = "%Y-%m-%d %H:%M:%S"
-    start_ts = request.args.get('start_ts')
-    if start_ts:
-        start_ts = start_ts.strip("'")
-        start_ts = start_ts.strip('"')
-
-    end_ts = request.args.get('end_ts')
-    if end_ts:
-        end_ts = end_ts.strip("'")
-        end_ts = end_ts.strip('"')
-
-    multi_positions = request.args.get('multi_positions')
-    details = request.args.get('details')
-    multi_positions = bool(multi_positions) and (
-        lambda s: s.lower() in {'true'})(multi_positions)
-    if start_ts:
-        start_ts = datetime.strptime(start_ts, ts_format)
-    if end_ts:
-        end_ts = datetime.strptime(end_ts, ts_format)
-
-    data = get_file_data(pair)
-    for row in data:
-        if len(row[0]) == 10:  # Check if the date string is in the format "YYYY-MM-DD"
-            row[0] += " 00:00:00"
-
-    result = analyse(data, start_ts, end_ts,
-                     multi_positions, strategies[strategy])
-
-    response_data = {
-        "pair": pair,
-        "strategy": strategy,
-        "data": data if details == "True" else [],
-        "result": (
-            result.indicators if details == "True" else [],
-            result.positions,
-            result.current_positions
-        ),
-        "stats": {
-            "drawdown": get_drawdowns_stats(result),
-            "positions": get_position_stats(result)
-        }
-    }
-
-    response = jsonify(response_data)
-
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-
-    logger.info(f"Request pair: {pair} | strategy: {strategy} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
-    logger.debug(f"Request response: {response}")
-    return response
-
 @app.route('/QTSBE/analyse')
 def analyse_endpoint():
     ts_format = "%Y-%m-%d %H:%M:%S"
