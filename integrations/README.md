@@ -1,11 +1,27 @@
-# integrations/
+# Integrations
 
-Integrations systems thats uses the API.
+External systems and visualization tools using the API.
 
-## discord_chat_bot
+## Discord Chat Bot
 
-You can use the discord_chat_bot to make commands from the api (scan, analyse) to get data directly in Discord.
+Interactive Discord bot for API commands:
+- Strategy analysis
+- Market scanning
+- Real-time alerts
 
-## plotly
+### Configuration
+See `discord_chat_bot/configs/README.md` for setup instructions.
 
-You can use plotly to plot your strategies and reviews them.
+## Plotly
+
+Chart visualization system:
+- Strategy performance plots
+- Technical indicators
+- Trade entry/exit points
+- Custom themes
+
+### Usage
+Run sample visualizations:
+```bash
+sh tests/integrations/plotly_unit.sh
+```

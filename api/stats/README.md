@@ -1,4 +1,23 @@
-# api/stats/
+# Statistics
 
-This folder contains every code that is used by the api to generate using a strategy buy/sell signals the statistics.
-These statistics includes drawdowns, positions ratios and tracking, ..
+Statistical analysis and calculation modules.
+
+## Features
+
+- Drawdown calculation
+- Position tracking
+- Performance metrics
+- Risk analysis
+
+## Components
+
+- Position management
+- Trade statistics
+- Leverage calculations
+- Historical analysis
+
+## Usage
+
+These modules are automatically used by the API when processing strategy results.
+
+See `api/stats/trades.py` for example implementations.

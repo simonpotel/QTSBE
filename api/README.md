@@ -1,31 +1,47 @@
-# api/
+# API
 
-This directory contains all the code for the API, including the algorithmic logic, statistical system, and all the strategies utilized by the API.
+This directory contains the core API implementation, including algorithmic logic, statistical systems, and strategy management.
 
-#### Getting Started
-To start the Flask API, navigate to the QTSBE directory and run the following command:
+## Getting Started
+
+Start the Flask API from the QTSBE root directory:
 
 ```bash
 python api/api.py
 ```
 
-You can now make requests via your web browser:
+## Usage
+
+Make requests via web browser:
 
 ```bash
 http://127.0.0.1:5000/QTSBE/<pair>/<strategy>
 ```
 
-For example:
+### Parameters
+
+- **`pair`**: Trading pair (e.g., "Binance_BTCUSDT_1d")
+- **`strategy`**: Strategy name to use (e.g., "default", "rsi_example")
+- **`start_ts`**: Start timestamp in format "YYYY-MM-DD HH:MM:SS" (e.g., '2000-01-01 00:00:00')
+- **`end_ts`**: End timestamp in format "YYYY-MM-DD HH:MM:SS"
+- **`multi_positions`**: Allow multiple concurrent positions (true/false)
+- **`details`**: Include full OHLCV data and indicators in response (true/false)
+  - Set to true for plotting/visualization
+  - Set to false for faster performance in real-time simulations
+
+### Example
 
 ```bash
-http://127.0.0.1:5000/QTSBE/Binance_BTCUSDT_1d/default
+http://127.0.0.1:5000/QTSBE/Binance_BTCUSDT_1d/default?start_ts=2023-01-01%2000:00:00&multi_positions=false
 ```
 
-You can also use the tool in QTSBE/display/python/main.py
+## Directory Structure
 
-#### API parameters
-- **`start_ts`**: Date format should be "%Y-%m-%d %H:%M:%S", for example, '2000-01-01 00:00:00'.
-- **`end_ts`**: Date format should be "%Y-%m-%d %H:%M:%S", for example, '2000-01-01 00:00:00'.
-- **`multi_positions`**: This parameter should be set to True or False. It determines whether your strategy allows multiple positions to be open simultaneously.
-- **`details`**: This parameter should be set to True or False. When set to True, it indicates that you want to retrieve detailed information such as OHLCV (Open, High, Low, Close, Volume) data from data/bank files and values of indicators. Setting it to False can improve the speed of your code, especially useful when using a real-time simulator. However, if you intend to create graphs and plot different curves, you must set `details` to True to obtain the necessary data.
+- `/logs` - API logs and debugging information
+- `/stats` - Statistical calculation modules
+- `/strategies` - Trading strategy implementations
+
+## Tools
+
+You can also use the visualization tool at `QTSBE/display/python/main.py`
 

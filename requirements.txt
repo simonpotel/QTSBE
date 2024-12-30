@@ -12,3 +12,5 @@ aiofiles
 selenium
 kaleido
 yfinance
+flask_caching
+numpy
