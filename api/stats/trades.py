@@ -5,7 +5,7 @@ class Positions(object):
         self.positions = []
         self.current_positions = []
         self.indicators = {}
-        self.broker_fees = 0.35 # Default broker fees in %
+        self.broker_fees = 1.25 # Default broker fees in %
 
     def add_trade(
             self,
