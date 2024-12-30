@@ -9,6 +9,7 @@ import os
 import sys
 import importlib.util
 from datetime import datetime
+from flask_caching import Cache
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.abspath(os.path.join(
@@ -65,6 +66,7 @@ def import_signals_and_indicators(strategies_folder="strategies"):
 
 
 app = Flask(__name__)
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 CORS(app, resources={r"/QTSBE/*": {"origins": "http://127.0.0.1"}})
 
 
@@ -114,6 +116,7 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
     return positions
 
 
+@cache.cached(timeout=60, query_string=True)
 @app.route('/QTSBE/<pair>/<strategy>')
 def get_data(pair, strategy):
     ts_format = "%Y-%m-%d %H:%M:%S"
