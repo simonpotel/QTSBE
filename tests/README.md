@@ -1,17 +1,31 @@
-# tests/
+# Tests
 
-All tests to fast-test some parts of the project and checking that a part is still working after changes.
+Test suites and integration testing tools.
 
-## tests/integrations/
+## Directory Structure
 
-## tests/integrations/plotly_unit.sh
-Some samples of plotly unit tests to data.
+### /integrations
+- `plotly_unit.sh` - Plotly visualization tests
+- `strategy_viewer.sh` - Multi-symbol strategy testing
 
-## tests/integrations/strategy_viewer.sh
-Test a strategy on multiples symbols using plotly.
+### /tools
+- `data_fetch/` - Provider data fetching tests
+- `fibonacci.py` - Fibonacci retracement testing
 
-## tests/tools/data_fetch
-Test data' providers updates and fetchs.
+## Running Tests
 
-## tests/fibonacci.py
-Test fibonacci retracement on a data set to see how it works.
+### Plotly Tests
+```bash
+sh tests/integrations/plotly_unit.sh
+```
+
+### Strategy Tests
+```bash
+sh tests/integrations/strategy_viewer.sh
+```
+
+## Adding Tests
+
+1. Create test file in appropriate directory
+2. Update relevant README
+3. Add to test suite if applicable
