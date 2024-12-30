@@ -16,10 +16,8 @@ sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), "..", "..")))
 
 debug_mode = True
-# path to the folder containing strategy files
 strategies_folder = r"api/strategies"
-strategies = {}  # dictionary to store strategy functions
-
+strategies = {}
 
 def reload_loguru_config():
     logger.remove()
@@ -29,9 +27,7 @@ def reload_loguru_config():
     else:
         logger.add(r"api/logs/logs.log", level="INFO")
 
-
 reload_loguru_config()
-
 
 def import_signals_and_indicators(strategies_folder="strategies"):
     strategies = {}
@@ -64,11 +60,9 @@ def import_signals_and_indicators(strategies_folder="strategies"):
     logger.info(f'Strategies: {strategies}')
     return strategies
 
-
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 CORS(app, resources={r"/QTSBE/*": {"origins": "http://127.0.0.1"}})
-
 
 def analyse(data, start_ts, end_ts, multi_positions, strategy):
     positions = Positions()
@@ -114,7 +108,6 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
                 )
 
     return positions
-
 
 @cache.cached(timeout=60, query_string=True)
 @app.route('/QTSBE/<pair>/<strategy>')
@@ -171,6 +164,97 @@ def get_data(pair, strategy):
     logger.debug(f"Request response: {response}")
     return response
 
+@app.route('/QTSBE/analyse')
+def analyse_endpoint():
+    ts_format = "%Y-%m-%d %H:%M:%S"
+    
+    # Get parameters from query string
+    pair = request.args.get('pair')
+    strategy = request.args.get('strategy')
+    start_ts = request.args.get('start_ts')
+    end_ts = request.args.get('end_ts')
+    multi_positions = request.args.get('multi_positions')
+    details = request.args.get('details')
+
+    if not pair or not strategy:
+        return jsonify({"error": "pair and strategy parameters are required"}), 400
+
+    # Clean timestamp strings
+    if start_ts:
+        start_ts = start_ts.strip("'").strip('"')
+    if end_ts:
+        end_ts = end_ts.strip("'").strip('"')
+
+    # Convert multi_positions to boolean
+    multi_positions = bool(multi_positions) and (lambda s: s.lower() in {'true'})(multi_positions)
+
+    # Parse timestamps
+    if start_ts:
+        start_ts = datetime.strptime(start_ts, ts_format)
+    if end_ts:
+        end_ts = datetime.strptime(end_ts, ts_format)
+
+    # Get data and process
+    data = get_file_data(pair)
+    for row in data:
+        if len(row[0]) == 10:  # Check if date format is YYYY-MM-DD
+            row[0] += " 00:00:00"
+
+    result = analyse(data, start_ts, end_ts, multi_positions, strategies[strategy])
+
+    response_data = {
+        "pair": pair,
+        "strategy": strategy,
+        "data": data if details == "True" else [],
+        "result": (
+            result.indicators if details == "True" else [],
+            result.positions,
+            result.current_positions
+        ),
+        "stats": {
+            "drawdown": get_drawdowns_stats(result),
+            "positions": get_position_stats(result)
+        }
+    }
+
+    logger.info(f"Analyse request - pair: {pair} | strategy: {strategy} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
+    return jsonify(response_data)
+
+@app.route('/QTSBE/get_tokens')
+def get_tokens():
+    try:
+        bank_path = "data/bank"
+        tokens = {}
+        
+        # Scan the data/bank directory
+        for filename in os.listdir(bank_path):
+            if filename.endswith('.csv'):
+                # Split filename into components (e.g., "Binance_BTCUSDT_1d.csv")
+                parts = filename[:-4].split('_')  # Remove .csv and split
+                if len(parts) >= 3:
+                    exchange = parts[0]
+                    pair = parts[1]
+                    timeframe = parts[2]
+                    
+                    # Create nested structure
+                    if exchange not in tokens:
+                        tokens[exchange] = {}
+                    if pair not in tokens[exchange]:
+                        tokens[exchange][pair] = []
+                    tokens[exchange][pair].append(timeframe)
+
+        response_data = {
+            "tokens": tokens,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        logger.info("Get tokens request successful")
+        return jsonify(response_data)
+        
+    except Exception as e:
+        error_msg = f"Error in get_tokens: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({"error": error_msg}), 500
 
 if __name__ == '__main__':
     reload_loguru_config()

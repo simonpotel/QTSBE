@@ -1,60 +1,62 @@
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import os
+import webbrowser
+import sys
 
-theme = 'white' # black / white
+theme = 'white'
 
 chart_colors = {
-    "Background": theme, # black
-    "increasing_line": "black", #blue: #1e90ff  | #green: #00ff00  |
-    "increasing_fill": "white", #blue: #115290  | #green: #00b300  |
-    "decreasing_line": "black",  #red: #be0000  | #orange: #d17123  | 
-    "decreasing_fill": "black",  #red: #ff0000  | #orange: #eb7f26  | 
+    "Background": theme,
+    "increasing_line": "black",
+    "increasing_fill": "white",
+    "decreasing_line": "black",
+    "decreasing_fill": "black",
     "shapes": "#8288b0",
     "MA_100": "#B8336A",
     "MA_40": "#FF9B42",
-    "MA_20": "#F4D35E", 
-    "Test": "#C73E1D",
-    "RSI": "#9AB87A",
-    "EMA": "#F0A7A0",
-    "EMA_MACD": "#F0A7A0",
+    "MA_20": "#F4D35E",
+    "MA_9": "#F95738",
+    "MA_21": "#F4D35E",
+    "MA_200": "#6A0572",
+    "RSI": "#77C67E",
+    "EMA": "#FF85A1",
+    "EMA_MACD": "#FF85A1",
     "MACD": "#5E4AE3",
     "Normalize_MACD": "#947BD3",
     "Bollinger_Lower": "#09917b",
-    "Bollinger_Rolling": "#2652cb",
+    "Bollinger_Rolling": "#0078ff",
     "Bollinger_Upper": "#c9313f",
     "Else": "#8FF7A7",
 }
 
 def extract_ohlc_data(data):
-    """Extract OHLC data from the JSON data."""
     dates, opens, highs, lows, closes, volume = zip(*data)
     return dates, opens, highs, lows, closes
 
 def extract_indicators(json_data):
-    """Extract indicators data from the JSON data."""
     indicators = {}
     for indicator in json_data['result'][0]:
         indicators[indicator] = json_data['result'][0][indicator]
     return indicators
 
 def extract_trade_data(trades):
-    """Extract trade indices and ratios from the trade data."""
     trade_indices = list(range(1, len(trades) + 1))
     trade_ratios = [trade['ratio'] for trade in trades if 'ratio' in trade]
     return trade_indices, trade_ratios
 
 def plot_json_data_in_gui(json_data, data_file, strategy):
-    """Plot JSON data in the GUI with candlestick chart, RSI chart (if available), and trade ratios."""
     dates, opens, highs, lows, closes = extract_ohlc_data(json_data['data'])
     indicators = extract_indicators(json_data)
     trades = json_data['result'][1]
     trade_indices, trade_ratios = extract_trade_data(trades)
     
-    # Determine the number of rows and columns based on indicators and trade ratios
     rows = 2
     cols = 1
-    bound_hundred_plot = True if 'RSI' in indicators or 'Normalize_MACD' in indicators else False 
+    if 'RSI' in indicators or 'ATR' in indicators or 'ATR_MA' in indicators:
+        bound_hundred_plot = True 
+    else: 
+        bound_hundred_plot = False 
 
     if bound_hundred_plot and len(trade_ratios) > 0:
         cols += 1
@@ -79,7 +81,6 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         column_widths=column_widths
     )
 
-    # Add candlestick chart to the first row, first column
     fig.add_trace(go.Candlestick(
         x=dates, open=opens, high=highs, low=lows, close=closes,
         name="Price", 
@@ -87,8 +88,6 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         increasing_fillcolor=chart_colors['increasing_fill'], decreasing_fillcolor=chart_colors['decreasing_fill']
     ), row=1, col=1)
 
-
-    # Add trade ratios chart to the second column if there are trade ratios
     if len(trade_ratios) > 0:
         fig.add_trace(go.Scatter(x=trade_indices, y=trade_ratios, mode='lines', name='Trade Ratios', line=dict(color='#DBB4AD')), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
         cumulative_ratios = [float(cumulative_ratio) for cumulative_ratio in json_data["stats"]["positions"]["cumulative_ratios"]]
@@ -101,25 +100,19 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         moving_avg_cumulative_ratios = [sum(cumulative_ratios[:i+1])/(i+1) for i in range(len(cumulative_ratios))]
         fig.add_trace(go.Scatter(x=trade_indices, y=moving_avg_cumulative_ratios, mode='lines', name='Moving Avg Cumulative Ratios', line=dict(color='#FFE3DC')), row=1 if bound_hundred_plot else 2, col=2 if bound_hundred_plot else 1)
 
-
-    # Add RSI or Normalize_MACD chart to the second row if available
     for indicator in indicators:
-        if indicator == 'RSI' or indicator == 'Normalize_MACD':
+        if indicator not in chart_colors.keys():
+            chart_colors[indicator] = chart_colors['Else']
+        if indicator == 'RSI' or indicator == 'ATR' or indicator == 'ATR_MA':
             fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=2, col=1)
         else:
-            if indicator not in chart_colors.keys():
-                chart_colors[indicator] = chart_colors['Else']
             fig.add_trace(go.Scatter(x=dates, y=indicators[indicator], mode='lines', name=indicator, line=dict(color=chart_colors[indicator])), row=1, col=1)
 
-
     if bound_hundred_plot: 
-        #fig.update_yaxes(range=[0, 100], row=2, col=1)
         fig.add_shape(type="line", x0=min(dates), y0=50, x1=max(dates), y1=50, row=2, col=1, line=dict(color=chart_colors['shapes'], width=2))
         fig.add_shape(type="line", x0=min(dates), y0=60, x1=max(dates), y1=60, row=2, col=1, line=dict(color='#D90368', width=2))
         fig.add_shape(type="line", x0=min(dates), y0=40, x1=max(dates), y1=40, row=2, col=1, line=dict(color='#D90368', width=2))
 
-    
-    # Add buy/sell markers to the price chart
     buy_dates = [trade['buy_date'] for trade in trades]
     buy_prices = [trade['buy_price'] for trade in trades]
     buy_indices = [trade['buy_index'] for trade in trades]  
@@ -132,11 +125,9 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
 
     ratios = [float(ratio) for ratio in json_data["stats"]["positions"]["all_ratios"]]
 
-    # Hover texts for the markets
     buy_hover_texts = [f"Index: {index}<br>Price: {price}<br>Date: {date}<br>Buy Signal: {buy_signal}" for index, price, date, buy_signal in zip(buy_indices, buy_prices, buy_dates, buy_signals)]
     sell_hover_texts = [f"Index: {index}<br>Price: {price}<br>Date: {date}<br>Ratio: {ratio}<br>Sell Signal: {sell_signal}" for index, price, date, ratio, sell_signal in zip(sell_indices, sell_prices, sell_dates, ratios, sell_signals)]
 
-    # Plot buy/sell markers on the price chart
     fig.add_trace(go.Scatter(
         x=buy_dates, 
         y=buy_prices, 
@@ -156,7 +147,6 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
         hoverinfo='text' 
     ), row=1, col=1)
 
-    # Update layout
     fig.update_layout(title=f"{data_file} ({strategy})",
                       xaxis_title='Date',
                       yaxis_title='Price',
@@ -169,10 +159,15 @@ def plot_json_data_in_gui(json_data, data_file, strategy):
                       yaxis2=dict(gridcolor=chart_colors['Background']),
                       xaxis2=dict(gridcolor=chart_colors['Background']))
 
-    fig.show()
-
     directory = 'integrations/plotly/saved_results/'
     os.makedirs(directory, exist_ok=True)
     plot_filename = f'plot_{data_file}_{strategy}.html'
     fig.write_html(directory + plot_filename)
-    #webbrowser.open(os.path.join(os.getcwd(), 'integrations', 'plotly', 'saved_results', plot_filename)) # save html file
+
+    if sys.platform == "darwin":
+        safari_path = 'open -a /Applications/Safari.app %s'
+        webbrowser.get(safari_path).open('file://' + os.path.realpath(os.path.join('integrations', 'plotly', 'saved_results', plot_filename)))
+    else:
+        fig.show()
+
+
