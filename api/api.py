@@ -10,6 +10,7 @@ import sys
 import importlib.util
 from datetime import datetime
 from flask_caching import Cache
+import pandas as pd
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.abspath(os.path.join(
@@ -165,23 +166,75 @@ def analyse_endpoint():
     logger.info(f"Analyse request - pair: {pair} | strategy: {strategy} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
     return jsonify(response_data)
 
+@app.route('/QTSBE/get_tokens_stats')
+def get_tokens_stats():
+    try:
+        bank_path = "data/bank"
+        tokens = {}
+        
+        for filename in os.listdir(bank_path):
+            if filename.endswith('.csv'):
+                parts = filename[:-4].split('_')
+                if len(parts) >= 3:
+                    exchange = parts[0]
+                    pair = parts[1]
+                    timeframe = parts[2]
+                    
+                    try:
+                        filepath = os.path.join(bank_path, filename)
+                        df = pd.read_csv(filepath)
+                        df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
+                        
+                        df = df.dropna(subset=['timestamp'])
+                        
+                        if not df.empty:
+                            token_info = {
+                                'timeframes': [timeframe],
+                                'first_date': df['timestamp'].min().strftime("%Y-%m-%d %H:%M:%S"),
+                                'last_date': df['timestamp'].max().strftime("%Y-%m-%d %H:%M:%S"),
+                                'last_price': float(df.iloc[-1]['close']),
+                                'volume_24h': float(df.iloc[-1]['volume']),
+                                'price_change_24h': float((df.iloc[-1]['close'] - df.iloc[-2]['close']) / df.iloc[-2]['close'] * 100) if len(df) > 1 else 0.0
+                            }
+                            
+                            if exchange not in tokens:
+                                tokens[exchange] = {}
+                            if pair not in tokens[exchange]:
+                                tokens[exchange][pair] = token_info
+                            else:
+                                tokens[exchange][pair]['timeframes'].append(timeframe)
+                    
+                    except Exception as e:
+                        logger.error(f"Error processing file {filename}: {str(e)}")
+                        continue
+
+        response_data = {
+            "tokens": tokens,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+        logger.info("Get tokens stats request successful")
+        return jsonify(response_data)
+        
+    except Exception as e:
+        error_msg = f"Error in get_tokens_stats: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({"error": error_msg}), 500
+
 @app.route('/QTSBE/get_tokens')
 def get_tokens():
     try:
         bank_path = "data/bank"
         tokens = {}
         
-        # Scan the data/bank directory
         for filename in os.listdir(bank_path):
             if filename.endswith('.csv'):
-                # Split filename into components (e.g., "Binance_BTCUSDT_1d.csv")
-                parts = filename[:-4].split('_')  # Remove .csv and split
+                parts = filename[:-4].split('_')  
                 if len(parts) >= 3:
                     exchange = parts[0]
                     pair = parts[1]
                     timeframe = parts[2]
                     
-                    # Create nested structure
                     if exchange not in tokens:
                         tokens[exchange] = {}
                     if pair not in tokens[exchange]:
