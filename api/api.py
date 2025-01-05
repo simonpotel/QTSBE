@@ -270,6 +270,81 @@ def get_strategies():
         logger.error(error_msg)
         return jsonify({"error": error_msg}), 500
 
+@app.route('/QTSBE/analyse_custom', methods=['POST'])
+def analyse_custom_endpoint():
+    ts_format = "%Y-%m-%d %H:%M:%S"
+    
+    # Get parameters from query string
+    pair = request.args.get('pair')
+    start_ts = request.args.get('start_ts')
+    end_ts = request.args.get('end_ts')
+    multi_positions = request.args.get('multi_positions')
+    details = request.args.get('details')
+    
+    # Get strategy code from request body
+    strategy_code = request.json.get('strategy_code')
+
+    if not pair or not strategy_code:
+        return jsonify({"error": "pair and strategy_code are required"}), 400
+
+    try:
+        # Create a temporary module for the custom strategy
+        import types
+        custom_module = types.ModuleType('custom_strategy')
+        
+        # Execute the strategy code in the temporary module
+        exec(strategy_code, custom_module.__dict__)
+        
+        # Create a strategy dict like the ones in strategies
+        custom_strategy = {
+            "buy_signal": custom_module.buy_signal,
+            "sell_signal": custom_module.sell_signal,
+            "Indicators": custom_module.Indicators
+        }
+
+        # Clean timestamp strings
+        if start_ts:
+            start_ts = start_ts.strip("'").strip('"')
+        if end_ts:
+            end_ts = end_ts.strip("'").strip('"')
+
+        # Parse timestamps
+        if start_ts:
+            start_ts = datetime.strptime(start_ts, ts_format)
+        if end_ts:
+            end_ts = datetime.strptime(end_ts, ts_format)
+
+        # Get data and process
+        data = get_file_data(pair)
+        for row in data:
+            if len(row[0]) == 10:  # Check if date format is YYYY-MM-DD
+                row[0] += " 00:00:00"
+
+        result = analyse(data, start_ts, end_ts, multi_positions, custom_strategy)
+
+        response_data = {
+            "pair": pair,
+            "strategy": "custom",
+            "data": data if details == "True" else [],
+            "result": (
+                result.indicators if details == "True" else [],
+                result.positions,
+                result.current_positions
+            ),
+            "stats": {
+                "drawdown": get_drawdowns_stats(result),
+                "positions": get_position_stats(result)
+            }
+        }
+
+        logger.info(f"Custom analyse request - pair: {pair} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
+        return jsonify(response_data)
+
+    except Exception as e:
+        error_msg = f"Error in custom strategy execution: {str(e)}"
+        logger.error(error_msg)
+        return jsonify({"error": error_msg}), 400
+
 if __name__ == '__main__':
     reload_loguru_config()
     strategies = import_signals_and_indicators(strategies_folder)
