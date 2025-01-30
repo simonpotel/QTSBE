@@ -43,19 +43,22 @@ async def fetch_and_send_data(message, data_file, strategy):
         await reply_msg[0].edit(embed=create_embed(
             title=reply_msg[1],
             description="🛰️Request to the API (Local)",
-            color=reply_msg[2]))
+            color=reply_msg[2]
+        ))
         # get data from the api
         json_data = await fetch_data(data_file, strategy)
         await reply_msg[0].edit(embed=create_embed(
             title=reply_msg[1],
             description="📜 Save JSON Content, 📊 HTML Plot, and 🖼️ HTML Plot Image",
-            color=reply_msg[2]))
+            color=reply_msg[2]
+        ))
         # save json request data + HTML plot + HTML plot image
         temp_files = await save_json_and_image(json_data, data_file, strategy)
         await reply_msg[0].edit(embed=create_embed(
             title=reply_msg[1],
             description="✅ Sending Data",
-            color=reply_msg[2]))
+            color=reply_msg[2]
+        ))
         # send all the data, html plot code and html plot image on discord channel
         await send_data_to_discord(message, json_data, temp_files, data_file, strategy)
 
@@ -68,11 +71,10 @@ async def fetch_and_send_data(message, data_file, strategy):
 
 
 async def fetch_data(data_file, strategy):
-    # url of the request
-    url = f"http://127.0.0.1:5000/QTSBE/{data_file}/{strategy}?details=True"
-    response = requests.get(url)  # send the request to the api
-    response.raise_for_status()  # checkout of the request status
-    return response.json()  # request content from the api
+    url = f"http://127.0.0.1:5000/QTSBE/analyse?pair={data_file}&strategy={strategy}&details=True"
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.json()
 
 
 async def save_json_and_image(json_data, data_file, strategy):

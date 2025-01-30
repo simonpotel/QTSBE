@@ -1,25 +1,24 @@
-from stats.positions import get_position_stats
-from stats.drawdown import get_drawdowns_stats
-from algo.data.file import *
-from stats.trades import Positions
+from flask import Flask
 from flask_cors import CORS
-from flask import Flask, jsonify, request, make_response
+from flask_caching import Cache
 from loguru import logger
 import os
 import sys
 import importlib.util
-from datetime import datetime
-from flask_caching import Cache
+
+from core.analysis import analyse
+from routes.analyse import register_analyse_routes
+from routes.analyse_custom import register_analyse_custom_routes
+from routes.strategies import register_strategy_routes
+from routes.get_tokens import register_get_tokens_routes
+from routes.get_tokens_stats import register_get_tokens_stats_routes
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(os.path.abspath(os.path.join(
-    os.path.dirname(__file__), "..", "..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 debug_mode = True
-# path to the folder containing strategy files
 strategies_folder = r"api/strategies"
-strategies = {}  # dictionary to store strategy functions
-
+strategies = {}
 
 def reload_loguru_config():
     logger.remove()
@@ -28,10 +27,6 @@ def reload_loguru_config():
         logger.add(r"api/logs/debug.log", level="DEBUG")
     else:
         logger.add(r"api/logs/logs.log", level="INFO")
-
-
-reload_loguru_config()
-
 
 def import_signals_and_indicators(strategies_folder="strategies"):
     strategies = {}
@@ -56,125 +51,31 @@ def import_signals_and_indicators(strategies_folder="strategies"):
                             "sell_signal": sell_signal_func,
                             "Indicators": indicators_class
                         }
-                        logger.debug(
-                            f"Imported strategy '{strategy_name}' from {file_path}")
+                        logger.debug(f"Imported strategy '{strategy_name}' from {file_path}")
+                    else:
+                        logger.warning(f"Strategy '{strategy_name}' is missing required functions/classes.")
                 except Exception as e:
-                    logger.error(
-                        f"Failed to import module '{strategy_name}' from {file_path}: {e}")
+                    logger.error(f"Failed to import module '{strategy_name}' from {file_path}: {e}")
     logger.info(f'Strategies: {strategies}')
     return strategies
 
+def create_app():
+    app = Flask(__name__)
+    cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+    CORS(app, resources={r"/QTSBE/*": {"origins": ["http://127.0.0.1:1337", "http://localhost:1337"]}})
 
-app = Flask(__name__)
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
-CORS(app, resources={r"/QTSBE/*": {"origins": "http://127.0.0.1"}})
+    register_analyse_routes(app, strategies, analyse)
+    register_analyse_custom_routes(app, analyse)
+    register_strategy_routes(app, strategies)
+    register_get_tokens_routes(app)
+    register_get_tokens_stats_routes(app)
 
-
-def analyse(data, start_ts, end_ts, multi_positions, strategy):
-    positions = Positions()
-    indicators = strategy["Indicators"](data)
-
-    positions.indicators = {key: list(value)
-                            for key, value in indicators.indicators.items()}
-
-    for i in range(len(data)):
-        # Convert string to datetime
-        data_date = datetime.strptime(data[i][0], "%Y-%m-%d %H:%M:%S")
-        if start_ts and data_date < start_ts:
-            continue
-        if end_ts and data_date > end_ts:
-            break
-
-        for position in positions.current_positions[:]:
-            sell_signal, sell_price = strategy["sell_signal"](
-                position, data, i, indicators.indicators)
-            if sell_signal > 0:
-                positions.close_position(
-                    buy_index=position['buy_index'],
-                    sell_index=i,
-                    sell_price=sell_price,
-                    sell_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
-                    sell_signals={'Sell_Signal': sell_signal}
-                )
-            position['active_stats'] = {
-                "current_ratio": (data[i][4] / position['buy_price']) * (1 - (positions.broker_fees / 100)),
-                "current_date": data[i][0],
-                "current_position_duration": (data_date - datetime.strptime(position['buy_date'], "%Y-%m-%d %H:%M:%S")).days
-            }
-
-        if len(positions.current_positions) == 0 or multi_positions:
-            buy_signal, buy_price = strategy["buy_signal"](
-                positions.current_positions, data, i, indicators.indicators)
-            if buy_signal > 0:
-                positions.add_position(
-                    buy_index=i,
-                    buy_price=buy_price,
-                    buy_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
-                    buy_signals={'Buy_Signal': buy_signal}
-                )
-
-    return positions
-
-
-@cache.cached(timeout=60, query_string=True)
-@app.route('/QTSBE/<pair>/<strategy>')
-def get_data(pair, strategy):
-    ts_format = "%Y-%m-%d %H:%M:%S"
-    start_ts = request.args.get('start_ts')
-    if start_ts:
-        start_ts = start_ts.strip("'")
-        start_ts = start_ts.strip('"')
-
-    end_ts = request.args.get('end_ts')
-    if end_ts:
-        end_ts = end_ts.strip("'")
-        end_ts = end_ts.strip('"')
-
-    multi_positions = request.args.get('multi_positions')
-    details = request.args.get('details')
-    multi_positions = bool(multi_positions) and (
-        lambda s: s.lower() in {'true'})(multi_positions)
-    if start_ts:
-        start_ts = datetime.strptime(start_ts, ts_format)
-    if end_ts:
-        end_ts = datetime.strptime(end_ts, ts_format)
-
-    data = get_file_data(pair)
-    for row in data:
-        if len(row[0]) == 10:  # Check if the date string is in the format "YYYY-MM-DD"
-            row[0] += " 00:00:00"
-
-    result = analyse(data, start_ts, end_ts,
-                     multi_positions, strategies[strategy])
-
-    response_data = {
-        "pair": pair,
-        "strategy": strategy,
-        "data": data if details == "True" else [],
-        "result": (
-            result.indicators if details == "True" else [],
-            result.positions,
-            result.current_positions
-        ),
-        "stats": {
-            "drawdown": get_drawdowns_stats(result),
-            "positions": get_position_stats(result)
-        }
-    }
-
-    response = jsonify(response_data)
-
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-
-    logger.info(f"Request pair: {pair} | strategy: {strategy} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
-    logger.debug(f"Request response: {response}")
-    return response
-
+    return app
 
 if __name__ == '__main__':
     reload_loguru_config()
     strategies = import_signals_and_indicators(strategies_folder)
     logger.debug("List of all strategies: {}", list(strategies.keys()))
     logger.warning("API has been restarted.")
+    app = create_app()
     app.run(debug=debug_mode)
