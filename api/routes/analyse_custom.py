@@ -37,9 +37,7 @@ def register_analyse_custom_routes(app, analyse_func):
                 end_ts = datetime.strptime(end_ts.strip("'").strip('"'), ts_format)
 
             data = get_file_data(pair)
-            for row in data:
-                if len(row[0]) == 10:
-                    row[0] += " 00:00:00"
+            data = [(row[0] + " 00:00:00" if len(row[0]) == 10 else row[0], *row[1:]) for row in data]
 
             result = analyse_func(data, start_ts, end_ts, multi_positions, custom_strategy)
 

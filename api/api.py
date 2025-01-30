@@ -52,6 +52,8 @@ def import_signals_and_indicators(strategies_folder="strategies"):
                             "Indicators": indicators_class
                         }
                         logger.debug(f"Imported strategy '{strategy_name}' from {file_path}")
+                    else:
+                        logger.warning(f"Strategy '{strategy_name}' is missing required functions/classes.")
                 except Exception as e:
                     logger.error(f"Failed to import module '{strategy_name}' from {file_path}: {e}")
     logger.info(f'Strategies: {strategies}')

@@ -14,15 +14,8 @@ def register_get_tokens_routes(app):
                 if filename.endswith('.csv'):
                     parts = filename[:-4].split('_')
                     if len(parts) >= 3:
-                        exchange = parts[0]
-                        pair = parts[1]
-                        timeframe = parts[2]
-                        
-                        if exchange not in tokens:
-                            tokens[exchange] = {}
-                        if pair not in tokens[exchange]:
-                            tokens[exchange][pair] = []
-                        tokens[exchange][pair].append(timeframe)
+                        exchange, pair, timeframe = parts[0], parts[1], parts[2]
+                        tokens.setdefault(exchange, {}).setdefault(pair, []).append(timeframe)
 
             response_data = {
                 "tokens": tokens,

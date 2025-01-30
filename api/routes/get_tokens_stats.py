@@ -21,10 +21,8 @@ def register_get_tokens_stats_routes(app):
                         
                         try:
                             filepath = os.path.join(bank_path, filename)
-                            df = pd.read_csv(filepath)
-                            df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
-                            
-                            df = df.dropna(subset=['timestamp'])
+                            df = pd.read_csv(filepath, parse_dates=['timestamp'], infer_datetime_format=True)
+                            df.dropna(subset=['timestamp'], inplace=True)
                             
                             if not df.empty:
                                 token_info = {

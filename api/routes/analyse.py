@@ -31,9 +31,7 @@ def register_analyse_routes(app, strategies, analyse_func):
         if not data:
             return jsonify({"error": f"No data found for pair {pair}"}), 404
 
-        for row in data:
-            if len(row[0]) == 10:
-                row[0] += " 00:00:00"
+        data = [(row[0] + " 00:00:00" if len(row[0]) == 10 else row[0], *row[1:]) for row in data]
 
         result = analyse_func(data, start_ts, end_ts, multi_positions, strategies[strategy])
 
