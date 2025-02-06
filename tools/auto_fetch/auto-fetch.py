@@ -3,6 +3,7 @@ import os
 import sys
 import time
 from loguru import logger
+import traceback
 
 sys.path.append(os.getcwd())
 
@@ -38,12 +39,14 @@ def main():
             yahoo_api.update_ohlcv(ticker, interval)
     except Exception as e:
         logger.error(f"Error fetching Yahoo data: {e}")
+        logger.error(traceback.format_exc())
 
     try:
         for symbol, interval in config['Binance']:
             binance_api.update_ohlcv(symbol, interval)
     except Exception as e:
         logger.error(f"Error fetching Binance data: {e}")
+        logger.error(traceback.format_exc())
 
     logger.success(f"Fetch cycle completed")
 
