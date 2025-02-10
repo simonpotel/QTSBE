@@ -4,7 +4,7 @@
   <img src="https://github.com/simonpotel/QTSBE/blob/master/assets/logo.jpeg?raw=true" width="400" height="400">
 </p>
 
-QTSBE is an open-source project designed to provide a robust environment for backtesting quantitative trading strategies. It includes an API developed in Python using Flask and an interface built with Python.
+QTSBE is an open-source platform for backtesting quantitative trading strategies. It features a Python-based API built with Flask, offering multiple endpoints to facilitate seamless integration into existing projects.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue">
@@ -18,92 +18,97 @@ QTSBE is an open-source project designed to provide a robust environment for bac
 </p>
 
 <p align="center">
-  <img src="https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/white_2.png?raw=true" width="618.8" height="463.8">
+  <img src="https://github.com/simonpotel/QTSBE/blob/365fd8b435958808fb084e1f998ca20fa599b04e/assets/smartswap.png">
 </p>
 
-## Features
+## Key Features
 
-- Backtesting environment for quantitative trading strategies. (Numpy / Pandas)
-- API for strategy implementation and testing. (Flask)
-- Visualization tools for strategy performance. (Plotly / Discord)
-- Tools to fetch data. (from yfinance or Binance API).
-- Tool to apply your trading strategy to a list of cryptos/stocks and see the stats of all. (Scanner)
-- Test files to enhance developer usage.
+- Comprehensive backtesting environment powered by NumPy and Pandas
+- Flask-based API with caching system for optimized performance
+- Interactive strategy visualization using Plotly
+- Data integration with Yahoo Finance and Binance APIs
+- Scanner tool for applying strategies across multiple cryptocurrencies and stocks
+- Rich API endpoints for quick backtesting analysis and integration
 
 ## Getting Started
 
 ### Installation
 
 1. Clone the repository:
-
    ```bash
    git clone https://github.com/simonpotel/QTSBE
    ```
 
 2. Install dependencies:
-
    ```bash
    cd QTSBE
    pip install -r requirements.txt
    ```
 
-### Usage
+### Usage Guide
 
-1. **Create Your Strategy:**
-   - Create your strategy based on the default structure found in `api/strategies/default.py`, or use the simple base example in `api/strategies/rsi_example`.
-   - Implement your strategy by creating a new Python file and defining the `analyse` function that returns the required data. You can choose to use indicators within the code without passing them in the JSON response.
+1. **Implement Your Strategy**
+   - Use the template in `api/strategies/default.py` or refer to `api/strategies/rsi_example`
+   - Create a new Python file with an `analyse` function that returns the required data
+   - Implement indicators directly in your code without including them in the JSON response
 
-2. **Start the API:**
-   - Run the API using `api/api.py`.
-
+2. **Launch the API**
    ```bash
    python api/api.py
    ```
 
-3. **Access the API:**
-   - Get the API response in your web browser: `http://127.0.0.1:5000/QTSBE/<data_set>/<your_strategy_name>`.
-     See others params in `api/README.md`
+3. **Available API Endpoints**
+   - Get available tokens: `http://127.0.0.1:5000/QTSBE/get_tokens`
+   - List strategies: `http://127.0.0.1:5000/QTSBE/get_strategies`
+   - Run analysis: `http://127.0.0.1:5000/QTSBE/analyse`
+   - Custom analysis: `http://127.0.0.1:5000/QTSBE/analyse_custom` (POST method)
 
-4. **Visualize Results (integrations):**
+   Note: Replace `127.0.0.1:5000` with your server's IP or domain name as needed.
+
+4. **Visualization Options**
+   - Generate Plotly charts:
+     ```bash
+     sh tests/integrations/plotly_unit.sh
+     ```
    
-     - Use Plotly Chart representation:
-    
-       ```bash
-       sh tests/integrations/plotly_unit.sh
-       ```
-  
-     - Use discord bot and following commands:
-    
-       Configure the bot in `integrations/discord_chat_bot/bot.py`
-    
-       ```bash
-       sh sh/discord_chat_bot.sh
-       ```
+   - Use the Discord bot:
+     1. Configure settings in `integrations/discord_chat_bot/bot.py`
+     2. Launch the bot:
+        ```bash
+        sh sh/discord_chat_bot.sh
+        ```
+   
+   - Create custom interfaces (e.g., web interface) similar to the Smartswap project
 
-5.  **Fetch your data properly:**
-      Configure the file `tools/auto_fetch/config.json`using `tools/auto_fetch/README.md`
-      - Using auto_fetch tool:
+5. **Data Collection**
+   - Configure `tools/auto_fetch/config.json` following instructions in `tools/auto_fetch/README.md`
+   - Run the auto-fetch tool:
+     ```bash
+     sh sh/auto_fetch.sh
+     ```
 
-       ```bash
-        sh sh/auto_fetch.sh
-       ```
+## Builtin Visualization Plotly
 
-## Charts
+![Example Chart 1](https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/white_3.png?raw=true)
+![Example Chart 2](https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/black_2.png?raw=true)
 
-![image](https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/white_3.png?raw=true)
-![image](https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/black_2.png?raw=true)
-![image](https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/void.png?raw=true)
+## Projects Samples (here is what you can create using QTSBE)
+- Automated trading bot that uses your strategy for live trading
+- Dashboard to visualize your strategies with live data
+- Alert system that notifies you of trading opportunities
+- Scanner to find the best trading pairs for your strategy
+- Tool to test and compare different trading strategies
+
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is distributed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## Important Disclaimer
 
 > [!CAUTION]  
-> Always review the code before using it. The documentation or the purpose of the code may not be updated, so please check everything you use. 
-> Developers are not responsible for any loss, miscalculation, or related issues resulting in losing money.
+> Please review all code thoroughly before implementation. Documentation and code purposes may not be current. The developers are not liable for any financial losses, calculation errors, or related issues that may occur from using this software.
 
 ---
 
-For questions or inquiries, feel free to contact me on [LinkedIn](https://www.linkedin.com).
+For questions or support, connect with me on [LinkedIn](https://www.linkedin.com/in/simonpotel/).
