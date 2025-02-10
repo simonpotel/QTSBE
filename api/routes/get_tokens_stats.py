@@ -21,6 +21,8 @@ def register_get_tokens_stats_routes(app):
                         
                         try:
                             filepath = os.path.join(bank_path, filename)
+                            last_modified = datetime.fromtimestamp(os.path.getmtime(filepath)).strftime("%Y-%m-%d %H:%M:%S")
+                            
                             df = pd.read_csv(filepath, parse_dates=['timestamp'], infer_datetime_format=True)
                             df.dropna(subset=['timestamp'], inplace=True)
                             
@@ -31,7 +33,8 @@ def register_get_tokens_stats_routes(app):
                                     'last_date': df['timestamp'].max().strftime("%Y-%m-%d %H:%M:%S"),
                                     'last_price': float(df.iloc[-1]['close']),
                                     'volume_24h': float(df.iloc[-1]['volume']),
-                                    'price_change_24h': float((df.iloc[-1]['close'] - df.iloc[-2]['close']) / df.iloc[-2]['close'] * 100) if len(df) > 1 else 0.0
+                                    'price_change_24h': float((df.iloc[-1]['close'] - df.iloc[-2]['close']) / df.iloc[-2]['close'] * 100) if len(df) > 1 else 0.0,
+                                    'last_modified': last_modified
                                 }
                                 
                                 if exchange not in tokens:
