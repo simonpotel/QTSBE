@@ -9,8 +9,13 @@ def get_file_data(pair):
         
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"File not found: {filepath}")
+        
+        if pair.startswith('Yahoo_'):
+            df = pd.read_csv(filepath, skiprows=[1])
+            df = df[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
+        else:
+            df = pd.read_csv(filepath)
             
-        df = pd.read_csv(filepath)
         return df.values.tolist()
         
     except Exception as e:
