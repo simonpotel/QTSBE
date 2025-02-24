@@ -57,12 +57,7 @@ QTSBE is an open-source platform for backtesting quantitative trading strategies
    ```
 
 3. **Available API Endpoints**
-   - Get available tokens: `http://127.0.0.1:5000/QTSBE/get_tokens`
-   - List strategies: `http://127.0.0.1:5000/QTSBE/get_strategies`
-   - Run analysis: `http://127.0.0.1:5000/QTSBE/analyse`
-   - Custom analysis: `http://127.0.0.1:5000/QTSBE/analyse_custom` (POST method)
-
-   Note: Replace `127.0.0.1:5000` with your server's IP or domain name as needed on config.
+   After running the API, you can access the API documentation at `http://127.0.0.1:5000/docs` (Swagger UI)
 
 4. **Visualization Options**
    - Generate Plotly charts:

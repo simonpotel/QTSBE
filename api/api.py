@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_caching import Cache
 from loguru import logger
@@ -6,6 +6,8 @@ import os
 import sys
 import json
 import importlib.util
+from flask_swagger_ui import get_swaggerui_blueprint
+import shutil
 
 from core.analysis import analyse
 from routes.analyse import register_analyse_routes
@@ -78,8 +80,39 @@ def create_app():
     app.config['CACHE_DEFAULT_TIMEOUT'] = cache_config['default_timeout']
     cache = Cache(app)
     
-    # Setup CORS
-    CORS(app, resources={r"/QTSBE/*": {"origins": config['cors']['origins']}})
+    CORS(app, resources={
+        r"/QTSBE/*": {
+            "origins": ["*"],  # Allow all origins for development
+            "methods": ["GET", "POST", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "Accept"],
+            "expose_headers": ["Content-Range", "X-Content-Range"]
+        }
+    })
+
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        return response
+
+    SWAGGER_URL = '/docs'
+    API_URL = '/static/swagger.yaml'
+
+    swaggerui_blueprint = get_swaggerui_blueprint(
+        SWAGGER_URL,
+        API_URL,
+        config={
+            'app_name': "QTSBE API Documentation"
+        }
+    )
+
+    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+    os.makedirs('api/static', exist_ok=True)
+
+    if os.path.exists('swagger.yaml'):
+        shutil.copy('swagger.yaml', 'api/static/swagger.yaml')
 
     register_analyse_routes(app, strategies, analyse)
     register_analyse_custom_routes(app, analyse)
