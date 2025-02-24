@@ -10,7 +10,7 @@ sys.path.append(os.getcwd())
 from tools.data_fetch.binance.binance import BinanceAPI
 from tools.data_fetch.yahoo.yahoo import YahooAPI
 
-log_directory = "tools/auto_fetch/logs"
+log_directory = "logs/auto_fetch"
 os.makedirs(log_directory, exist_ok=True)
 log_path = os.path.join(log_directory, "{time:YYYY-MM-DD}.log")
 
@@ -26,7 +26,7 @@ logger.info('Start')
 # ERROR : logs for errors using Binance/Yahoo api.
 
 def main():
-    with open('tools/auto_fetch/config.json', 'r') as f:
+    with open('config/auto_fetch.json', 'r') as f:
         config = json.load(f)
 
     yahoo_api = YahooAPI()

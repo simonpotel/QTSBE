@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    volumes:
+      - .:/app
+    command: python api/api.py
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  auto-fetch:
+    build: .
+    volumes:
+      - .:/app
+    command: python tools/auto_fetch/auto-fetch.py
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge 

@@ -1,8 +1,11 @@
 *.pyc
 .DS_Store
 
-api/logs/*
-!api/logs/README.md
+logs/*
+
+config/*
+!config/README.md
+
 
 data/bank/*
 
@@ -15,8 +18,6 @@ integrations/plotly/saved_results/*
 
 integrations/discord_chat_bot/configs/bot.json
 
-tools/auto_fetch/config.json
-tools/auto_fetch/logs/*
 
 tools/strategy_scanner/_results/*
 !tools/strategy_scanner/_results/README.md

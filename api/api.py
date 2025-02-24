@@ -4,6 +4,7 @@ from flask_caching import Cache
 from loguru import logger
 import os
 import sys
+import json
 import importlib.util
 
 from core.analysis import analyse
@@ -16,17 +17,26 @@ from routes.get_tokens_stats import register_get_tokens_stats_routes
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-debug_mode = True
+def load_config():
+    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', 'api.json')
+    try:
+        with open(config_path, 'r') as f:
+            return json.load(f)
+    except Exception as e:
+        logger.error(f"Failed to load config from {config_path}: {e}")
+        sys.exit(1)
+
+config = load_config()
 strategies_folder = r"api/strategies"
 strategies = {}
 
 def reload_loguru_config():
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")
-    if debug_mode:
-        logger.add(r"api/logs/debug.log", level="DEBUG")
+    if config['server']['debug']:
+        logger.add(r"logs/api/debug.log", level="DEBUG")
     else:
-        logger.add(r"api/logs/logs.log", level="INFO")
+        logger.add(r"logs/api/logs.log", level="INFO")
 
 def import_signals_and_indicators(strategies_folder="strategies"):
     strategies = {}
@@ -61,8 +71,15 @@ def import_signals_and_indicators(strategies_folder="strategies"):
 
 def create_app():
     app = Flask(__name__)
-    cache = Cache(app, config={'CACHE_TYPE': 'simple'})
-    CORS(app, resources={r"/QTSBE/*": {"origins": ["http://127.0.0.1:1337", "http://localhost:1337"]}})
+    
+    # Setup cache
+    cache_config = config['cache']
+    app.config['CACHE_TYPE'] = cache_config['type']
+    app.config['CACHE_DEFAULT_TIMEOUT'] = cache_config['default_timeout']
+    cache = Cache(app)
+    
+    # Setup CORS
+    CORS(app, resources={r"/QTSBE/*": {"origins": config['cors']['origins']}})
 
     register_analyse_routes(app, strategies, analyse)
     register_analyse_custom_routes(app, analyse)
@@ -78,4 +95,8 @@ if __name__ == '__main__':
     logger.debug("List of all strategies: {}", list(strategies.keys()))
     logger.warning("API has been restarted.")
     app = create_app()
-    app.run(debug=debug_mode)
+    app.run(
+        host=config['server']['host'],
+        port=config['server']['port'],
+        debug=config['server']['debug']
+    )

@@ -9,7 +9,7 @@ import os
 from collections import deque, defaultdict
 import hashlib
 
-CACHE_DIR = "api/logs"
+CACHE_DIR = "logs/api"
 MAX_CACHE_ENTRIES = 500
 
 class CustomAnalysisCache:
