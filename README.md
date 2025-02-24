@@ -62,7 +62,7 @@ QTSBE is an open-source platform for backtesting quantitative trading strategies
    - Run analysis: `http://127.0.0.1:5000/QTSBE/analyse`
    - Custom analysis: `http://127.0.0.1:5000/QTSBE/analyse_custom` (POST method)
 
-   Note: Replace `127.0.0.1:5000` with your server's IP or domain name as needed.
+   Note: Replace `127.0.0.1:5000` with your server's IP or domain name as needed on config.
 
 4. **Visualization Options**
    - Generate Plotly charts:
