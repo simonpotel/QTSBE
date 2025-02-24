@@ -39,10 +39,9 @@ QTSBE is an open-source platform for backtesting quantitative trading strategies
    git clone https://github.com/simonpotel/QTSBE
    ```
 
-2. Install dependencies:
+2. Run the docker:
    ```bash
-   cd QTSBE
-   pip install -r requirements.txt
+   docker-compose up
    ```
 
 ### Usage Guide
