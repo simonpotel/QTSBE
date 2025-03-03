@@ -63,7 +63,11 @@ python api/api.py
    - Access the Swagger UI documentation: `http://127.0.0.1:5002/docs`
    - Comprehensive endpoint documentation and testing interface
 
-4. **Visualization Tools**
+4. **Running Tests**
+   > ![INFO]
+   > Run fixtures of the API with : `pytest tests/test_api_endpoints.py`
+
+5. **Visualization Tools**
 
    a. Generate Plotly Charts:
    ```bash
@@ -81,7 +85,7 @@ python api/api.py
    - Framework available for building custom web interfaces
    - Reference the Smartswap project for implementation examples
 
-5. **Automated Data Collection**
+6. **Automated Data Collection**
    - Configure: `tools/auto_fetch/config.json`
    - Launch collector:
    ```bash
