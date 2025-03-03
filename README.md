@@ -64,8 +64,8 @@ python api/api.py
    - Comprehensive endpoint documentation and testing interface
 
 4. **Running Tests**
-   > ![INFO]
-   > Run fixtures of the API with : `pytest tests/test_api_endpoints.py`
+> [!TIP]
+> Run fixtures of the API with : `pytest tests/test_api_endpoints.py`
 
 5. **Visualization Tools**
 
