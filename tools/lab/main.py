@@ -121,7 +121,7 @@ class App(tk.Tk):
         self.response_text.delete(1.0, tk.END)
         self.response_text.insert(tk.END, f"Loading {api_source} {pair} {timeframe} {strategy}...\n")
 
-        url = f"http://127.0.0.1:5000/QTSBE/analyse?pair={api_source}_{pair}_{timeframe}&strategy={strategy}&details=True&multi_positions={multi_positions}"
+        url = f"http://127.0.0.1:5002/QTSBE/analyse?pair={api_source}_{pair}_{timeframe}&strategy={strategy}&details=True&multi_positions={multi_positions}"
         
         if start_ts:
             url += f"&start_ts={start_ts}"
