@@ -7,7 +7,7 @@ services:
       - .:/app
     command: python api/api.py
     ports:
-      - "5000:5000"
+      - "5002:5002"
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped

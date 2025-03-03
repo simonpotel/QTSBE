@@ -22,7 +22,7 @@ class BinanceScanner(object):
 
     def analyze_symbol(self, symbol, timeframe, strategy, start_ts=None, end_ts=None):
         data_file = f"Binance_{symbol.replace('/', '')}_{timeframe}"
-        url = f"http://127.0.0.1:5000/QTSBE/analyse?pair={data_file}&strategy={strategy}&details=True"
+        url = f"http://127.0.0.1:5002/QTSBE/analyse?pair={data_file}&strategy={strategy}&details=True"
         
         if start_ts:
             url += f"&start_ts={start_ts}"

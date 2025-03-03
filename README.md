@@ -60,7 +60,7 @@ python api/api.py
 ```
 
 3. **API Documentation**
-   - Access the Swagger UI documentation: `http://127.0.0.1:5000/docs`
+   - Access the Swagger UI documentation: `http://127.0.0.1:5002/docs`
    - Comprehensive endpoint documentation and testing interface
 
 4. **Visualization Tools**
