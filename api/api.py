@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_caching import Cache
+#from flask_caching import Cache
 from loguru import logger
 import os
 import sys
@@ -75,10 +75,10 @@ def create_app():
     app = Flask(__name__)
     
     # Setup cache
-    cache_config = config['cache']
-    app.config['CACHE_TYPE'] = cache_config['type']
-    app.config['CACHE_DEFAULT_TIMEOUT'] = cache_config['default_timeout']
-    cache = Cache(app)
+    #cache_config = config['cache']
+    #app.config['CACHE_TYPE'] = cache_config['type']
+    #app.config['CACHE_DEFAULT_TIMEOUT'] = cache_config['default_timeout']
+    #cache = Cache(app)
     
     CORS(app, resources={
         r"/QTSBE/*": {
