@@ -9,14 +9,11 @@ config/*
 
 data/bank/*
 
-
 api/strategies/*
 !api/strategies/default.py
 !api/strategies/rsi_example.py
 !api/strategies/README.md
 integrations/plotly/saved_results/*
-
-integrations/discord_chat_bot/configs/bot.json
 
 
 tools/strategy_scanner/_results/*
