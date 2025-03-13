@@ -69,6 +69,14 @@ paths:
             type: string
           description: Include detailed data in response
           example: "True"
+        - name: position_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [long, short]
+          description: Type of position analysis (long or short)
+          example: "long"
       responses:
         '200':
           description: Successful analysis
@@ -184,6 +192,14 @@ paths:
             type: string
           description: Include detailed data in response
           example: "True"
+        - name: position_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [long, short]
+          description: Type of position analysis (long or short)
+          example: "long"
       requestBody:
         required: true
         content:

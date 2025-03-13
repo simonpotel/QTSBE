@@ -16,9 +16,13 @@ def register_analyse_routes(app, strategies, analyse_func):
         end_ts = request.args.get('end_ts')
         multi_positions = request.args.get('multi_positions')
         details = request.args.get('details')
+        position_type = request.args.get('position_type', 'long')
 
         if not pair or not strategy:
             return jsonify({"error": "pair and strategy parameters are required"}), 400
+
+        if position_type not in ['long', 'short']:
+            return jsonify({"error": "position_type must be either 'long' or 'short'"}), 400
 
         if start_ts:
             start_ts = datetime.strptime(start_ts.strip("'").strip('"'), ts_format)
@@ -38,11 +42,12 @@ def register_analyse_routes(app, strategies, analyse_func):
             float(row[1]), float(row[2]), float(row[3]), float(row[4]), float(row[5])
         ) for row in data]
 
-        result = analyse_func(data, start_ts, end_ts, multi_positions, strategies[strategy])
+        result = analyse_func(data, start_ts, end_ts, multi_positions, strategies[strategy], position_type)
 
         response_data = {
             "pair": pair,
             "strategy": strategy,
+            "position_type": position_type,
             "data": data if details == "True" else [],
             "result": (
                 result.indicators if details == "True" else [],
@@ -55,5 +60,5 @@ def register_analyse_routes(app, strategies, analyse_func):
             }
         }
 
-        logger.info(f"Analyse request - pair: {pair} | strategy: {strategy}")
+        logger.info(f"Analyse request - pair: {pair} | strategy: {strategy} | position_type: {position_type}")
         return jsonify(response_data) 

@@ -1,7 +1,7 @@
 from datetime import datetime
 from stats.trades import Positions
 
-def analyse(data, start_ts, end_ts, multi_positions, strategy):
+def analyse(data, start_ts, end_ts, multi_positions, strategy, position_type='long'):
     positions = Positions()
     indicators = strategy["Indicators"](data)
 
@@ -27,7 +27,7 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
                     sell_signals={'Sell_Signal': sell_signal}
                 )
             position['active_stats'] = {
-                "current_ratio": (data[i][4] / position['buy_price']) * (1 - (positions.broker_fees / 100)),
+                "current_ratio": (data[i][4] / position['buy_price']) * (1 - (positions.broker_fees / 100)) if position['position_type'] == 'long' else (position['buy_price'] / data[i][4]) * (1 - (positions.broker_fees / 100)),
                 "current_date": data[i][0],
                 "current_position_duration": (data_date - datetime.strptime(position['buy_date'], "%Y-%m-%d %H:%M:%S")).days
             }
@@ -40,7 +40,8 @@ def analyse(data, start_ts, end_ts, multi_positions, strategy):
                     buy_index=i,
                     buy_price=buy_price,
                     buy_date=data_date.strftime("%Y-%m-%d %H:%M:%S"),
-                    buy_signals={'Buy_Signal': buy_signal}
+                    buy_signals={'Buy_Signal': buy_signal},
+                    position_type=position_type
                 )
 
     return positions 

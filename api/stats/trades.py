@@ -16,7 +16,8 @@ class Positions(object):
             sell_index,
             sell_price,
             sell_date,
-            sell_signals):
+            sell_signals,
+            position_type='long'):
         try:
             buy_date_dt = datetime.strptime(buy_date, "%Y-%m-%d %H:%M:%S")
             sell_date_dt = datetime.strptime(sell_date, "%Y-%m-%d %H:%M:%S")
@@ -24,8 +25,9 @@ class Positions(object):
             print(f"Error parsing dates: {e}")
             return
 
-        # Calculate position duration correctly
         position_duration = (sell_date_dt - buy_date_dt).days + 1
+        ratio = ((sell_price / buy_price) * (1-(self.broker_fees/100))) if position_type == 'long' else ((buy_price / sell_price) * (1-(self.broker_fees/100)))
+        
         self.positions.append(
             {
             'buy_index': buy_index,
@@ -36,8 +38,9 @@ class Positions(object):
             'sell_price': sell_price,
             'sell_date': sell_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
             'sell_signals': sell_signals,
-            'ratio': ((sell_price / buy_price) * (1-(self.broker_fees/100))),
-            'position_duration': position_duration
+            'ratio': ratio,
+            'position_duration': position_duration,
+            'position_type': position_type
             }
         )
 
@@ -46,7 +49,8 @@ class Positions(object):
             buy_index,
             buy_price,
             buy_date,
-            buy_signals):
+            buy_signals,
+            position_type='long'):
         try:
             buy_date_dt = datetime.strptime(buy_date, "%Y-%m-%d %H:%M:%S")
         except ValueError as e:
@@ -58,6 +62,7 @@ class Positions(object):
             'buy_price': buy_price,
             'buy_date': buy_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
             'buy_signals': buy_signals,
+            'position_type': position_type,
             'active_stats': {
             "current_ratio": 1,
             "current_date": buy_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
@@ -90,7 +95,8 @@ class Positions(object):
             sell_index=sell_index,
             sell_price=sell_price,
             sell_date=sell_date_dt.strftime("%Y-%m-%d %H:%M:%S"),
-            sell_signals=sell_signals)
+            sell_signals=sell_signals,
+            position_type=position.get('position_type', 'long'))
         self.current_positions = [pos for pos in self.current_positions if pos['buy_index'] != buy_index]
 
 if __name__ == "__main__":
