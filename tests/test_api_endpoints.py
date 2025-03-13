@@ -11,9 +11,10 @@ def api_client():
 
 def test_analyse_endpoint_success(api_client):
     params = {
-        "pair": "Binance_BTCUSDT_1d",
+        "pair": "Binance_ETHUSDT_1d",
         "strategy": "rsi_example",
-        "details": "True"
+        "details": "True",
+        "position_type": "long"
     }
     response = api_client.get(f"{BASE_URL}/analyse", params=params)
     assert response.status_code == 200
@@ -23,6 +24,8 @@ def test_analyse_endpoint_success(api_client):
     assert "data" in data
     assert "result" in data
     assert "stats" in data
+    assert "position_type" in data
+    assert data["position_type"] == "long"
 
 def test_analyse_endpoint_missing_params(api_client):
     response = api_client.get(f"{BASE_URL}/analyse")
@@ -41,18 +44,44 @@ def test_analyse_endpoint_with_timestamps(api_client):
     end_ts = datetime.now()
     start_ts = end_ts - timedelta(days=30)
     params = {
-        "pair": "Binance_BTCUSDT_1d",
+        "pair": "Binance_ETHUSDT_1d",
         "strategy": "rsi_example",
         "start_ts": start_ts.strftime("%Y-%m-%d %H:%M:%S"),
-        "end_ts": end_ts.strftime("%Y-%m-%d %H:%M:%S")
+        "end_ts": end_ts.strftime("%Y-%m-%d %H:%M:%S"),
+        "position_type": "long"
     }
     response = api_client.get(f"{BASE_URL}/analyse", params=params)
     assert response.status_code == 200
 
+def test_analyse_endpoint_short_position(api_client):
+    params = {
+        "pair": "Binance_ETHUSDT_1d",
+        "strategy": "rsi_example",
+        "details": "True",
+        "position_type": "short"
+    }
+    response = api_client.get(f"{BASE_URL}/analyse", params=params)
+    assert response.status_code == 200
+    data = response.json()
+    assert "position_type" in data
+    assert data["position_type"] == "short"
+
+def test_analyse_endpoint_invalid_position_type(api_client):
+    params = {
+        "pair": "Binance_ETHUSDT_1d",
+        "strategy": "rsi_example",
+        "position_type": "invalid"
+    }
+    response = api_client.get(f"{BASE_URL}/analyse", params=params)
+    assert response.status_code == 400
+    assert "error" in response.json()
+    assert "position_type must be either 'long' or 'short'" in response.json()["error"]
+
 def test_analyse_custom_endpoint_success(api_client):
     params = {
-        "pair": "Binance_BTCUSDT_1d",
-        "details": "True"
+        "pair": "Binance_ETHUSDT_1d",
+        "details": "True",
+        "position_type": "long"
     }
     strategy_code = """
 import numpy as np
@@ -103,6 +132,8 @@ def sell_signal(open_position, data, index_check, indicators, current_price=None
     assert "data" in data
     assert "result" in data
     assert "stats" in data
+    assert "position_type" in data
+    assert data["position_type"] == "long"
 
 def test_analyse_custom_endpoint_missing_params(api_client):
     headers = {'Content-Type': 'application/json'}
@@ -112,7 +143,7 @@ def test_analyse_custom_endpoint_missing_params(api_client):
 
 def test_analyse_custom_endpoint_invalid_code(api_client):
     params = {
-        "pair": "Binance_BTCUSDT_1d"
+        "pair": "Binance_ETHUSDT_1d"
     }
     strategy_code = "invalid python code"
     response = api_client.post(f"{BASE_URL}/analyse_custom", params=params, json={"strategy_code": strategy_code})
