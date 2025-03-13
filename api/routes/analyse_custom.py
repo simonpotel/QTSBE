@@ -111,10 +111,14 @@ def register_analyse_custom_routes(app, analyse_func):
         end_ts = request.args.get('end_ts')
         multi_positions = request.args.get('multi_positions')
         details = request.args.get('details')
+        position_type = request.args.get('position_type', 'long')
         strategy_code = request.json.get('strategy_code')
 
         if not pair or not strategy_code:
             return jsonify({"error": "pair and strategy_code are required"}), 400
+
+        if position_type not in ['long', 'short']:
+            return jsonify({"error": "position_type must be either 'long' or 'short'"}), 400
 
         try:
             import types
@@ -135,7 +139,7 @@ def register_analyse_custom_routes(app, analyse_func):
             data = get_file_data(pair)
             data = [(row[0] + " 00:00:00" if len(row[0]) == 10 else row[0], *row[1:]) for row in data]
 
-            result = analyse_func(data, start_ts, end_ts, multi_positions, custom_strategy)
+            result = analyse_func(data, start_ts, end_ts, multi_positions, custom_strategy, position_type)
 
             stats = {
                 "drawdown": get_drawdowns_stats(result),
@@ -145,6 +149,7 @@ def register_analyse_custom_routes(app, analyse_func):
             response_data = {
                 "pair": pair,
                 "strategy": "custom",
+                "position_type": str(position_type),
                 "data": data if details == "True" else [],
                 "result": (
                     result.indicators if details == "True" else [],
@@ -161,7 +166,7 @@ def register_analyse_custom_routes(app, analyse_func):
                 timestamp=datetime.now().strftime(ts_format)
             )
 
-            logger.info(f"Custom analyse request - pair: {pair} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
+            logger.info(f"Custom analyse request - pair: {pair} | position_type: {position_type} | start_ts: {start_ts} | end_ts: {end_ts} | multi_positions: {multi_positions} | details: {details}")
             return jsonify(response_data)
 
         except Exception as e:
