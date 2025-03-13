@@ -10,10 +10,10 @@ Contains OHLCV data fetched from various providers:
 - Yahoo Finance
 - Other supported providers
 
-Data is organized by:
-- Trading pair
-- Timeframe
-- Provider
+Data is organized by with:
+Provider_pairs_timestamp
+
+example: `Binance_BTCUSDT_1d`
 
 ## Data Fetching
 
