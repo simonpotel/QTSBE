@@ -1,0 +1,35 @@
+{
+  "id": "qtsbe-environments",
+  "_postman_variable_scope": "environment",
+  "name": "QTSBE Environments",
+  "description": "Environment variables for the QTSBE API",
+  "values": [
+    {
+      "key": "development",
+      "value": {
+        "base_url": "http://127.0.0.1:5002",
+        "description": "Local development server"
+      },
+      "type": "object",
+      "enabled": true
+    },
+    {
+      "key": "staging",
+      "value": {
+        "base_url": "http://staging-api.example.com",
+        "description": "Staging server"
+      },
+      "type": "object",
+      "enabled": true
+    },
+    {
+      "key": "production",
+      "value": {
+        "base_url": "http://api.example.com",
+        "description": "Production server"
+      },
+      "type": "object",
+      "enabled": true
+    }
+  ]
+} 

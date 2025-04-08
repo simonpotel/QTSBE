@@ -1,0 +1,233 @@
+{
+  "info": {
+    "name": "QTSBE API Collection",
+    "description": "Quantitative Trading Strategy Backtesting Environment API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "QTSBE_API"
+  },
+  "item": [
+    {
+      "name": "Analysis",
+      "description": "Strategy analysis endpoints",
+      "item": [
+        {
+          "name": "Run Strategy Analysis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:5002/QTSBE/analyse?pair=Binance_BTCUSDC_1d&strategy=rsi_example&start_ts=2024-01-01 00:00:00&end_ts=2024-02-24 00:00:00&multi_positions=false&details=True",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "5002",
+              "path": [
+                "QTSBE",
+                "analyse"
+              ],
+              "query": [
+                {
+                  "key": "pair",
+                  "value": "BTC/USDC",
+                  "description": "Trading pair to analyze"
+                },
+                {
+                  "key": "strategy",
+                  "value": "rsi_example",
+                  "description": "Name of the strategy to analyze"
+                },
+                {
+                  "key": "start_ts",
+                  "value": "2024-01-01 00:00:00",
+                  "description": "Start timestamp (format YYYY-MM-DD HH:mm:ss)"
+                },
+                {
+                  "key": "end_ts",
+                  "value": "2024-02-24 00:00:00",
+                  "description": "End timestamp (format YYYY-MM-DD HH:mm:ss)"
+                },
+                {
+                  "key": "multi_positions",
+                  "value": "false",
+                  "description": "Enable multiple positions"
+                },
+                {
+                  "key": "details",
+                  "value": "True",
+                  "description": "Include detailed data in response"
+                },
+                {
+                  "key": "position_type",
+                  "value": "long",
+                  "description": "Position type (long or short)"
+                }
+              ]
+            },
+            "description": "Execute a backtesting analysis using specified parameters"
+          },
+          "response": []
+        },
+        {
+          "name": "Custom Strategy Analysis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"strategy_code\": \"def entry_condition(candle_data, index, indicators):\\n    return indicators['rsi'][index] < 30\\n\\ndef exit_condition(candle_data, index, indicators, entry_price):\\n    return indicators['rsi'][index] > 70\\n\\ndef indicators(candle_data):\\n    import numpy as np\\n    from talib import RSI\\n    close_prices = np.array([candle[4] for candle in candle_data])\\n    rsi = RSI(close_prices, timeperiod=14)\\n    return {\\n        'rsi': rsi\\n    }\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:5002/QTSBE/analyse_custom?pair=BTC/USDC&start_ts=2024-01-01 00:00:00&end_ts=2024-02-24 00:00:00&multi_positions=false&details=True&position_type=long",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "5002",
+              "path": [
+                "QTSBE",
+                "analyse_custom"
+              ],
+              "query": [
+                {
+                  "key": "pair",
+                  "value": "BTC/USDC",
+                  "description": "Trading pair to analyze"
+                },
+                {
+                  "key": "start_ts",
+                  "value": "2024-01-01 00:00:00",
+                  "description": "Start timestamp (format YYYY-MM-DD HH:mm:ss)"
+                },
+                {
+                  "key": "end_ts",
+                  "value": "2024-02-24 00:00:00",
+                  "description": "End timestamp (format YYYY-MM-DD HH:mm:ss)"
+                },
+                {
+                  "key": "multi_positions",
+                  "value": "false",
+                  "description": "Enable multiple positions"
+                },
+                {
+                  "key": "details",
+                  "value": "True",
+                  "description": "Include detailed data in response"
+                },
+                {
+                  "key": "position_type",
+                  "value": "long",
+                  "description": "Position type (long or short)"
+                }
+              ]
+            },
+            "description": "Execute a backtesting analysis with custom strategy code"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tokens",
+      "description": "Token management endpoints",
+      "item": [
+        {
+          "name": "Get Available Tokens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:5002/QTSBE/get_tokens",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "5002",
+              "path": [
+                "QTSBE",
+                "get_tokens"
+              ]
+            },
+            "description": "Retrieve a list of all available trading tokens/pairs"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tokens Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:5002/QTSBE/get_tokens_stats",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "5002",
+              "path": [
+                "QTSBE",
+                "get_tokens_stats"
+              ]
+            },
+            "description": "Retrieve detailed statistics for all available tokens"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Strategies",
+      "description": "Trading strategy endpoints",
+      "item": [
+        {
+          "name": "Get Available Strategies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:5002/QTSBE/get_strategies",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "5002",
+              "path": [
+                "QTSBE",
+                "get_strategies"
+              ]
+            },
+            "description": "Get a list of all implemented trading strategies"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:5002",
+      "type": "string"
+    }
+  ]
+} 
