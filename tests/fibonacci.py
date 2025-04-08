@@ -33,7 +33,7 @@ def get_file_data(pair):
     data = [[str(row["timestamp"]), str(row["open"]), str(row["high"]), str(row["low"]), str(row["close"]), str(row["volume"])] for row in csv_data]
     print(f"Data was successfully retrieved for {pair}.")
     return data
-pair = "Binance_SOLUSDT_1d"
+pair = "Binance_SOLUSDC_1d"
 data = get_file_data(pair) 
 if not data:
     sys.exit("Data retrieval failed.")

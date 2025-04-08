@@ -13,7 +13,7 @@ Contains OHLCV data fetched from various providers:
 Data is organized by with:
 Provider_pairs_timestamp
 
-example: `Binance_BTCUSDT_1d`
+example: `Binance_BTCUSDC_1d`
 
 ## Data Fetching
 

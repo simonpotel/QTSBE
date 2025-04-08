@@ -6,7 +6,7 @@ from tools.strategy_scanner.binance.scanner import BinanceScanner
 scanner = BinanceScanner()
 
 specific_symbols = [
-    'BTC/USDT', 'ETH/USDT'
+    'BTC/USDC', 'ETH/USDC'
 ]
 
 timeframe = '1d'

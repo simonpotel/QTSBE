@@ -11,7 +11,7 @@ def api_client():
 
 def test_analyse_endpoint_success(api_client):
     params = {
-        "pair": "Binance_ETHUSDT_1d",
+        "pair": "Binance_ETHUSDC_1d",
         "strategy": "rsi_example",
         "details": "True",
         "position_type": "long"
@@ -44,7 +44,7 @@ def test_analyse_endpoint_with_timestamps(api_client):
     end_ts = datetime.now()
     start_ts = end_ts - timedelta(days=30)
     params = {
-        "pair": "Binance_ETHUSDT_1d",
+        "pair": "Binance_ETHUSDC_1d",
         "strategy": "rsi_example",
         "start_ts": start_ts.strftime("%Y-%m-%d %H:%M:%S"),
         "end_ts": end_ts.strftime("%Y-%m-%d %H:%M:%S"),
@@ -55,7 +55,7 @@ def test_analyse_endpoint_with_timestamps(api_client):
 
 def test_analyse_endpoint_short_position(api_client):
     params = {
-        "pair": "Binance_ETHUSDT_1d",
+        "pair": "Binance_ETHUSDC_1d",
         "strategy": "rsi_example",
         "details": "True",
         "position_type": "short"
@@ -68,7 +68,7 @@ def test_analyse_endpoint_short_position(api_client):
 
 def test_analyse_endpoint_invalid_position_type(api_client):
     params = {
-        "pair": "Binance_ETHUSDT_1d",
+        "pair": "Binance_ETHUSDC_1d",
         "strategy": "rsi_example",
         "position_type": "invalid"
     }
@@ -79,7 +79,7 @@ def test_analyse_endpoint_invalid_position_type(api_client):
 
 def test_analyse_custom_endpoint_success(api_client):
     params = {
-        "pair": "Binance_ETHUSDT_1d",
+        "pair": "Binance_ETHUSDC_1d",
         "details": "True",
         "position_type": "long"
     }
@@ -143,7 +143,7 @@ def test_analyse_custom_endpoint_missing_params(api_client):
 
 def test_analyse_custom_endpoint_invalid_code(api_client):
     params = {
-        "pair": "Binance_ETHUSDT_1d"
+        "pair": "Binance_ETHUSDC_1d"
     }
     strategy_code = "invalid python code"
     response = api_client.post(f"{BASE_URL}/analyse_custom", params=params, json={"strategy_code": strategy_code})
