@@ -21,8 +21,8 @@ To scan tokens with the option to fetch the latest data: (with scan.py)
 scanner = BinanceScanner()
 
 specific_symbols = [
-    "BTC/USDT",
-    "ETH/USDT"]
+    "BTC/USDC",
+    "ETH/USDC"]
 
 timeframe = '1d'
 strategy = 'rsi_example'

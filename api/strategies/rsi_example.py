@@ -49,7 +49,7 @@ def get_RSI(prices, window=14):
 
 # ⚠️⚠️⚠️ Note that this is an example that does not actually work in the market, 
 # as it is based only on a single indicator and a price check that I implemented for selling to avoid losing money. 
-# This is why, if you run this example on BTCUSDT since 2018, 
+# This is why, if you run this example on BTCUSDC since 2018, 
 # you will only have 20 transactions and only a 3x increase in your capital over 6 years. 
 
 class Indicators(object):

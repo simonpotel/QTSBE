@@ -31,8 +31,8 @@
         ["AAPL", "1d"]
     ],
     "Binance": [
-        ["BTC/USDT", "1d"],
-        ["ETH/USDT", "1d"]
+        ["BTC/USDC", "1d"],
+        ["ETH/USDC", "1d"]
     ]
 }
 }
