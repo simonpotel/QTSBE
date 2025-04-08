@@ -33,7 +33,7 @@ paths:
           schema:
             type: string
           description: Trading pair to analyze
-          example: "BTC/USDT"
+          example: "BTC/USDC"
         - name: strategy
           in: query
           required: true
@@ -87,7 +87,7 @@ paths:
                 properties:
                   pair:
                     type: string
-                    example: "Binance_BTCUSDT_1d"
+                    example: "Binance_BTCUSDC_1d"
                   strategy:
                     type: string
                     example: "rsi_example"
@@ -148,7 +148,7 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: "No data found for pair BTC/USDT"
+                    example: "No data found for pair BTC/USDC"
 
   /QTSBE/analyse_custom:
     post:
@@ -163,7 +163,7 @@ paths:
           schema:
             type: string
           description: Trading pair to analyze
-          example: "Binance_BTCUSDT_1d"
+          example: "Binance_BTCUSDC_1d"
         - name: start_ts
           in: query
           required: false
@@ -264,7 +264,7 @@ paths:
 
                     # ⚠️⚠️⚠️ Note that this is an example that does not actually work in the market, 
                     # as it is based only on a single indicator and a price check that I implemented for selling to avoid losing money. 
-                    # This is why, if you run this example on BTCUSDT since 2018, 
+                    # This is why, if you run this example on BTCUSDC since 2018, 
                     # you will only have 20 transactions and only a 3x increase in your capital over 6 years. 
 
                     class Indicators(object):
@@ -310,7 +310,7 @@ paths:
                 properties:
                   pair:
                     type: string
-                    example: "BTC/USDT"
+                    example: "BTC/USDC"
                   strategy:
                     type: string
                     example: "custom"
@@ -378,7 +378,7 @@ paths:
                 type: array
                 items:
                   type: string
-                example: ["BTC/USDT", "ETH/USDT", "BNB/USDT"]
+                example: ["BTC/USDC", "ETH/USDC", "BNB/USDC"]
         '500':
           description: Internal server error
           
