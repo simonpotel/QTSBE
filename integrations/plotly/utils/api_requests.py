@@ -5,7 +5,7 @@ from datetime import datetime
 from utils.plots import plot_json_data_in_gui
 
 def fetch_and_show_data(data_file, strategy, start_ts, end_ts, multi_positions):
-    url = f"http://127.0.0.1:5000/QTSBE/analyse?pair={data_file}&strategy={strategy}&start_ts={start_ts}&end_ts={end_ts}&multi_positions={multi_positions}&details=True"
+    url = f"http://127.0.0.1:5002/QTSBE/analyse?pair={data_file}&strategy={strategy}&start_ts={start_ts}&end_ts={end_ts}&multi_positions={multi_positions}&details=True"
 
     try:
         response = requests.get(url)
