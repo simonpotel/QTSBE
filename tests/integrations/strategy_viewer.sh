@@ -2,9 +2,9 @@ strategy="QTS_fibo"
 multi_positions="False"
 
 specific_symbols=(
-    "BTC/USDT" "ETH/USDT" "BNB/USDT" "ADA/USDT" "XRP/USDT" "DOGE/USDT" 
-    "LTC/USDT" "DOT/USDT" "UNI/USDT" "LINK/USDT" "LUNA/USDT" "SOL/USDT" 
-    "AVAX/USDT" "POL/USDT" "ATOM/USDT" "XLM/USDT" "TRX/USDT" "AAVE/USDT"
+    "BTC/USDC" "ETH/USDC" "BNB/USDC" "ADA/USDC" "XRP/USDC" "DOGE/USDC" 
+    "LTC/USDC" "DOT/USDC" "UNI/USDC" "LINK/USDC" "LUNA/USDC" "SOL/USDC" 
+    "AVAX/USDC" "POL/USDC" "ATOM/USDC" "XLM/USDC" "TRX/USDC" "AAVE/USDC"
 )
 
 for symbol in "${specific_symbols[@]}"; do
