@@ -15,6 +15,7 @@ from routes.analyse_custom import register_analyse_custom_routes
 from routes.strategies import register_strategy_routes
 from routes.get_tokens import register_get_tokens_routes
 from routes.get_tokens_stats import register_get_tokens_stats_routes
+from routes.health import register_health_routes
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
@@ -119,6 +120,7 @@ def create_app():
     register_strategy_routes(app, strategies)
     register_get_tokens_routes(app)
     register_get_tokens_stats_routes(app)
+    register_health_routes(app)
 
     return app
 

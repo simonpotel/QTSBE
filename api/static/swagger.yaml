@@ -18,6 +18,8 @@ tags:
     description: Token management endpoints
   - name: Strategies
     description: Trading strategy endpoints
+  - name: Health
+    description: Health check endpoints
 
 paths:
   /QTSBE/analyse:
@@ -381,7 +383,23 @@ paths:
                 example: ["BTC/USDC", "ETH/USDC", "BNB/USDC"]
         '500':
           description: Internal server error
-          
+
+  /QTSBE/get_tokens_stats:
+    get:
+      tags:
+        - Tokens
+      summary: Get tokens statistics
+      description: Retrieve detailed statistics for all available tokens
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Internal server error
+
   /QTSBE/get_strategies:
     get:
       tags:
@@ -399,4 +417,50 @@ paths:
                   type: string
                 example: ["rsi_example", "moving_average", "default"]
         '500':
-          description: Internal server error 
+          description: Internal server error
+
+  /QTSBE/health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Check if the QTSBE service is running and can connect to Binance
+      responses:
+        '200':
+          description: Service is healthy and Binance connection is working
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+                  message:
+                    type: string
+                    example: "QTSBE service is running and Binance connection is working"
+                  binance_status:
+                    type: string
+                    example: "connected"
+                  server_time:
+                    type: number
+                    example: 1641027600000
+        '503':
+          description: Service unhealthy or Binance connection failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "unhealthy"
+                  message:
+                    type: string
+                    example: "Service running but Binance connection failed"
+                  binance_status:
+                    type: string
+                    example: "disconnected"
+                  error:
+                    type: string
+                    example: "Connection timeout"
