@@ -18,3 +18,5 @@ integrations/plotly/saved_results/*
 
 tools/strategy_scanner/_results/*
 !tools/strategy_scanner/_results/README.md
+
+.env

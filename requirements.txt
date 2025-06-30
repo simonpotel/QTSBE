@@ -17,3 +17,4 @@ numpy>=1.21.0
 discord.py==2.3.2
 flask-swagger-ui>=4.11.0
 python-binance>=1.0.0
+python-dotenv>=1.0.0

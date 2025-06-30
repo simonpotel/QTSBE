@@ -8,6 +8,9 @@ import json
 import importlib.util
 from flask_swagger_ui import get_swaggerui_blueprint
 import shutil
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from core.analysis import analyse
 from routes.analyse import register_analyse_routes
@@ -130,8 +133,13 @@ if __name__ == '__main__':
     logger.debug("List of all strategies: {}", list(strategies.keys()))
     logger.warning("API has been restarted.")
     app = create_app()
+    
+    port = int(os.getenv('FLASK_QTSBE_PORT', config['server']['port']))
+    host = os.getenv('FLASK_HOST', config['server']['host'])
+    debug = os.getenv('FLASK_DEBUG', str(config['server']['debug'])).lower() == 'true'
+    
     app.run(
-        host=config['server']['host'],
-        port=config['server']['port'],
-        debug=config['server']['debug']
+        host=host,
+        port=port,
+        debug=debug
     )
