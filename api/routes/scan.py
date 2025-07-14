@@ -3,6 +3,7 @@ from datetime import datetime
 from loguru import logger
 from stats.positions import get_position_stats
 from stats.drawdown import get_drawdowns_stats
+from stats.advanced import get_advanced_stats
 from core.file_utils import get_file_data
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -73,7 +74,8 @@ def register_scan_routes(app, strategies, analyse_func):
                     ),
                     "stats": {
                         "drawdown": get_drawdowns_stats(result),
-                        "positions": get_position_stats(result)
+                        "positions": get_position_stats(result),
+                        "advanced": get_advanced_stats(result)
                     }
                 }
             except Exception as e:
@@ -125,13 +127,51 @@ def register_scan_routes(app, strategies, analyse_func):
                 "best": {"pair": best_pair, "value": max_val},
                 "worst": {"pair": worst_pair, "value": min_val}
             }
+
+        descriptions = {
+            "positions.average_ratio": ">",
+            "positions.final_cumulative_ratio": ">",
+            "positions.average_position_duration": "~",
+            "drawdown.max_drawdown": "<",
+            "drawdown.average_drawdown": "<",
+            "advanced.sharpe_ratio": ">",
+            "advanced.sortino_ratio": ">",
+            "advanced.volatility": "<",
+            "advanced.annualized_return": ">",
+            "advanced.calmar_ratio": ">",
+            "advanced.recovery_factor": ">",
+            "advanced.win_rate": ">",
+            "advanced.loss_rate": "<",
+            "advanced.profit_factor": ">",
+            "advanced.expectancy": ">",
+            "advanced.trade_frequency_per_year": "info",
+            "advanced.exposure_pct": "info",
+            "advanced.skewness": "≈0",
+            "advanced.kurtosis": "≈3",
+            "advanced.VaR_95": ">",
+            "advanced.CVaR_95": ">",
+            "advanced.consecutive_wins": ">",
+            "advanced.consecutive_losses": "<",
+            "advanced.max_drawdown_period_days": "<",
+            "advanced.time_to_recovery_days": "<"
+        }
+        for field, symbol in descriptions.items():
+            if field not in aggregate:
+                aggregate[field] = {
+                    "average": None,
+                    "best": None,
+                    "worst": None,
+                    "analysis": symbol
+                }
+            else:
+                aggregate[field]["analysis"] = symbol
  
         response_data = {
             "strategy": strategy,
             "position_type": position_type,
             "concurrency": concurrency,
             "pairs_analyzed": len(pairs_list),
-            "aggregate": aggregate,
+            "metrics_summary": aggregate,
             "results": results
         }
 

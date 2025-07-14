@@ -3,6 +3,7 @@ from datetime import datetime
 from loguru import logger
 from stats.positions import get_position_stats
 from stats.drawdown import get_drawdowns_stats
+from stats.advanced import get_advanced_stats
 from core.file_utils import get_file_data
 import json
 import os
@@ -143,7 +144,8 @@ def register_analyse_custom_routes(app, analyse_func):
 
             stats = {
                 "drawdown": get_drawdowns_stats(result),
-                "positions": get_position_stats(result)
+                "positions": get_position_stats(result),
+                "advanced": get_advanced_stats(result)
             }
 
             response_data = {

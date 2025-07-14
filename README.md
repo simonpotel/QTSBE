@@ -99,6 +99,58 @@ python api/api.py
   <img src="https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/black_2.png?raw=true" width="100%">
 </p>
 
+## Statistics Reference
+
+| Section | Field | Goal | Analysis | Reference |
+|---------|-------|------|---------------|-----------|
+| Positions | average_ratio | Average ratio of individual positions. | > | https://www.investopedia.com/terms/r/returnoninvestment.asp |
+| Positions | final_cumulative_ratio | Total compounded return across all positions. | > | https://www.investopedia.com/terms/c/cagr.asp |
+| Positions | average_position_duration | Mean duration (days) a position is held. | ~ | https://www.investopedia.com/terms/h/holdingperiod.asp |
+| Positions | lowest_ratio | Lowest single‐trade ratio. | > | |
+| Positions | lowest_ratio_buy_index | Index of the trade with lowest ratio. | info | |
+| Positions | lowest_ratio_sell_index | Index when lowest ratio trade closed. | info | |
+| Positions | biggest_ratio | Highest single‐trade ratio. | > | https://www.investopedia.com/terms/r/return.asp |
+| Positions | biggest_ratio_buy_index | Index of trade with highest ratio. | info | |
+| Positions | biggest_ratio_sell_index | Index when highest ratio trade closed. | info | |
+| Positions | biggest_position_duration | Longest trade duration (days). | ~ | https://www.investopedia.com/terms/h/holdingperiod.asp |
+| Positions | lowest_position_duration | Shortest trade duration (days). | ~ | https://www.investopedia.com/terms/h/holdingperiod.asp |
+| Positions | max_cumulative_ratio | Peak cumulative return. | > | https://www.investopedia.com/terms/c/cagr.asp |
+| Positions | min_cumulative_ratio | Lowest cumulative return encountered. | > | |
+| Positions | average_cumulative_ratio | Mean of cumulative return curve. | > | https://www.investopedia.com/terms/c/cagr.asp |
+| Positions | lowest_cr_ratio | Lowest cumulative ratio reset value. | > | |
+| Drawdown | max_drawdown | Worst peak‐to‐trough decline. | < | https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp |
+| Drawdown | average_drawdown | Mean drawdown over the backtest. | < | https://www.investopedia.com/terms/d/drawdown.asp |
+| Drawdown | max_drawdown_period | Dates of peak→trough for max DD. | < | https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp |
+| Advanced | sharpe_ratio | Risk-adjusted return (σ). | > | https://www.investopedia.com/terms/s/sharperatio.asp |
+| Advanced | sortino_ratio | Downside risk-adjusted return. | > | https://www.investopedia.com/terms/s/sortinoratio.asp |
+| Advanced | volatility | Standard deviation of trade returns. | < | https://www.investopedia.com/terms/v/volatility.asp |
+| Advanced | annualized_return | CAGR of the strategy. | > | https://www.investopedia.com/terms/c/cagr.asp |
+| Advanced | calmar_ratio | Annualized return ÷ max drawdown. | > | https://www.investopedia.com/terms/c/calmarratio.asp |
+| Advanced | recovery_factor | Final return ÷ max drawdown. | > | https://www.investopedia.com/terms/r/recovery-rate.asp |
+| Advanced | win_rate | % of winning trades. | > | |
+| Advanced | loss_rate | % of losing trades. | < | |
+| Advanced | profit_factor | Gross profit ÷ gross loss. | > | |
+| Advanced | expectancy | Average return per trade. | > | |
+| Advanced | trade_frequency_per_year | Number of closed trades per year. | info | |
+| Advanced | exposure_pct | % of time capital is exposed. | info | |
+| Advanced | skewness | Asymmetry of return distribution. | ≈0 | https://www.investopedia.com/terms/s/skewness.asp |
+| Advanced | kurtosis | Tail heaviness of returns. | ≈3 | https://www.investopedia.com/terms/k/kurtosis.asp |
+| Advanced | VaR_95 | 5% worst-case daily return. | > | https://www.investopedia.com/terms/v/var.asp |
+| Advanced | CVaR_95 | Average of worst 5% returns. | > | https://www.investopedia.com/terms/c/conditional_value_at_risk.asp |
+| Advanced | consecutive_wins | Longest winning streak. | > | |
+| Advanced | consecutive_losses | Longest losing streak. | < | |
+| Advanced | max_drawdown_period_days | Days between peak and trough of max drawdown. | < | https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp |
+| Advanced | time_to_recovery_days | Days needed to recover after max drawdown. | < | |
+
+## Value Analysis Legend
+
+- `>` : Higher value is better (maximize)
+- `<` : Lower value is better (minimize)
+- `≈0` : Value close to zero is ideal (neutral skewness)
+- `≈3` : Value close to 3 is ideal (normal kurtosis)
+- `~` : No optimal value, depends on strategy or context
+- `info` : Informational only, not directly used for scoring
+
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
