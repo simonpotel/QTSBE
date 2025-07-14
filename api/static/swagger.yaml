@@ -365,6 +365,144 @@ paths:
                     type: string
                     example: "pair and strategy_code are required"
 
+  /QTSBE/scan:
+    get:
+      tags:
+        - Analysis
+      summary: Run strategy analysis on multiple pairs
+      description: Execute a backtesting analysis on multiple trading pairs using specified parameters
+      parameters:
+        - name: pairs
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Comma-separated list of trading pairs to analyze
+          example: "Binance_BTCUSDC_1d,Binance_ETHUSDC_1d,Binance_XRPUSDC_1d,Binance_BNBUSDC_1d"
+        - name: strategy
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Name of the strategy to analyze
+          example: "rsi_example"
+        - name: start_ts
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Start timestamp (format YYYY-MM-DD HH:mm:ss)
+          example: "2024-01-01 00:00:00"
+        - name: end_ts
+          in: query
+          required: false
+          schema:
+            type: string
+          description: End timestamp (format YYYY-MM-DD HH:mm:ss)
+          example: "2024-02-24 00:00:00"
+        - name: multi_positions
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Enable multiple positions
+          example: false
+        - name: position_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [long, short]
+          description: Type of position analysis (long or short)
+          example: "long"
+        - name: concurrency
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: Maximum number of concurrent analyses
+          example: 5
+      responses:
+        '200':
+          description: Successful scan analysis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  strategy:
+                    type: string
+                    example: "rsi_example"
+                  position_type:
+                    type: string
+                    example: "long"
+                  pairs_analyzed:
+                    type: integer
+                    example: 3
+                  results:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: object
+                          properties:
+                            pair:
+                              type: string
+                              example: "BTC/USDC"
+                            strategy:
+                              type: string
+                              example: "rsi_example"
+                            position_type:
+                              type: string
+                              example: "long"
+                            result:
+                              type: array
+                              items:
+                                oneOf:
+                                  - type: array  # indicators (always empty for scan)
+                                    description: Indicators data (always empty for scan)
+                                  - type: array  # positions
+                                    description: Position data
+                                  - type: array  # current_positions
+                                    description: Current positions
+                            stats:
+                              type: object
+                              properties:
+                                drawdown:
+                                  type: object
+                                  properties:
+                                    max_drawdown:
+                                      type: number
+                                    average_drawdown:
+                                      type: number
+                                positions:
+                                  type: object
+                                  properties:
+                                    average_ratio:
+                                      type: number
+                                    final_cumulative_ratio:
+                                      type: number
+                                    average_position_duration:
+                                      type: number
+                        - type: object
+                          properties:
+                            pair:
+                              type: string
+                              example: "INVALID/PAIR"
+                            error:
+                              type: string
+                              example: "No data found for pair INVALID/PAIR"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "pairs and strategy parameters are required"
+
   /QTSBE/get_tokens:
     get:
       tags:

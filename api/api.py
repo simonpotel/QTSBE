@@ -15,6 +15,7 @@ load_dotenv()
 from core.analysis import analyse
 from routes.analyse import register_analyse_routes
 from routes.analyse_custom import register_analyse_custom_routes
+from routes.scan import register_scan_routes
 from routes.strategies import register_strategy_routes
 from routes.get_tokens import register_get_tokens_routes
 from routes.get_tokens_stats import register_get_tokens_stats_routes
@@ -120,6 +121,7 @@ def create_app():
 
     register_analyse_routes(app, strategies, analyse)
     register_analyse_custom_routes(app, analyse)
+    register_scan_routes(app, strategies, analyse)
     register_strategy_routes(app, strategies)
     register_get_tokens_routes(app)
     register_get_tokens_stats_routes(app)

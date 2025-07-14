@@ -135,6 +135,67 @@
             "description": "Execute a backtesting analysis with custom strategy code"
           },
           "response": []
+        },
+        {
+          "name": "Strategy Scan (Multiple Pairs)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://127.0.0.1:5002/QTSBE/scan?pairs=Binance_BTCUSDC_1d,Binance_ETHUSDC_1d,Binance_XRPUSDC_1d,Binance_BNBUSDC_1d&strategy=rsi_example&start_ts=2018-01-01 00:00:00&end_ts=2025-02-24 00:00:00&multi_positions=false&position_type=long&concurrency=1",
+              "protocol": "http",
+              "host": [
+                "127",
+                "0",
+                "0",
+                "1"
+              ],
+              "port": "5002",
+              "path": [
+                "QTSBE",
+                "scan"
+              ],
+              "query": [
+                {
+                  "key": "pairs",
+                  "value": "Binance_BTCUSDC_1d,Binance_ETHUSDC_1d,Binance_XRPUSDC_1d,Binance_BNBUSDC_1d",
+                  "description": "Comma-separated list of trading pairs to analyze"
+                },
+                {
+                  "key": "strategy",
+                  "value": "rsi_example",
+                  "description": "Name of the strategy to analyze"
+                },
+                {
+                  "key": "start_ts",
+                  "value": "2024-01-01 00:00:00",
+                  "description": "Start timestamp (format YYYY-MM-DD HH:mm:ss)"
+                },
+                {
+                  "key": "end_ts",
+                  "value": "2024-02-24 00:00:00",
+                  "description": "End timestamp (format YYYY-MM-DD HH:mm:ss)"
+                },
+                {
+                  "key": "multi_positions",
+                  "value": "false",
+                  "description": "Enable multiple positions"
+                },
+                {
+                  "key": "position_type",
+                  "value": "long",
+                  "description": "Position type (long or short)"
+                },
+                {
+                  "key": "concurrency",
+                  "value": "1",
+                  "description": "Number of concurrent scans"
+                }
+              ]
+            },
+            "description": "Execute a backtesting analysis on multiple trading pairs using specified parameters"
+          },
+          "response": []
         }
       ]
     },
