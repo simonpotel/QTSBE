@@ -116,8 +116,9 @@ def get_advanced_stats(positions_obj):
 
     peak = cumulative[0]
     trough_index = peak_index = 0
+    dd_peak_index = 0
     max_drawdown = 0
-    recovery_days = None
+    
     for i, val in enumerate(cumulative):
         if val > peak:
             peak = val
@@ -126,13 +127,25 @@ def get_advanced_stats(positions_obj):
         if drawdown > max_drawdown:
             max_drawdown = drawdown
             trough_index = i
-    if max_drawdown > 0:
-        for j in range(trough_index, len(cumulative)):
-            if cumulative[j] >= peak:
-                recovery_days = (_parse_date(trades[j]['sell_date']) - _parse_date(trades[trough_index]['sell_date'])).days
+            dd_peak_index = peak_index
+    
+    peak_date = _parse_date(trades[dd_peak_index]['sell_date'])
+    trough_date = _parse_date(trades[trough_index]['sell_date'])
+    stats['max_drawdown_period_days'] = (trough_date - peak_date).days if max_drawdown>0 else None
+
+    recovery_days = None
+    if max_drawdown > 0 and trough_index < len(cumulative) - 1:
+        trough_value = cumulative[trough_index]
+        peak_value_for_dd = cumulative[dd_peak_index]
+        recovery_target = trough_value + (peak_value_for_dd - trough_value) * 0.5
+        
+        for j in range(trough_index + 1, len(cumulative)):
+            if cumulative[j] >= recovery_target:
+                recovery_date = _parse_date(trades[j]['sell_date'])
+                recovery_days = (recovery_date - trough_date).days
                 break
     stats['time_to_recovery_days'] = recovery_days
-    stats['max_drawdown_period_days'] = (_parse_date(trades[trough_index]['sell_date']) - _parse_date(trades[peak_index]['sell_date'])).days if max_drawdown > 0 else None
+
     stats['recovery_factor'] = final_cum / max_drawdown if max_drawdown > 0 else None
     stats['calmar_ratio'] = stats['annualized_return'] / max_drawdown if max_drawdown > 0 else None
 
