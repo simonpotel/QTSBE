@@ -81,14 +81,17 @@ def create_app():
     
     # Setup cache
     cache_config = config['cache']
-    app.config['CACHE_TYPE'] = cache_config['type']
-    app.config['CACHE_DEFAULT_TIMEOUT'] = cache_config['default_timeout']
+    app.config['CACHE_TYPE'] = os.getenv('QTSBE_CACHE_TYPE')
+    app.config['CACHE_DEFAULT_TIMEOUT'] = int(os.getenv('QTSBE_CACHE_DEFAULT_TIMEOUT'))
     cache = Cache(app)
+    
+    cors_origins = os.getenv('QTSBE_CORS_ORIGINS').split(',') if os.getenv('QTSBE_CORS_ORIGINS') != '*' else ["*"]
+    cors_methods = os.getenv('QTSBE_CORS_METHODS').split(',')
     
     CORS(app, resources={
         r"/QTSBE/*": {
-            "origins": ["*"],  # Allow all origins for development
-            "methods": ["GET", "POST", "OPTIONS"],
+            "origins": cors_origins,
+            "methods": cors_methods,
             "allow_headers": ["Content-Type", "Authorization", "Accept"],
             "expose_headers": ["Content-Range", "X-Content-Range"]
         }
@@ -96,9 +99,10 @@ def create_app():
 
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Origin', '*')
+        cors_origin = os.getenv('QTSBE_CORS_ORIGINS')
+        response.headers.add('Access-Control-Allow-Origin', cors_origin if cors_origin != '*' else '*')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Methods', os.getenv('QTSBE_CORS_METHODS'))
         return response
 
     SWAGGER_URL = '/docs'
@@ -136,9 +140,9 @@ if __name__ == '__main__':
     logger.warning("API has been restarted.")
     app = create_app()
     
-    port = int(os.getenv('FLASK_QTSBE_PORT', config['server']['port']))
-    host = os.getenv('FLASK_HOST', config['server']['host'])
-    debug = os.getenv('FLASK_DEBUG', str(config['server']['debug'])).lower() == 'true'
+    port = int(os.getenv('QTSBE_PORT'))
+    host = os.getenv('QTSBE_HOST')
+    debug = os.getenv('QTSBE_DEBUG').lower() == 'true'
     
     app.run(
         host=host,

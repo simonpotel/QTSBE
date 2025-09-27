@@ -94,9 +94,9 @@ def main():
 
 def start_flask_server():
     """Start Flask server in a separate thread"""
-    port = int(os.getenv('FLASK_QTSBE_AUTO_FETCH_PORT', 5004))
-    host = os.getenv('FLASK_HOST', '0.0.0.0')
-    debug = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
+    port = int(os.getenv('QTSBE_AUTO_FETCH_PORT'))
+    host = os.getenv('QTSBE_HOST')
+    debug = os.getenv('QTSBE_DEBUG').lower() == 'true'
     
     logger.info(f"Starting Flask server on {host}:{port}")
     app.run(host=host, port=port, debug=debug, use_reloader=False)
