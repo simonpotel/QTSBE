@@ -5,6 +5,7 @@ from stats.positions import get_position_stats
 from stats.drawdown import get_drawdowns_stats
 from stats.advanced import get_advanced_stats
 from core.file_utils import get_file_data
+from utils import clean_nans
 
 def register_analyse_routes(app, strategies, analyse_func):
     @app.route('/QTSBE/analyse')
@@ -63,4 +64,4 @@ def register_analyse_routes(app, strategies, analyse_func):
         }
 
         logger.info(f"Analyse request - pair: {pair} | strategy: {strategy} | position_type: {position_type}")
-        return jsonify(response_data) 
+        return jsonify(clean_nans(response_data)) 
