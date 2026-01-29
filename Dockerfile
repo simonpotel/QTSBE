@@ -1,17 +1,32 @@
-FROM python:3.11-slim
-WORKDIR /app
+FROM python:3.11-slim as builder
 
 RUN apt-get update && apt-get install -y \
     gcc \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+WORKDIR /app
 
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY --from=builder /opt/venv /opt/venv
 
 COPY . .
 
-RUN useradd -m appuser && chown -R appuser:appuser /app
+ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
+
+RUN useradd -m appuser && \
+    chown -R appuser:appuser /app /opt/venv
+
 USER appuser
 
-CMD ["tail", "-f", "/dev/null"] 
+CMD ["python", "api/api.py"]
