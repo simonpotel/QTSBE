@@ -1,91 +1,59 @@
 import os
 import pandas as pd
-from datetime import datetime
 import yfinance as yf
-from colorama import Fore
+import h5py
+import numpy as np
+from loguru import logger
 
 class YahooAPI:
-    def __init__(self, data_dir='data/bank'):
-        self.data_dir = data_dir
-        os.makedirs(self.data_dir, exist_ok=True)
-
-    def download_and_save(self, tickers, interval='1d'):
-        for ticker in tickers:
-            try:
-                print(f"{Fore.CYAN}Downloading data for {ticker}")
-                data = yf.download(ticker, interval=interval)
-                if data.empty:
-                    print(f"{Fore.RED}No data found for {ticker}")
-                    continue
-                
-                if isinstance(data.columns, pd.MultiIndex):
-                    data.columns = data.columns.get_level_values(0)
-                
-                data.reset_index(inplace=True)
-                data = data.rename(columns={
-                    'Date': 'timestamp', 
-                    'Open': 'open', 
-                    'High': 'high', 
-                    'Low': 'low', 
-                    'Close': 'close', 
-                    'Volume': 'volume'
-                })
-                
-                cols_to_keep = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
-                data = data[[c for c in cols_to_keep if c in data.columns]]
-                
-                clean_ticker = ticker.replace('/', '_')
-                filepath = os.path.join(self.data_dir, f'Yahoo_{clean_ticker}_{interval}.csv')
-                data.to_csv(filepath, index=False)
-                print(f"{Fore.GREEN}Data saved in: {filepath}")
-            except Exception as e:
-                print(f"{Fore.RED}Error downloading {ticker}: {e}")
+    def __init__(self, h5_path='data/bank/qtsbe_data.h5'):
+        self.h5_path = h5_path
+        os.makedirs(os.path.dirname(self.h5_path), exist_ok=True)
 
     def update_ohlcv(self, ticker, interval='1d'):
-        clean_ticker = ticker.replace('/', '_')
-        filepath = os.path.join(self.data_dir, f'Yahoo_{clean_ticker}_{interval}.csv')
-        if os.path.exists(filepath):
+        key = f"Yahoo_{ticker.replace('/', '_')}_{interval}"
+        last_ts = None
+        
+        if os.path.exists(self.h5_path):
             try:
-                existing_data = pd.read_csv(filepath)
-                if existing_data.empty:
-                    self.download_and_save([ticker], interval=interval)
-                    return
-                    
-                last_date = existing_data['timestamp'].iloc[-1]
-                try:
-                    last_datetime = datetime.strptime(str(last_date), '%Y-%m-%d')
-                except ValueError:
-                    last_datetime = pd.to_datetime(last_date)
+                with h5py.File(self.h5_path, 'r') as f:
+                    if key in f:
+                        data = f[key][:]
+                        if len(data) > 0:
+                            last_ts = data[-1][0]
+            except Exception: pass
 
-                new_data = yf.download(ticker, start=last_datetime, interval=interval)
-                if not new_data.empty:
-                    if isinstance(new_data.columns, pd.MultiIndex):
-                        new_data.columns = new_data.columns.get_level_values(0)
-
-                    new_data.reset_index(inplace=True)
-                    new_data = new_data.rename(columns={
-                        'Date': 'timestamp', 
-                        'Open': 'open', 
-                        'High': 'high', 
-                        'Low': 'low', 
-                        'Close': 'close', 
-                        'Volume': 'volume'
-                    })
-                    
-                    if 'timestamp' in new_data.columns:
-                        new_data['timestamp'] = pd.to_datetime(new_data['timestamp']).dt.strftime('%Y-%m-%d')
-                        new_data = new_data[new_data['timestamp'] > str(last_date)]
-
-                    if not new_data.empty:
-                        cols_to_keep = ['timestamp', 'open', 'high', 'low', 'close', 'volume']
-                        new_data = new_data[[c for c in cols_to_keep if c in new_data.columns]]
-                        new_data.to_csv(filepath, mode='a', header=False, index=False)
-                        print(f"{Fore.GREEN}{ticker}: Data updated successfully")
-                    else:
-                        print(f"{Fore.YELLOW}{ticker}: No new data available")
+        try:
+            params = {"tickers": ticker, "interval": interval, "progress": False}
+            if last_ts:
+                dt = pd.to_datetime(last_ts, unit='ms')
+                params["start"] = dt
+            
+            df = yf.download(**params)
+            if df.empty: return
+            
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            
+            df = df.reset_index().rename(columns={'Date': 'timestamp', 'Open': 'open', 'High': 'high', 'Low': 'low', 'Close': 'close', 'Volume': 'volume'})
+            df['timestamp'] = pd.to_datetime(df['timestamp']).view('int64') // 10**6
+            
+            if last_ts:
+                df = df[df['timestamp'] > last_ts]
+            
+            if df.empty: return
+            
+            new_data = df[['timestamp', 'open', 'high', 'low', 'close', 'volume']].values
+            
+            with h5py.File(self.h5_path, 'a') as f:
+                if key in f:
+                    old_data = f[key][:]
+                    combined = np.vstack([old_data, new_data])
+                    del f[key]
+                    f.create_dataset(key, data=combined, compression="gzip")
                 else:
-                    print(f"{Fore.YELLOW}{ticker}: No new data available")
-            except Exception as e:
-                print(f"{Fore.RED}Error updating {ticker}: {e}")
-        else:
-            self.download_and_save([ticker], interval=interval)
+                    f.create_dataset(key, data=new_data, compression="gzip", maxshape=(None, 6))
+            
+            logger.info(f"Yahoo:{ticker} updated")
+        except Exception as e:
+            logger.error(f"Yahoo:{ticker} error: {e}")

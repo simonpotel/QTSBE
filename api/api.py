@@ -6,8 +6,6 @@ import os
 import sys
 import json
 import importlib.util
-from flask_swagger_ui import get_swaggerui_blueprint
-import shutil
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -99,24 +97,6 @@ def create_app():
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
         response.headers.add('Access-Control-Allow-Methods', os.getenv('QTSBE_CORS_METHODS'))
         return response
-
-    SWAGGER_URL = '/docs'
-    API_URL = '/static/swagger.yaml'
-
-    swaggerui_blueprint = get_swaggerui_blueprint(
-        SWAGGER_URL,
-        API_URL,
-        config={
-            'app_name': "QTSBE API Documentation"
-        }
-    )
-
-    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
-
-    os.makedirs('api/static', exist_ok=True)
-
-    if os.path.exists('swagger.yaml'):
-        shutil.copy('swagger.yaml', 'api/static/swagger.yaml')
 
     register_analyse_routes(app, strategies, analyse)
     register_analyse_custom_routes(app, analyse)

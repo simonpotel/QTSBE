@@ -1,49 +1,49 @@
 import ccxt
 import pandas as pd
+import h5py
 import os
-from colorama import Fore
+import numpy as np
+from loguru import logger
 
 class BinanceAPI:
-    def __init__(self):
+    def __init__(self, h5_path='data/bank/qtsbe_data.h5'):
         self.exchange = ccxt.binance()
+        self.h5_path = h5_path
+        os.makedirs(os.path.dirname(self.h5_path), exist_ok=True)
 
     def update_ohlcv(self, symbol, timeframe='1d'):
-        """
-        Method to update the OHLCV data for a given symbol and timeframe.
-        """
-        filename = f"Binance_{symbol.replace('/', '')}_{timeframe}.csv"
-        filepath = os.path.join('data/bank/', filename)
-        os.makedirs('data/bank/', exist_ok=True)
+        key = f"Binance_{symbol.replace('/', '')}_{timeframe}"
+        since_ts = self.exchange.parse8601('2000-01-01T00:00:00Z')
         
-        if os.path.exists(filepath):
+        if os.path.exists(self.h5_path):
             try:
-                df_existing = pd.read_csv(filepath)
-                df_existing['timestamp'] = pd.to_datetime(df_existing['timestamp'])
-                last_timestamp = df_existing['timestamp'].max()
-                since_timestamp = int(last_timestamp.timestamp() * 1000)
-            except Exception as e:
-                print(f"{Fore.RED}Error reading existing file {filepath}: {e}")
-                df_existing = pd.DataFrame()
-                since_timestamp = self.exchange.parse8601('2000-01-01T00:00:00Z')
-        else:
-            df_existing = pd.DataFrame()
-            since_timestamp = self.exchange.parse8601('2000-01-01T00:00:00Z')
+                with h5py.File(self.h5_path, 'r') as f:
+                    if key in f:
+                        data = f[key][:]
+                        if len(data) > 0:
+                            since_ts = int(data[-1][0]) 
+            except Exception: pass
 
         try:
-            new_data = self.exchange.fetch_ohlcv(symbol, timeframe, since=since_timestamp)
-            if not new_data:
-                print(f"{Fore.YELLOW}No new data for {symbol}")
-                return
-
-            df_new = pd.DataFrame(new_data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-            df_new['timestamp'] = pd.to_datetime(df_new['timestamp'], unit='ms')
+            new_ohlcv = self.exchange.fetch_ohlcv(symbol, timeframe, since=since_ts)
+            if not new_ohlcv: return
             
-            if not df_existing.empty:
-                df_combined = pd.concat([df_existing, df_new]).drop_duplicates(subset=['timestamp'], keep='last').reset_index(drop=True)
-            else:
-                df_combined = df_new
+            new_data = np.array(new_ohlcv)
             
-            df_combined.to_csv(filepath, index=False)
-            print(f"{Fore.GREEN}Updated data has been saved in: {filepath}")
+            with h5py.File(self.h5_path, 'a') as f:
+                if key in f:
+                    old_data = f[key][:]
+                    if len(old_data) > 0 and len(new_data) > 0:
+                        if old_data[-1][0] == new_data[0][0]:
+                             new_data = new_data[1:]
+                    
+                    if len(new_data) > 0:
+                        combined = np.vstack([old_data, new_data])
+                        del f[key]
+                        f.create_dataset(key, data=combined, compression="gzip")
+                else:
+                    f.create_dataset(key, data=new_data, compression="gzip", maxshape=(None, 6))
+                
+            logger.info(f"Binance:{symbol} updated")
         except Exception as e:
-            print(f"{Fore.RED}Error updating {symbol}: {e}")
+            logger.error(f"Binance:{symbol} error: {e}")
