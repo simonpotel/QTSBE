@@ -30,7 +30,9 @@ class YahooAPI:
                 params["start"] = dt
             
             df = yf.download(**params)
-            if df.empty: return
+            if df.empty:
+                logger.info(f"Yahoo:{ticker} is up to date")
+                return
             
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
@@ -41,7 +43,9 @@ class YahooAPI:
             if last_ts:
                 df = df[df['timestamp'] > last_ts]
             
-            if df.empty: return
+            if df.empty:
+                logger.info(f"Yahoo:{ticker} is up to date (after filtering)")
+                return
             
             new_data = df[['timestamp', 'open', 'high', 'low', 'close', 'volume']].values
             

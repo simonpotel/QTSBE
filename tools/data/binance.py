@@ -26,7 +26,9 @@ class BinanceAPI:
 
         try:
             new_ohlcv = self.exchange.fetch_ohlcv(symbol, timeframe, since=since_ts)
-            if not new_ohlcv: return
+            if not new_ohlcv:
+                logger.info(f"Binance:{symbol} is up to date")
+                return
             
             new_data = np.array(new_ohlcv)
             
@@ -41,6 +43,9 @@ class BinanceAPI:
                         combined = np.vstack([old_data, new_data])
                         del f[key]
                         f.create_dataset(key, data=combined, compression="gzip")
+                    else:
+                        logger.info(f"Binance:{symbol} is up to date (after deduplication)")
+                        return
                 else:
                     f.create_dataset(key, data=new_data, compression="gzip", maxshape=(None, 6))
                 
