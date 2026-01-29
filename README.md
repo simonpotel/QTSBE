@@ -11,7 +11,7 @@ QTSBE is a robust, open-source platform designed for backtesting quantitative tr
   <img src="https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white">
   <img src="https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white">
   <img src="https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white">
-  <img src="https://img.shields.io/badge/Plotly-%233F4F75.svg?style=for-the-badge&logo=plotly&logoColor=white">
+  <img src="https://img.shields.io/badge/pytest-%23C1E81C.svg?style=for-the-badge&logo=pytest&logoColor=black">
   <img src="https://img.shields.io/badge/Binance-FCD535?style=for-the-badge&logo=binance&logoColor=white">
   <img src="https://img.shields.io/badge/Yahoo!-6001D2?style=for-the-badge&logo=Yahoo!&logoColor=white">
   <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black">
@@ -92,8 +92,7 @@ docker-compose up
 1. **Strategy Development**
    - Base template: `api/strategies/default.py`
    - Example implementation: `api/strategies/rsi_example`
-   - Create your strategy file with an `analyse` function
-   - Implement technical indicators directly in your strategy code
+   - Create your strategy file with required functions (`buy_signal`, `sell_signal`, `Indicators`)
 
 2. **API Deployment**
 ```bash
@@ -101,44 +100,41 @@ python api/api.py
 ```
 
 3. **API Documentation**
-   - Access the Swagger UI documentation: `http://127.0.0.1:5002/docs`
-   - Comprehensive endpoint documentation and testing interface
+   - API Documentation is available via **Postman**.
+   - Import the collection located in `docs/postman/QTSBE_API_Collection.json`.
+   - See [Postman Documentation](docs/postman.md) for detailed instructions.
 
-4. **Running Tests**
-> [!TIP]
-> Run fixtures of the API with : `pytest tests/test_api_endpoints.py`
+4. **Automated Data Collection**
+   - Configure: `config/data_cron.json`
+   - Launch collector: `python tools/data/cron.py`
 
-5. **Visualization Tools**
+## Documentation
 
-   a. Generate Plotly Charts:
-   ```bash
-   sh tests/integrations/plotly_unit.sh
-   ```
-   
-   b. Discord Integration:
-   - Configure: `integrations/discord_chat_bot/bot.py`
-   - Launch:
-   ```bash
-   sh sh/discord_chat_bot.sh
-   ```
-   
-   c. Custom Interface Development
-   - Framework available for building custom web interfaces
-   - Reference the Smartswap project for implementation examples
+For more detailed information, please refer to the following guides:
 
-6. **Automated Data Collection**
-   - Configure: `tools/auto_fetch/config.json`
-   - Launch collector:
-   ```bash
-   sh sh/auto_fetch.sh
-   ```
+- [Strategy Development](docs/strategies.md) : How to build and add your own trading strategies.
+- [Configuration](docs/configuration.md) : Detailed explanation of all configuration files.
+- [Data Management](docs/data.md) : Understanding HDF5 storage and data structures.
+- [Tooling](docs/tools.md) : Overview of data fetching and maintenance tools.
+- [Postman Guide](docs/postman.md) : How to import and use the API collection.
 
-## Visualization Examples
+## Testing
 
-<p align="center">
-  <img src="https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/white_3.png?raw=true" width="100%">
-  <img src="https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/black_2.png?raw=true" width="100%">
-</p>
+QTSBE uses **Pytest** for automated integration testing.
+
+| Endpoint | Test Objective |
+|----------|----------------|
+| `/QTSBE/health` | Service health and external connectivity |
+| `/QTSBE/get_tokens` | Listing of available HDF5 datasets |
+| `/QTSBE/get_tokens_stats` | Live performance and metadata validation |
+| `/QTSBE/get_strategies` | Discovery of local Python strategy modules |
+| `/QTSBE/analyse` | Core backtesting engine execution |
+| `/QTSBE/analyse_custom` | Dynamic execution of injected strategy code |
+
+To run the tests simply execute:
+```bash
+pytest
+```
 
 ## License
 

@@ -1,62 +1,36 @@
 from flask import jsonify
 from datetime import datetime
-from loguru import logger
 import os
-import pandas as pd
+from core.data_utils import list_keys, get_data
 
 def register_get_tokens_stats_routes(app):
     @app.route('/QTSBE/get_tokens_stats')
     def get_tokens_stats():
-        try:
-            bank_path = "data/bank"
-            tokens = {}
+        tokens = {}
+        h5_path = "data/bank/qtsbe_data.h5"
+        for key in list_keys():
+            data = get_data(key, limit=2)
+            if not data: continue
             
-            for filename in os.listdir(bank_path):
-                if filename.endswith('.csv'):
-                    parts = filename[:-4].split('_')
-                    if len(parts) >= 3:
-                        exchange = parts[0]
-                        pair = parts[1]
-                        timeframe = parts[2]
-                        
-                        try:
-                            filepath = os.path.join(bank_path, filename)
-                            last_modified = datetime.fromtimestamp(os.path.getmtime(filepath)).strftime("%Y-%m-%d %H:%M:%S")
-                            
-                            df = pd.read_csv(filepath, parse_dates=['timestamp'], infer_datetime_format=True)
-                            df.dropna(subset=['timestamp'], inplace=True)
-                            
-                            if not df.empty:
-                                token_info = {
-                                    'timeframes': [timeframe],
-                                    'first_date': df['timestamp'].min().strftime("%Y-%m-%d %H:%M:%S"),
-                                    'last_date': df['timestamp'].max().strftime("%Y-%m-%d %H:%M:%S"),
-                                    'last_price': float(df.iloc[-1]['close']),
-                                    'volume_24h': float(df.iloc[-1]['volume']),
-                                    'price_change_24h': float((df.iloc[-1]['close'] - df.iloc[-2]['close']) / df.iloc[-2]['close'] * 100) if len(df) > 1 else 0.0,
-                                    'last_modified': last_modified
-                                }
-                                
-                                if exchange not in tokens:
-                                    tokens[exchange] = {}
-                                if pair not in tokens[exchange]:
-                                    tokens[exchange][pair] = token_info
-                                else:
-                                    tokens[exchange][pair]['timeframes'].append(timeframe)
-                        
-                        except Exception as e:
-                            logger.error(f"Error processing file {filename}: {str(e)}")
-                            continue
-
-            response_data = {
-                "tokens": tokens,
-                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            parts = key.split('_')
+            if len(parts) < 3: continue
+            ex, p, tf = parts[0], parts[1], parts[2]
+            
+            latest = data[-1]
+            prev_close = data[-2][4] if len(data) > 1 else latest[4]
+            
+            stats = {
+                'timeframes': [tf],
+                'first_date': data[0][0],
+                'last_date': latest[0],
+                'last_price': float(latest[4]),
+                'volume_24h': float(latest[5]),
+                'price_change_24h': float((latest[4] - prev_close) / prev_close * 100) if prev_close else 0.0,
+                'last_modified': datetime.fromtimestamp(os.path.getmtime(h5_path)).strftime("%Y-%m-%d %H:%M:%S")
             }
             
-            logger.info("Get tokens stats request successful")
-            return jsonify(response_data)
-            
-        except Exception as e:
-            error_msg = f"Error in get_tokens_stats: {str(e)}"
-            logger.error(error_msg)
-            return jsonify({"error": error_msg}), 500 
+            if ex not in tokens: tokens[ex] = {}
+            if p not in tokens[ex]: tokens[ex][p] = stats
+            else: tokens[ex][p]['timeframes'].append(tf)
+
+        return jsonify({"tokens": tokens, "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})

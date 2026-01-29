@@ -1,22 +1,11 @@
 *.pyc
 .DS_Store
 
-logs/*
-
-config/*
-!config/README.md
-
-
 data/bank/*
 
 api/strategies/*
 !api/strategies/default.py
 !api/strategies/rsi_example.py
 !api/strategies/README.md
-integrations/plotly/saved_results/*
-
-
-tools/strategy_scanner/_results/*
-!tools/strategy_scanner/_results/README.md
 
 .env
