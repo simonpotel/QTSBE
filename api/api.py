@@ -21,12 +21,9 @@ def load_config():
     path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config', 'api.json')
     with open(path, 'r') as f: return json.load(f)
 
-config = load_config()
-strategies_folder = "api/strategies"
-strategies = {}
-
 def import_strategies(folder):
     strats = {}
+    if not os.path.exists(folder): return strats
     for root, _, files in os.walk(folder):
         for f in files:
             if f.endswith(".py"):
@@ -43,6 +40,7 @@ def import_strategies(folder):
 
 def create_app():
     app = Flask(__name__)
+    config = load_config()
     app.config['CACHE_TYPE'] = os.getenv('QTSBE_CACHE_TYPE')
     app.config['CACHE_DEFAULT_TIMEOUT'] = int(os.getenv('QTSBE_CACHE_DEFAULT_TIMEOUT'))
     Cache(app)
@@ -50,15 +48,15 @@ def create_app():
     origins = os.getenv('QTSBE_CORS_ORIGINS', '*').split(',')
     CORS(app, resources={r"/QTSBE/*": {"origins": origins}})
 
-    register_analyse_routes(app, strategies, analyse)
+    strats = import_strategies("api/strategies")
+    register_analyse_routes(app, strats, analyse)
     register_analyse_custom_routes(app, analyse)
-    register_strategy_routes(app, strategies)
+    register_strategy_routes(app, strats)
     register_get_tokens_routes(app)
     register_get_tokens_stats_routes(app)
     register_health_routes(app)
     return app
 
 if __name__ == '__main__':
-    strategies = import_strategies(strategies_folder)
     app = create_app()
     app.run(host=os.getenv('QTSBE_HOST'), port=int(os.getenv('QTSBE_PORT')), debug=os.getenv('QTSBE_DEBUG', 'false').lower() == 'true')
