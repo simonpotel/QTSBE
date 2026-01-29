@@ -57,3 +57,5 @@ class YahooAPI:
             logger.info(f"Yahoo:{ticker} updated")
         except Exception as e:
             logger.error(f"Yahoo:{ticker} error: {e}")
+        finally:
+            pass

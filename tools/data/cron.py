@@ -78,19 +78,25 @@ def run_fetch_cycle():
 
     # Yahoo data fetch
     if 'Yahoo' in config:
-        for ticker, interval in config['Yahoo']:
-            try:
-                yahoo_api.update_ohlcv(ticker, interval)
-            except Exception as e:
-                logger.error(f"Error fetching Yahoo data for {ticker}: {e}")
+        try:
+            for ticker, interval in config['Yahoo']:
+                try:
+                    yahoo_api.update_ohlcv(ticker, interval)
+                except Exception as e:
+                    logger.error(f"Error fetching Yahoo data for {ticker}: {e}")
+        except Exception as e:
+            logger.error(f"Major error in Yahoo fetch block: {e}")
 
     # Binance data fetch
     if 'Binance' in config:
-        for symbol, interval in config['Binance']:
-            try:
-                binance_api.update_ohlcv(symbol, interval)
-            except Exception as e:
-                logger.error(f"Error fetching Binance data for {symbol}: {e}")
+        try:
+            for symbol, interval in config['Binance']:
+                try:
+                    binance_api.update_ohlcv(symbol, interval)
+                except Exception as e:
+                    logger.error(f"Error fetching Binance data for {symbol}: {e}")
+        except Exception as e:
+            logger.error(f"Major error in Binance fetch block: {e}")
 
     logger.info("Fetch cycle completed")
 
