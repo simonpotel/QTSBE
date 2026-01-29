@@ -15,11 +15,6 @@ from tools.data_fetch.yahoo.yahoo import YahooAPI
 
 load_dotenv()
 
-log_directory = "logs/auto_fetch"
-os.makedirs(log_directory, exist_ok=True)
-log_path = os.path.join(log_directory, "{time:YYYY-MM-DD}.log")
-
-logger.add(log_path, rotation="00:00", retention="7 days", level="INFO")
 logger.info('Start')
 
 app = Flask(__name__)

@@ -104,41 +104,9 @@ python api/api.py
    - Access the Swagger UI documentation: `http://127.0.0.1:5002/docs`
    - Comprehensive endpoint documentation and testing interface
 
-4. **Running Tests**
-> [!TIP]
-> Run fixtures of the API with : `pytest tests/test_api_endpoints.py`
-
-5. **Visualization Tools**
-
-   a. Generate Plotly Charts:
-   ```bash
-   sh tests/integrations/plotly_unit.sh
-   ```
-   
-   b. Discord Integration:
-   - Configure: `integrations/discord_chat_bot/bot.py`
-   - Launch:
-   ```bash
-   sh sh/discord_chat_bot.sh
-   ```
-   
-   c. Custom Interface Development
-   - Framework available for building custom web interfaces
-   - Reference the Smartswap project for implementation examples
-
-6. **Automated Data Collection**
+4. **Automated Data Collection**
    - Configure: `tools/auto_fetch/config.json`
-   - Launch collector:
-   ```bash
-   sh sh/auto_fetch.sh
-   ```
-
-## Visualization Examples
-
-<p align="center">
-  <img src="https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/white_3.png?raw=true" width="100%">
-  <img src="https://github.com/simonpotel/QTSBE/blob/master/assets/integration/plotly/black_2.png?raw=true" width="100%">
-</p>
+   - Launch collector: `python tools/auto_fetch/auto-fetch.py`
 
 ## License
 

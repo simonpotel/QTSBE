@@ -15,7 +15,6 @@ load_dotenv()
 from core.analysis import analyse
 from routes.analyse import register_analyse_routes
 from routes.analyse_custom import register_analyse_custom_routes
-from routes.scan import register_scan_routes
 from routes.strategies import register_strategy_routes
 from routes.get_tokens import register_get_tokens_routes
 from routes.get_tokens_stats import register_get_tokens_stats_routes
@@ -40,10 +39,6 @@ strategies = {}
 def reload_loguru_config():
     logger.remove()
     logger.add(sys.stdout, level="DEBUG")
-    if config['server']['debug']:
-        logger.add(r"logs/api/debug.log", level="DEBUG")
-    else:
-        logger.add(r"logs/api/logs.log", level="INFO")
 
 def import_signals_and_indicators(strategies_folder="strategies"):
     strategies = {}
@@ -125,7 +120,6 @@ def create_app():
 
     register_analyse_routes(app, strategies, analyse)
     register_analyse_custom_routes(app, analyse)
-    register_scan_routes(app, strategies, analyse)
     register_strategy_routes(app, strategies)
     register_get_tokens_routes(app)
     register_get_tokens_stats_routes(app)
