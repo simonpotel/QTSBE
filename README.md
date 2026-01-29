@@ -112,11 +112,11 @@ python api/api.py
 
 For more detailed information, please refer to the following guides:
 
-- [🚀 Strategy Development](docs/strategies.md) : How to build and add your own trading strategies.
-- [⚙️ Configuration](docs/configuration.md) : Detailed explanation of all configuration files.
-- [📊 Data Management](docs/data.md) : Understanding HDF5 storage and data structures.
-- [🛠️ Tooling](docs/tools.md) : Overview of data fetching and maintenance tools.
-- [📮 Postman Guide](docs/postman.md) : How to import and use the API collection.
+- [Strategy Development](docs/strategies.md) : How to build and add your own trading strategies.
+- [Configuration](docs/configuration.md) : Detailed explanation of all configuration files.
+- [Data Management](docs/data.md) : Understanding HDF5 storage and data structures.
+- [Tooling](docs/tools.md) : Overview of data fetching and maintenance tools.
+- [Postman Guide](docs/postman.md) : How to import and use the API collection.
 
 ## Testing
 
