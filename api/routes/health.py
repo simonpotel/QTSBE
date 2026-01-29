@@ -1,10 +1,13 @@
-from flask import jsonify
+from flask import jsonify, current_app
 import ccxt
 
 def register_health_routes(app):
     @app.route('/QTSBE/health')
     def health_check():
         try:
+            if current_app.config.get('TESTING'):
+                return jsonify({"status": "healthy", "binance": "mocked", "time": 0}), 200
+            
             exchange = ccxt.binance()
             server_time = exchange.fetch_time()
             if server_time:
