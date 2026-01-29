@@ -7,15 +7,15 @@
     ],
     "Binance": [
         [
-            "BTC/USDT",
+            "BTC/USDC",
             "1d"
         ],
         [
-            "ETH/USDT",
+            "ETH/USDC",
             "1d"
         ],
         [
-            "SOL/USDT",
+            "SOL/USDC",
             "1d"
         ]
     ]

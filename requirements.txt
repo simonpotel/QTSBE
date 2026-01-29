@@ -1,5 +1,5 @@
 loguru==0.7.2
-ccxt==4.3.33
+ccxt>=4.4.0
 pandas>=1.3.0
 flask==3.0.2
 flask_cors==4.0.0
