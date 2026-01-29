@@ -36,7 +36,7 @@ class YahooAPI:
                 df.columns = df.columns.get_level_values(0)
             
             df = df.reset_index().rename(columns={'Date': 'timestamp', 'Open': 'open', 'High': 'high', 'Low': 'low', 'Close': 'close', 'Volume': 'volume'})
-            df['timestamp'] = pd.to_datetime(df['timestamp']).view('int64') // 10**6
+            df['timestamp'] = pd.to_datetime(df['timestamp']).astype('int64') // 10**6
             
             if last_ts:
                 df = df[df['timestamp'] > last_ts]
