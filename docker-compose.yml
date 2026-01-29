@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   api:
@@ -17,6 +16,8 @@ services:
     volumes:
       - .:/app
     command: python tools/data/cron.py
+    ports:
+      - "5004:5004"
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
