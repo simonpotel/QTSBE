@@ -1,0 +1,17 @@
+{
+    "server": {
+        "host": "0.0.0.0",
+        "port": 5002,
+        "debug": false
+    },
+    "cors": {
+        "origins": [
+            "http://127.0.0.1:3000",
+            "http://localhost:3000"
+        ]
+    },
+    "cache": {
+        "type": "simple",
+        "default_timeout": 300
+    }
+}

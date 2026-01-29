@@ -105,8 +105,8 @@ python api/api.py
    - Comprehensive endpoint documentation and testing interface
 
 4. **Automated Data Collection**
-   - Configure: `tools/auto_fetch/config.json`
-   - Launch collector: `python tools/auto_fetch/auto-fetch.py`
+   - Configure: `config/data_cron.json`
+   - Launch collector: `python tools/data/cron.py`
 
 ## License
 

@@ -1,0 +1,22 @@
+{
+    "Yahoo": [
+        [
+            "AAPL",
+            "1d"
+        ]
+    ],
+    "Binance": [
+        [
+            "BTC/USDT",
+            "1d"
+        ],
+        [
+            "ETH/USDT",
+            "1d"
+        ],
+        [
+            "SOL/USDT",
+            "1d"
+        ]
+    ]
+}

@@ -1,9 +1,6 @@
 *.pyc
 .DS_Store
 
-config/*
-!config/README.md
-
 data/bank/*
 
 api/strategies/*

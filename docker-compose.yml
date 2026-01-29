@@ -12,11 +12,11 @@ services:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
 
-  auto-fetch:
+  cron:
     build: .
     volumes:
       - .:/app
-    command: python tools/auto_fetch/auto-fetch.py
+    command: python tools/data/cron.py
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped

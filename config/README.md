@@ -22,7 +22,7 @@
 } 
 ```
 
-## auto_fetch.json
+## data_cron.json
 
 ``` json
 {
