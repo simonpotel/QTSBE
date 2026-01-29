@@ -40,7 +40,6 @@ def import_strategies(folder):
 
 def create_app():
     app = Flask(__name__)
-    config = load_config()
     app.config['CACHE_TYPE'] = os.getenv('QTSBE_CACHE_TYPE')
     app.config['CACHE_DEFAULT_TIMEOUT'] = int(os.getenv('QTSBE_CACHE_DEFAULT_TIMEOUT'))
     Cache(app)
