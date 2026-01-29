@@ -102,11 +102,21 @@ python api/api.py
 3. **API Documentation**
    - API Documentation is available via **Postman**.
    - Import the collection located in `docs/postman/QTSBE_API_Collection.json`.
-   - See [Postman README](docs/postman/README.md) for detailed instructions.
+   - See [Postman Documentation](docs/postman.md) for detailed instructions.
 
 4. **Automated Data Collection**
    - Configure: `config/data_cron.json`
    - Launch collector: `python tools/data/cron.py`
+
+## Documentation
+
+For more detailed information, please refer to the following guides:
+
+- [🚀 Strategy Development](docs/strategies.md) : How to build and add your own trading strategies.
+- [⚙️ Configuration](docs/configuration.md) : Detailed explanation of all configuration files.
+- [📊 Data Management](docs/data.md) : Understanding HDF5 storage and data structures.
+- [🛠️ Tooling](docs/tools.md) : Overview of data fetching and maintenance tools.
+- [📮 Postman Guide](docs/postman.md) : How to import and use the API collection.
 
 ## Testing
 
