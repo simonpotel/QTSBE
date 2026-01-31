@@ -19,6 +19,7 @@ FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y \
     libhdf5-dev \
+    gosu \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -26,12 +27,11 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 COPY . .
 
-ENV PATH="/opt/venv/bin:$PATH"
-ENV PYTHONUNBUFFERED=1
-
 RUN useradd -m appuser && \
     chown -R appuser:appuser /app /opt/venv
 
-USER appuser
+ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
 
+ENTRYPOINT ["sh", "-c", "chown -R appuser:appuser /app/data 2>/dev/null || true; exec gosu appuser \"$@\"", "sh"]
 CMD ["python", "api/api.py"]
