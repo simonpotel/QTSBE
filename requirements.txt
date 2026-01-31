@@ -8,4 +8,4 @@ flask_caching>=2.0.0
 numpy>=1.21.0
 python-binance>=1.0.0
 python-dotenv>=1.0.0
-h5py
+h5py>=3.10.0
