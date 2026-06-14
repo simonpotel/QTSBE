@@ -3,7 +3,7 @@ from datetime import datetime
 from stats.positions import get_position_stats
 from stats.drawdown import get_drawdowns_stats
 from stats.advanced import get_advanced_stats
-from core.data_utils import get_data
+from core.data_utils import get_data, clean_nans
 import json, os, hashlib
 
 def register_analyse_custom_routes(app, analyse_func):
@@ -39,6 +39,6 @@ def register_analyse_custom_routes(app, analyse_func):
                 "result": (result.indicators if details == "True" else [], result.positions, result.current_positions),
                 "stats": {"drawdown": get_drawdowns_stats(result), "positions": get_position_stats(result), "advanced": get_advanced_stats(result)}
             }
-            return jsonify(res)
+            return jsonify(clean_nans(res))
         except Exception as e:
             return jsonify({"error": str(e)}), 400
